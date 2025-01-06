@@ -1,0 +1,22 @@
+services:
+  # express:
+  #   build: .
+  #   ports:
+  #     - '${PORT}:3000'
+  #   environment:
+  #     - DATABASE_URL=postgresql://postgres:supersecret@db:5432
+  #     - DB_HOST=localhost
+  #     - DB_USER=postgres
+  #     - DB_PASSWORD=supersecret
+  #     - DB_NAME=devilDB
+  #     - DB_PORT=5432
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - ./db-data:/var/lib/postgresql/data

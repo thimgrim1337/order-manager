@@ -1,0 +1,34 @@
+[
+  {
+    "orderNr": "1/11/2024",
+    "statusID": 1,
+    "price": "1000.00",
+    "truckID": 1,
+    "driverID": 1,
+    "customerID": 1
+  },
+  {
+    "orderNr": "2/11/2024",
+    "statusID": 3,
+    "price": "1200.00",
+    "truckID": 2,
+    "driverID": 2,
+    "customerID": 1
+  },
+  {
+    "orderNr": "3/11/2024",
+    "statusID": 2,
+    "price": "5000.00",
+    "truckID": 3,
+    "driverID": 4,
+    "customerID": 2
+  },
+  {
+    "orderNr": "4/11/2024",
+    "statusID": 3,
+    "price": "10000.00",
+    "truckID": 4,
+    "driverID": 5,
+    "customerID": 3
+  }
+]

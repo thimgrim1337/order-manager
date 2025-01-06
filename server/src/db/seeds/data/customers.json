@@ -1,0 +1,22 @@
+[
+  {
+    "tax": "PL123445678",
+    "name": "Test Comapny",
+    "addressID": 1
+  },
+  {
+    "tax": "PL123245678",
+    "name": "Test 2 Comapny",
+    "addressID": 2
+  },
+  {
+    "tax": "PL112345678",
+    "name": "Test 3 Comapny",
+    "addressID": 3
+  },
+  {
+    "tax": "PL123455678",
+    "name": "Test 4 Comapny",
+    "addressID": 1
+  }
+]

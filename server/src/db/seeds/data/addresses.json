@@ -1,0 +1,37 @@
+[
+  {
+    "street": "Otolińska",
+    "streetNr": "21/101",
+    "postal": "09-400",
+    "city": "Płock",
+    "countryID": 1
+  },
+  {
+    "street": "Otolińska",
+    "streetNr": "21/102",
+    "postal": "09-400",
+    "city": "Płock",
+    "countryID": 2
+  },
+  {
+    "street": "Otolińska",
+    "streetNr": "21/103",
+    "postal": "09-400",
+    "city": "Płock",
+    "countryID": 3
+  },
+  {
+    "street": "Otolińska",
+    "streetNr": "21/104",
+    "postal": "09-400",
+    "city": "Płock",
+    "countryID": 15
+  },
+  {
+    "street": "Otolińska",
+    "streetNr": "21/105",
+    "postal": "09-400",
+    "city": "Płock",
+    "countryID": 14
+  }
+]

@@ -1,0 +1,40 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file=.env --import=tsx  --watch src/server.ts ",
+    "build": "rimraf dist && npx tsc --noEmit false && tsc-alias",
+    "start": "node --env-file=.env dist/server.js",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "DB_MIGRATING=true node --env-file=.env --import=tsx src/db/migrate.ts ",
+    "db:seed": "DB_SEEDING=true node --env-file=.env --import=tsx src/db/seed.ts",
+    "test": "vitest --mode development"
+  },
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.36.0",
+    "drizzle-zod": "^0.5.1",
+    "express": "^4.21.1",
+    "postgres": "^3.4.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "drizzle-kit": "^0.27.0",
+    "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.5"
+  },
+  "keywords": [],
+  "description": ""
+}
