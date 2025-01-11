@@ -17,12 +17,13 @@ import orderUnloadingPlaces from './orderUnloadingPlaces';
 const order = pgTable('order', {
   id: serial().primaryKey(),
   orderNr: varchar('order_nr', { length: 30 }).notNull(),
-  startTime: date('start_time', { mode: 'string' }).notNull().defaultNow(),
-  endTime: date('end_time', { mode: 'string' }).notNull().defaultNow(),
+  startDate: date('start_date', { mode: 'string' }).notNull().defaultNow(),
+  endDate: date('end_date', { mode: 'string' }).notNull().defaultNow(),
   statusID: integer('status_id')
     .notNull()
     .references(() => status.id),
   price: numeric({ precision: 7, scale: 2 }).notNull(),
+  currency: varchar('currency', { length: 3 }).notNull().default('PLN'),
   truckID: integer('truck_id')
     .notNull()
     .references(() => truck.id),

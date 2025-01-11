@@ -1,5 +1,5 @@
 {
-  "id": "205a70ec-df35-4a56-9cfd-f414d768ef76",
+  "id": "fa4de661-9cef-4baa-a553-729f52dc6409",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -312,15 +312,15 @@
           "primaryKey": false,
           "notNull": true
         },
-        "start_time": {
-          "name": "start_time",
+        "start_date": {
+          "name": "start_date",
           "type": "date",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         },
-        "end_time": {
-          "name": "end_time",
+        "end_date": {
+          "name": "end_date",
           "type": "date",
           "primaryKey": false,
           "notNull": true,
@@ -337,6 +337,13 @@
           "type": "numeric(7, 2)",
           "primaryKey": false,
           "notNull": true
+        },
+        "currency": {
+          "name": "currency",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'PLN'"
         },
         "truck_id": {
           "name": "truck_id",

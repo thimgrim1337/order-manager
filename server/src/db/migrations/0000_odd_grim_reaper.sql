@@ -42,10 +42,11 @@ CREATE TABLE IF NOT EXISTS "order_loading_places" (
 CREATE TABLE IF NOT EXISTS "order" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"order_nr" varchar(30) NOT NULL,
-	"start_time" date DEFAULT now() NOT NULL,
-	"end_time" date DEFAULT now() NOT NULL,
+	"start_date" date DEFAULT now() NOT NULL,
+	"end_date" date DEFAULT now() NOT NULL,
 	"status_id" integer NOT NULL,
 	"price" numeric(7, 2) NOT NULL,
+	"currency" varchar(3) DEFAULT 'PLN' NOT NULL,
 	"truck_id" integer NOT NULL,
 	"driver_id" integer NOT NULL,
 	"customer_id" integer NOT NULL

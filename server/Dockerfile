@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:alpine
 WORKDIR /usr/nodeapp
 
 COPY ./dist ./

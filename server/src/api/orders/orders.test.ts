@@ -14,8 +14,8 @@ let order: Order;
 beforeEach(() => {
   order = {
     orderNr: '3/11/2024',
-    startTime: '2024-12-19',
-    endTime: '2024-12-19',
+    startDate: '2024-12-19',
+    endDate: '2024-12-19',
     statusID: 3,
     price: '10000.00',
     truckID: 4,

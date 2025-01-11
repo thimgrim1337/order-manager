@@ -4,8 +4,8 @@ import { z } from 'zod';
 
 export const Order = createInsertSchema(order, {
   orderNr: z.string().min(1).max(30),
-  startTime: z.string().date(),
-  endTime: z.string().date(),
+  startDate: z.string().date(),
+  endDate: z.string().date(),
   statusID: z.number().min(1),
   price: z.string(),
   truckID: z.number().min(1),
@@ -19,3 +19,30 @@ export type Order = z.infer<typeof Order>;
 
 export const OrderWithId = createSelectSchema(order);
 export type OrderWithId = z.infer<typeof OrderWithId>;
+
+export const OrderWithIdAndDetails = OrderWithId.extend({
+  status: z.object({
+    name: z.string().min(1),
+  }),
+  truck: z.object({
+    plate: z.string().min(1),
+  }),
+  driver: z.object({
+    firstName: z.string().min(1),
+    lastName: z.string().min(1),
+  }),
+  customer: z.object({
+    name: z.string().min(1),
+  }),
+  orderLoadingPlaces: z
+    .object({
+      placeID: z.number(),
+    })
+    .array(),
+  orderUnloadingPlaces: z
+    .object({
+      placeID: z.number(),
+    })
+    .array(),
+});
+export type OrderWithIdAndDetails = z.infer<typeof OrderWithIdAndDetails>;

@@ -4,10 +4,92 @@ import { and, eq } from 'drizzle-orm';
 import { Order } from './orders.model';
 
 export const orderServices = {
-  getOrdersQuery: () => db.query.order.findMany(),
+  getOrdersQuery: () =>
+    db.query.order.findMany({
+      with: {
+        orderLoadingPlaces: {
+          columns: {
+            placeID: true,
+          },
+          with: {
+            place: {
+              columns: {
+                name: true,
+              },
+            },
+          },
+        },
+        orderUnloadingPlaces: {
+          columns: {
+            placeID: true,
+          },
+          with: {
+            place: {
+              columns: {
+                name: true,
+              },
+            },
+          },
+        },
+        status: {
+          columns: {
+            name: true,
+          },
+        },
+        truck: {
+          columns: {
+            plate: true,
+          },
+        },
+        driver: {
+          columns: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+        customer: {
+          columns: {
+            name: true,
+          },
+        },
+      },
+    }),
   getOrderByIdQuery: (orderID: number) =>
     db.query.order.findFirst({
       where: (order) => eq(order.id, orderID),
+      with: {
+        orderLoadingPlaces: {
+          columns: {
+            placeID: true,
+          },
+        },
+        orderUnloadingPlaces: {
+          columns: {
+            placeID: true,
+          },
+        },
+        status: {
+          columns: {
+            name: true,
+          },
+        },
+        truck: {
+          columns: {
+            plate: true,
+          },
+        },
+        driver: {
+          columns: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+        customer: {
+          columns: {
+            name: true,
+          },
+        },
+      },
     }),
   getOrderByNrAndCustomerQuery: (orderNr: string, customerID: number) =>
     db.query.order.findFirst({

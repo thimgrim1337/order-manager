@@ -1,19 +1,19 @@
 import { RequestHandler } from 'express';
 import { orderServices } from './orders.sevices';
 import { AppError } from '@/lib/app-error';
-import { Order, OrderWithId } from './orders.model';
+import { Order, OrderWithId, OrderWithIdAndDetails } from './orders.model';
 import { ParamsWithId } from '@/interfaces/ParamsWithId';
 import * as loadingPlacesHandler from '@/api/loadingPlaces/loading-places.handlers';
 import * as unloadingPlacesHandler from '@/api/unloadingPlaces/unloading-places.handlers';
 
-export const getAllOrders: RequestHandler<{}, OrderWithId[]> = async (
+export const getAllOrders: RequestHandler<{}, OrderWithIdAndDetails[]> = async (
   req,
   res,
   next
 ) => {
   try {
     const orders = await orderServices.getOrdersQuery();
-    res.status(200).send(orders);
+    res.status(200).json(orders);
   } catch (error) {
     next(new AppError('Failed to fetch orders', 500));
   }
@@ -21,7 +21,7 @@ export const getAllOrders: RequestHandler<{}, OrderWithId[]> = async (
 
 export const getOrderById: RequestHandler<
   ParamsWithId,
-  OrderWithId | {}
+  OrderWithIdAndDetails | {}
 > = async (req, res, next) => {
   try {
     const order = await orderServices.getOrderByIdQuery(+req.params.id);
@@ -30,7 +30,7 @@ export const getOrderById: RequestHandler<
 
     await loadingPlacesHandler.getAllLoadingPlacesByOrderId(+req.params.id);
 
-    res.status(200).send(order);
+    res.status(200).json(order);
   } catch (error) {
     next(new AppError('Failed to fetch order', 500));
   }
