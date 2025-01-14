@@ -1,29 +1,14 @@
-import { order } from '../../db/schema/index';
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-export const Order = createInsertSchema(order, {
+export const Order = z.object({
   orderNr: z.string().min(1).max(30),
   startDate: z.string().date(),
   endDate: z.string().date(),
-  statusID: z.number().min(1),
-  price: z.string(),
-  truckID: z.number().min(1),
-  driverID: z.number().min(1),
-  customerID: z.number().min(1),
-}).extend({
-  loadingPlaces: z.number().array(),
-  unloadingPlaces: z.number().array(),
-});
-export type Order = z.infer<typeof Order>;
-
-export const OrderWithId = createSelectSchema(order);
-export type OrderWithId = z.infer<typeof OrderWithId>;
-
-export const OrderWithIdAndDetails = OrderWithId.extend({
   status: z.object({
     name: z.string().min(1),
   }),
+  price: z.string(),
+  currency: z.string().min(1).max(3).default('PLN'),
   truck: z.object({
     plate: z.string().min(1),
   }),
@@ -51,4 +36,5 @@ export const OrderWithIdAndDetails = OrderWithId.extend({
     })
     .array(),
 });
-export type OrderWithIdAndDetails = z.infer<typeof OrderWithIdAndDetails>;
+
+export type Order = z.infer<typeof Order>;
