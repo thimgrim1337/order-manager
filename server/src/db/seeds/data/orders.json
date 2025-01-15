@@ -2,7 +2,8 @@
   {
     "orderNr": "1/11/2024",
     "statusID": 1,
-    "price": "1000.00",
+    "pricePLN": "1000.00",
+    "priceCurrency": "1000.00",
     "currency": "PLN",
     "truckID": 1,
     "driverID": 1,
@@ -10,28 +11,34 @@
   },
   {
     "orderNr": "2/11/2024",
-    "statusID": 3,
-    "price": "1200.00",
+    "statusID": 1,
+    "pricePLN": "2000.00",
+    "priceCurrency": "2000.00",
     "currency": "PLN",
-    "truckID": 2,
+    "truckID": 7,
     "driverID": 2,
     "customerID": 1
   },
   {
     "orderNr": "3/11/2024",
-    "statusID": 2,
-    "price": "5000.00",
-    "currency": "EUR",
-    "truckID": 3,
-    "driverID": 4,
-    "customerID": 2
+    "statusID": 3,
+    "pricePLN": "5000.00",
+    "priceCurrency": "5000.00",
+    "currency": "PLN",
+    "currencyRate": "4.2414",
+    "truckID": 2,
+    "driverID": 3,
+    "customerID": 3
   },
   {
     "orderNr": "4/11/2024",
-    "statusID": 3,
-    "price": "10000.00",
-    "truckID": 4,
-    "driverID": 5,
+    "statusID": 2,
+    "pricePLN": "1000.00",
+    "priceCurrency": "1000.00",
+    "currency": "EUR",
+    "currencyRate": "4.2511",
+    "truckID": 5,
+    "driverID": 6,
     "customerID": 3
   }
 ]

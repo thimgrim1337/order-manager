@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import {
   pgTable,
   serial,
@@ -22,8 +22,15 @@ const order = pgTable('order', {
   statusID: integer('status_id')
     .notNull()
     .references(() => status.id),
-  price: numeric({ precision: 7, scale: 2 }).notNull(),
+  priceCurrency: numeric('price_currency', {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  pricePLN: numeric('price_pln', { precision: 10, scale: 2 }),
   currency: varchar('currency', { length: 3 }).notNull().default('PLN'),
+  currencyRate: numeric('currency_rate', { precision: 10, scale: 4 }).default(
+    '0'
+  ),
   truckID: integer('truck_id')
     .notNull()
     .references(() => truck.id),

@@ -45,8 +45,10 @@ CREATE TABLE IF NOT EXISTS "order" (
 	"start_date" date DEFAULT now() NOT NULL,
 	"end_date" date DEFAULT now() NOT NULL,
 	"status_id" integer NOT NULL,
-	"price" numeric(7, 2) NOT NULL,
+	"price_currency" numeric(10, 2) NOT NULL,
+	"price_pln" numeric(10, 2),
 	"currency" varchar(3) DEFAULT 'PLN' NOT NULL,
+	"currency_rate" numeric(10, 4) DEFAULT '0',
 	"truck_id" integer NOT NULL,
 	"driver_id" integer NOT NULL,
 	"customer_id" integer NOT NULL

@@ -1,5 +1,5 @@
 {
-  "id": "fa4de661-9cef-4baa-a553-729f52dc6409",
+  "id": "ddc13145-d0c5-400b-8088-17b63ef3a170",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -332,11 +332,17 @@
           "primaryKey": false,
           "notNull": true
         },
-        "price": {
-          "name": "price",
-          "type": "numeric(7, 2)",
+        "price_currency": {
+          "name": "price_currency",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
+        },
+        "price_pln": {
+          "name": "price_pln",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
         },
         "currency": {
           "name": "currency",
@@ -344,6 +350,13 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'PLN'"
+        },
+        "currency_rate": {
+          "name": "currency_rate",
+          "type": "numeric(10, 4)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
         },
         "truck_id": {
           "name": "truck_id",
