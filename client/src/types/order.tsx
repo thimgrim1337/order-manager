@@ -7,8 +7,10 @@ export const Order = z.object({
   status: z.object({
     name: z.string().min(1),
   }),
-  price: z.string(),
+  pricePLN: z.string(),
+  priceCurrency: z.string(),
   currency: z.string().min(1).max(3).default('PLN'),
+  currencyRate: z.string(),
   truck: z.object({
     plate: z.string().min(1),
   }),

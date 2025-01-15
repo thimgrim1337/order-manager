@@ -1,6 +1,6 @@
 import { Order } from '@/types/order';
 import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal } from 'lucide-react';
+import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -50,14 +50,15 @@ export const columns: ColumnDef<Order>[] = [
     header: 'Kierowca',
   },
   {
+    id: 'customer',
     accessorKey: 'customer.name',
     header: 'Klient',
   },
   {
-    accessorKey: 'price',
+    accessorKey: 'priceCurrency',
     header: () => <div className='text-right'>Cena w walucie</div>,
     cell: ({ row }) => {
-      const price = parseFloat(row.getValue('price'));
+      const price = parseFloat(row.getValue('priceCurrency'));
       const formatted = new Intl.NumberFormat('pl-PL').format(price);
       return <div className='text-right font-medium'>{formatted}</div>;
     },
@@ -71,13 +72,25 @@ export const columns: ColumnDef<Order>[] = [
     ),
   },
   {
-    id: 'calculatedPrice',
-    header: () => <div className='text-right'>Cena w PLN</div>,
+    accessorKey: 'pricePLN',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant={'ghost'}
+          className={'bg-transparent'}
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Cena w PLN
+          <ArrowUpDown className='ml-2 h-4 w-4' />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
-      const price = parseFloat(row.getValue('price'));
+      const price = parseFloat(row.getValue('pricePLN'));
       const currency = row.getValue('currency');
+      const currencyRate = parseFloat(row.original.currencyRate);
 
-      const calculatedPrice = currency === 'EUR' ? price * 4.25 : price;
+      const calculatedPrice = currency === 'EUR' ? price * currencyRate : price;
 
       const formatted = new Intl.NumberFormat('pl-PL', {
         style: 'currency',
