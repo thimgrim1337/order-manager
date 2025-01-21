@@ -18,17 +18,26 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { DataTablePagination } from './data-table-pagination';
-import { useState } from 'react';
-import { Input } from './input';
+import { ReactNode, useState } from 'react';
+import FormDialog from './data-table-dialog';
+import DataTableFilter from './data-table-filter';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  dialogTrigerText: string;
+  dialogTitle: string;
+  dialogContent?: ReactNode;
+  searchInputPlaceholder: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  dialogTrigerText,
+  dialogTitle,
+  dialogContent,
+  searchInputPlaceholder,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,15 +61,15 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className='flex items-center py-4'>
-        <Input
-          placeholder='Filtruj zlecenia'
-          value={globalFilter}
-          onChange={(event) =>
-            table.setGlobalFilter(String(event.target.value))
-          }
-          className='max-w-sm'
+      <div className='flex items-center justify-between py-4'>
+        <DataTableFilter
+          table={table}
+          globalFilterState={globalFilter}
+          placeholder={searchInputPlaceholder}
         />
+        <FormDialog btnText={dialogTrigerText} dialogTitle={dialogTitle}>
+          {dialogContent}
+        </FormDialog>
       </div>
       <div className='rounded-md border'>
         <Table>

@@ -5,8 +5,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from './select';
-import { Button } from './button';
+} from '../select';
+import { Button } from '../button';
 import {
   ChevronLeft,
   ChevronRight,

@@ -1,5 +1,6 @@
 import { columns } from '@/components/OrdersTable/columns';
-import { DataTable } from '@/components/ui/data-table';
+import OrderForm from '@/components/OrdersTable/new-order-form';
+import { DataTable } from '@/components/ui/data-table/data-table';
 import { Order } from '@/types/order';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
@@ -31,7 +32,14 @@ function OrdersComponent() {
   return (
     <div className='container mx-auto py-10'>
       {isError && <div>An errror occured. !</div>}
-      <DataTable columns={columns} data={data} />
+      <DataTable
+        columns={columns}
+        data={data}
+        dialogTrigerText='Dodaj zlecenie'
+        dialogTitle='Wprowadź dane aby dodać nowe zlecenie.'
+        dialogContent={<OrderForm />}
+        searchInputPlaceholder='Filtruj zlecenia...'
+      />
     </div>
   );
 }

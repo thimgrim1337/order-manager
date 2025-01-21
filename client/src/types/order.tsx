@@ -5,7 +5,7 @@ export const Order = z.object({
   startDate: z.string().date(),
   endDate: z.string().date(),
   status: z.object({
-    name: z.string().min(1),
+    name: z.enum(['W trakcie', 'Anulowane', 'Zakończone']),
   }),
   pricePLN: z.string(),
   priceCurrency: z.string(),
