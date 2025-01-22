@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Customer } from './customer';
 
 export const Order = z.object({
   orderNr: z.string().min(1).max(30),
@@ -18,9 +19,7 @@ export const Order = z.object({
     firstName: z.string().min(1),
     lastName: z.string().min(1),
   }),
-  customer: z.object({
-    name: z.string().min(1),
-  }),
+  customer: Customer,
   orderLoadingPlaces: z
     .object({
       placeID: z.number(),

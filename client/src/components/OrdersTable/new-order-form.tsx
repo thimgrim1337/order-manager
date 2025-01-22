@@ -1,11 +1,9 @@
 import { Order } from '@/types/order';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format, addDays } from 'date-fns';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -13,9 +11,9 @@ import {
 } from '../ui/form';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
-
-const today = format(Date.now(), 'yyyy-MM-dd');
-const tomorrow = format(addDays(Date.now(), 1), 'yyyy-MM-dd');
+import { today, tomorrow } from '@/helpers/dates';
+import FormCombobox from '../ui/form/form-combobox';
+import { DevTool } from '@hookform/devtools';
 
 export default function OrderForm() {
   const form = useForm<Order>({
@@ -33,7 +31,9 @@ export default function OrderForm() {
         firstName: '',
         lastName: '',
       },
-      customer: {},
+      customer: {
+        name: '',
+      },
       orderLoadingPlaces: [],
       orderUnloadingPlaces: [],
     },
@@ -47,14 +47,12 @@ export default function OrderForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
         <FormField
+          name='customer'
           control={form.control}
-          name='customer.name'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Zleceniodawca</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
+              <FormLabel>Zleceniedawca</FormLabel>
+              <FormCombobox {...field} />
               <FormMessage />
             </FormItem>
           )}
@@ -202,6 +200,7 @@ export default function OrderForm() {
         </div>
         <Button type='submit'>Dodaj</Button>
       </form>
+      <DevTool control={form.control} /> {/* set up the dev tool */}
     </Form>
   );
 }
