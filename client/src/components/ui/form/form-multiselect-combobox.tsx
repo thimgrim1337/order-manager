@@ -11,13 +11,14 @@ import {
   CommandList,
 } from '../command';
 import { cn } from '@/lib/utils';
-import { forwardRef } from 'react';
+import { forwardRef, useState } from 'react';
 import {
   FieldName,
   FieldValue,
   FieldValues,
   useFormContext,
 } from 'react-hook-form';
+import { Badge } from '../badge';
 
 type FormComboboxProps<TFieldValue extends FieldValues> = {
   value: FieldValue<TFieldValue>;
@@ -26,28 +27,51 @@ type FormComboboxProps<TFieldValue extends FieldValues> = {
   data: TFieldValue[];
 };
 
-const FormCombobox = forwardRef<
+const FormMultiSelectCombobox = forwardRef<
   HTMLInputElement,
   FormComboboxProps<FieldValues>
 >(({ value: fieldValue, name: fieldName, data, placeholder }, ref) => {
+  const [selectedValues, setSelectedValues] = useState<string[]>(fieldValue);
   const { setValue } = useFormContext();
+
+  function handleSelect(value: string) {
+    if (selectedValues.includes(value)) {
+      setSelectedValues((prev) =>
+        prev.filter((selectedValue) => selectedValue !== value)
+      );
+    } else {
+      setSelectedValues((prev) => [...prev, value]);
+    }
+  }
+
+  function handleChangeValue(open: boolean) {
+    if (!open) {
+      const values = selectedValues.map((value) => {
+        return {
+          name: value,
+        };
+      });
+
+      setValue(fieldName, values);
+    }
+  }
 
   return (
     <>
-      <Popover>
+      <Popover onOpenChange={handleChangeValue}>
         <PopoverTrigger asChild>
           <FormControl>
             <Button
               variant='outline'
               role='combobox'
               className={cn(
-                'w-full justify-between',
-                !fieldValue && 'text-muted-foreground'
+                `w-full h-auto ${selectedValues.length === 0 ? 'justify-start flex-row' : 'items-start flex-col'}`,
+                !selectedValues.length && 'text-muted-foreground'
               )}
             >
-              {fieldValue.name === '' || fieldValue?.length === 0
+              {selectedValues.length === 0
                 ? placeholder
-                : data.find((d) => d.name === fieldValue.name)?.name}
+                : selectedValues?.map((value) => <Badge>{value}</Badge>)}
               <ChevronsUpDown className='opacity-50' />
             </Button>
           </FormControl>
@@ -63,17 +87,16 @@ const FormCombobox = forwardRef<
                     value={d.name}
                     key={d.name}
                     ref={ref}
-                    onSelect={() => {
-                      setValue(fieldName, {
-                        name: d.name,
-                      });
-                    }}
+                    onSelect={() => handleSelect(d.name)}
                   >
                     {d.name}
+
                     <Check
                       className={cn(
                         'ml-auto',
-                        d.name === fieldValue.name ? 'opacity-100' : 'opacity-0'
+                        selectedValues.includes(d.name)
+                          ? 'opacity-100'
+                          : 'opacity-0'
                       )}
                     />
                   </CommandItem>
@@ -87,4 +110,4 @@ const FormCombobox = forwardRef<
   );
 });
 
-export default FormCombobox;
+export default FormMultiSelectCombobox;

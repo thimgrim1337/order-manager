@@ -8,12 +8,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '../ui/form';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { today, tomorrow } from '@/helpers/dates';
-import FormCombobox from '../ui/form/form-combobox';
 import { DevTool } from '@hookform/devtools';
+import FormCombobox from '@/components/ui/form/form-combobox';
+import { useSuspenseQueries } from '@tanstack/react-query';
+import customersQueryOptions from '../queries/customersQuery';
+import placesQueryOptions from '../queries/placesQuery';
+import FormMultiSelectCombobox from '@/components/ui/form/form-multiselect-combobox';
 
 export default function OrderForm() {
   const form = useForm<Order>({
@@ -38,6 +42,9 @@ export default function OrderForm() {
       orderUnloadingPlaces: [],
     },
   });
+  const [customers, places] = useSuspenseQueries({
+    queries: [customersQueryOptions, placesQueryOptions],
+  });
 
   function onSubmit(values: Order) {
     console.log(values);
@@ -51,8 +58,12 @@ export default function OrderForm() {
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Zleceniedawca</FormLabel>
-              <FormCombobox {...field} />
+              <FormLabel>Zleceniodawca</FormLabel>
+              <FormCombobox
+                {...field}
+                placeholder='Wybierz zleceniodawcę'
+                data={customers.data}
+              />
               <FormMessage />
             </FormItem>
           )}
@@ -70,15 +81,15 @@ export default function OrderForm() {
             </FormItem>
           )}
         />
-        <div className='flex justify-between'>
+        <div className='flex justify-between  gap-5'>
           <FormField
             control={form.control}
             name='startDate'
             render={({ field }) => (
-              <FormItem>
+              <FormItem className='w-full'>
                 <FormLabel>Data załadunku</FormLabel>
                 <FormControl>
-                  <Input placeholder='2025/01/01' {...field} />
+                  <Input placeholder='2025/01/01' {...field} type='date' />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -88,30 +99,28 @@ export default function OrderForm() {
             control={form.control}
             name='endDate'
             render={({ field }) => (
-              <FormItem>
+              <FormItem className='w-full'>
                 <FormLabel>Data rozładunku</FormLabel>
                 <FormControl>
-                  <Input placeholder='2025/01/01' {...field} />
+                  <Input placeholder='2025/01/01' {...field} type='date' />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-        <div className='flex justify-between'>
+        <div className='flex justify-between gap-5'>
           <FormField
             control={form.control}
             name='orderLoadingPlaces'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Miejsce załadunku</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='Miejsce załadunku'
-                    {...field}
-                    value={field.value[0]?.place?.name}
-                  />
-                </FormControl>
+                <FormMultiSelectCombobox
+                  {...field}
+                  placeholder='Wybierz miejsce'
+                  data={places.data}
+                />
                 <FormMessage />
               </FormItem>
             )}
@@ -123,10 +132,10 @@ export default function OrderForm() {
               <FormItem>
                 <FormLabel>Miejsce rozładunku</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder='Miejsce rozładunku'
+                  <FormMultiSelectCombobox
                     {...field}
-                    value={field.value[0]?.place?.name}
+                    placeholder='Wybierz miejsce'
+                    data={places.data}
                   />
                 </FormControl>
                 <FormMessage />
@@ -134,12 +143,12 @@ export default function OrderForm() {
             )}
           />
         </div>
-        <div className='flex justify-between'>
+        <div className='flex justify-between  gap-5'>
           <FormField
             control={form.control}
             name='priceCurrency'
             render={({ field }) => (
-              <FormItem>
+              <FormItem className='w-full'>
                 <FormLabel>Cena w walucie</FormLabel>
                 <FormControl>
                   <Input placeholder='5000' {...field} />
@@ -152,7 +161,7 @@ export default function OrderForm() {
             control={form.control}
             name='currency'
             render={({ field }) => (
-              <FormItem>
+              <FormItem className='w-full'>
                 <FormLabel>Waluta</FormLabel>
                 <FormControl>
                   <Input placeholder='EUR' {...field} />
@@ -162,12 +171,12 @@ export default function OrderForm() {
             )}
           />
         </div>
-        <div className='flex justify-between'>
+        <div className='flex justify-between  gap-5'>
           <FormField
             control={form.control}
             name='driver'
             render={({ field }) => (
-              <FormItem>
+              <FormItem className='w-full'>
                 <FormLabel>Kierowca</FormLabel>
                 <FormControl>
                   <Input
@@ -184,7 +193,7 @@ export default function OrderForm() {
             control={form.control}
             name='truck'
             render={({ field }) => (
-              <FormItem>
+              <FormItem className='w-full'>
                 <FormLabel>Pojazd</FormLabel>
                 <FormControl>
                   <Input

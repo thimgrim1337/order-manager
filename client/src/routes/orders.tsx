@@ -1,5 +1,5 @@
-import { columns } from '@/components/OrdersTable/columns';
-import OrderForm from '@/components/OrdersTable/new-order-form';
+import { columns } from '@/features/OrdersTable/components/columns';
+import OrderForm from '@/features/OrderForm/components/new-order-form';
 import { DataTable } from '@/components/ui/data-table/data-table';
 import { Order } from '@/types/order';
 import { useSuspenseQuery } from '@tanstack/react-query';
