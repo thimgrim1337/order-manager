@@ -27,17 +27,23 @@ type FormComboboxProps<TFieldValue extends FieldValues> = {
   data: TFieldValue[];
 };
 
+type SelectedValue = {
+  id: number;
+  name: string;
+};
+
 const FormMultiSelectCombobox = forwardRef<
   HTMLInputElement,
   FormComboboxProps<FieldValues>
 >(({ value: fieldValue, name: fieldName, data, placeholder }, ref) => {
-  const [selectedValues, setSelectedValues] = useState<string[]>(fieldValue);
+  const [selectedValues, setSelectedValues] =
+    useState<SelectedValue[]>(fieldValue);
   const { setValue } = useFormContext();
 
-  function handleSelect(value: string) {
-    if (selectedValues.includes(value)) {
+  function handleSelect(value: SelectedValue) {
+    if (selectedValues.some((selectedValue) => selectedValue.id === value.id)) {
       setSelectedValues((prev) =>
-        prev.filter((selectedValue) => selectedValue !== value)
+        prev.filter((selectedValue) => selectedValue.id !== value.id)
       );
     } else {
       setSelectedValues((prev) => [...prev, value]);
@@ -45,14 +51,9 @@ const FormMultiSelectCombobox = forwardRef<
   }
 
   function handleChangeValue(open: boolean) {
+    const values = selectedValues.map((selectedValue) => selectedValue.id);
     if (!open) {
-      const values = selectedValues.map((value) => {
-        return {
-          name: value,
-        };
-      });
-
-      setValue(fieldName, values);
+      setValue(fieldName, values, { shouldDirty: true });
     }
   }
 
@@ -71,7 +72,9 @@ const FormMultiSelectCombobox = forwardRef<
             >
               {selectedValues.length === 0
                 ? placeholder
-                : selectedValues?.map((value) => <Badge>{value}</Badge>)}
+                : selectedValues.map((value) => (
+                    <Badge key={value.id}>{value.name}</Badge>
+                  ))}
               <ChevronsUpDown className='opacity-50' />
             </Button>
           </FormControl>
@@ -85,16 +88,21 @@ const FormMultiSelectCombobox = forwardRef<
                 {data.map((d) => (
                   <CommandItem
                     value={d.name}
-                    key={d.name}
+                    key={d.id}
                     ref={ref}
-                    onSelect={() => handleSelect(d.name)}
+                    onSelect={() =>
+                      handleSelect({
+                        id: d.id,
+                        name: d.name,
+                      })
+                    }
                   >
                     {d.name}
 
                     <Check
                       className={cn(
                         'ml-auto',
-                        selectedValues.includes(d.name)
+                        selectedValues.some((value) => value.id === d.id)
                           ? 'opacity-100'
                           : 'opacity-0'
                       )}

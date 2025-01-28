@@ -19,11 +19,11 @@ import {
   useFormContext,
 } from 'react-hook-form';
 
-type FormComboboxProps<TFieldValue extends FieldValues> = {
-  value: FieldValue<TFieldValue>;
-  name: FieldName<TFieldValue>;
+type FormComboboxProps<TFieldValues extends FieldValues> = {
+  value: FieldValue<TFieldValues>;
+  name: FieldName<TFieldValues>;
   placeholder: string;
-  data: TFieldValue[];
+  data: TFieldValues[];
 };
 
 const FormCombobox = forwardRef<
@@ -45,9 +45,9 @@ const FormCombobox = forwardRef<
                 !fieldValue && 'text-muted-foreground'
               )}
             >
-              {fieldValue.name === '' || fieldValue?.length === 0
+              {fieldValue === undefined || fieldValue === ''
                 ? placeholder
-                : data.find((d) => d.name === fieldValue.name)?.name}
+                : data.find((d) => d.id === fieldValue)?.name}
               <ChevronsUpDown className='opacity-50' />
             </Button>
           </FormControl>
@@ -64,16 +64,14 @@ const FormCombobox = forwardRef<
                     key={d.name}
                     ref={ref}
                     onSelect={() => {
-                      setValue(fieldName, {
-                        name: d.name,
-                      });
+                      setValue(fieldName, d.id, { shouldDirty: true });
                     }}
                   >
                     {d.name}
                     <Check
                       className={cn(
                         'ml-auto',
-                        d.name === fieldValue.name ? 'opacity-100' : 'opacity-0'
+                        d.id === fieldValue ? 'opacity-100' : 'opacity-0'
                       )}
                     />
                   </CommandItem>

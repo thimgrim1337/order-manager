@@ -18,6 +18,10 @@ import { useSuspenseQueries } from '@tanstack/react-query';
 import customersQueryOptions from '../queries/customersQuery';
 import placesQueryOptions from '../queries/placesQuery';
 import FormMultiSelectCombobox from '@/components/ui/form/form-multiselect-combobox';
+import driversQueryOptions from '../queries/driversQuery';
+import FormSelect from '@/components/ui/form/form-select';
+
+const currencies = ['PLN', 'EUR'];
 
 export default function OrderForm() {
   const form = useForm<Order>({
@@ -28,22 +32,15 @@ export default function OrderForm() {
       endDate: tomorrow,
       priceCurrency: '0',
       currency: 'PLN',
-      truck: {
-        plate: '',
-      },
-      driver: {
-        firstName: '',
-        lastName: '',
-      },
-      customer: {
-        name: '',
-      },
+      truck: undefined,
+      driver: undefined,
+      customer: undefined,
       orderLoadingPlaces: [],
       orderUnloadingPlaces: [],
     },
   });
-  const [customers, places] = useSuspenseQueries({
-    queries: [customersQueryOptions, placesQueryOptions],
+  const [customers, places, drivers] = useSuspenseQueries({
+    queries: [customersQueryOptions, placesQueryOptions, driversQueryOptions],
   });
 
   function onSubmit(values: Order) {
@@ -131,13 +128,11 @@ export default function OrderForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Miejsce rozładunku</FormLabel>
-                <FormControl>
-                  <FormMultiSelectCombobox
-                    {...field}
-                    placeholder='Wybierz miejsce'
-                    data={places.data}
-                  />
-                </FormControl>
+                <FormMultiSelectCombobox
+                  {...field}
+                  placeholder='Wybierz miejsce'
+                  data={places.data}
+                />
                 <FormMessage />
               </FormItem>
             )}
@@ -164,7 +159,11 @@ export default function OrderForm() {
               <FormItem className='w-full'>
                 <FormLabel>Waluta</FormLabel>
                 <FormControl>
-                  <Input placeholder='EUR' {...field} />
+                  <FormSelect
+                    {...field}
+                    data={currencies}
+                    placeholder='Wybierz walutę'
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -179,10 +178,15 @@ export default function OrderForm() {
               <FormItem className='w-full'>
                 <FormLabel>Kierowca</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder='Jan Kowalski'
+                  <FormCombobox
                     {...field}
-                    value={field.value.firstName}
+                    data={drivers.data.map((driver) => {
+                      return {
+                        id: driver.id,
+                        name: `${driver.firstName} ${driver.lastName}`,
+                      };
+                    })}
+                    placeholder='Wybierz kierowcę'
                   />
                 </FormControl>
                 <FormMessage />
@@ -196,11 +200,7 @@ export default function OrderForm() {
               <FormItem className='w-full'>
                 <FormLabel>Pojazd</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder='WP0997C'
-                    {...field}
-                    value={field.value.plate}
-                  />
+                  <Input placeholder='WP0997C' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
