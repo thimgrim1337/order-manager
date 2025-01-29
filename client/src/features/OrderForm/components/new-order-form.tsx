@@ -1,5 +1,5 @@
 import { Order } from '@/types/order';
-import { useForm } from 'react-hook-form';
+import { FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Form,
@@ -20,6 +20,7 @@ import placesQueryOptions from '../queries/placesQuery';
 import FormMultiSelectCombobox from '@/components/ui/form/form-multiselect-combobox';
 import driversQueryOptions from '../queries/driversQuery';
 import FormSelect from '@/components/ui/form/form-select';
+import trucksQueryOptions from '../queries/trucksQuery';
 
 const currencies = ['PLN', 'EUR'];
 
@@ -30,7 +31,10 @@ export default function OrderForm() {
       orderNr: '',
       startDate: today,
       endDate: tomorrow,
-      priceCurrency: '0',
+      status: 'W trakcie',
+      priceCurrency: 0,
+      pricePLN: 0,
+      currencyRate: 4.2254,
       currency: 'PLN',
       truck: undefined,
       driver: undefined,
@@ -39,17 +43,35 @@ export default function OrderForm() {
       orderUnloadingPlaces: [],
     },
   });
-  const [customers, places, drivers] = useSuspenseQueries({
-    queries: [customersQueryOptions, placesQueryOptions, driversQueryOptions],
+
+  const [customers, places, drivers, trucks] = useSuspenseQueries({
+    queries: [
+      customersQueryOptions,
+      placesQueryOptions,
+      driversQueryOptions,
+      trucksQueryOptions,
+    ],
   });
 
+  function onIvalid(error: FieldErrors) {
+    console.error(error);
+  }
+
   function onSubmit(values: Order) {
-    console.log(values);
+    const formData = { ...values };
+
+    if (formData.currency === 'PLN') formData.pricePLN = formData.priceCurrency;
+    else formData.pricePLN = formData.priceCurrency * formData.currencyRate;
+
+    console.log(formData);
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+      <form
+        onSubmit={form.handleSubmit(onSubmit, onIvalid)}
+        className='space-y-8'
+      >
         <FormField
           name='customer'
           control={form.control}
@@ -92,6 +114,7 @@ export default function OrderForm() {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name='endDate'
@@ -177,18 +200,16 @@ export default function OrderForm() {
             render={({ field }) => (
               <FormItem className='w-full'>
                 <FormLabel>Kierowca</FormLabel>
-                <FormControl>
-                  <FormCombobox
-                    {...field}
-                    data={drivers.data.map((driver) => {
-                      return {
-                        id: driver.id,
-                        name: `${driver.firstName} ${driver.lastName}`,
-                      };
-                    })}
-                    placeholder='Wybierz kierowcę'
-                  />
-                </FormControl>
+                <FormCombobox
+                  {...field}
+                  data={drivers.data.map((driver) => {
+                    return {
+                      id: driver.id,
+                      name: `${driver.firstName} ${driver.lastName}`,
+                    };
+                  })}
+                  placeholder='Wybierz kierowcę'
+                />
                 <FormMessage />
               </FormItem>
             )}
@@ -199,9 +220,16 @@ export default function OrderForm() {
             render={({ field }) => (
               <FormItem className='w-full'>
                 <FormLabel>Pojazd</FormLabel>
-                <FormControl>
-                  <Input placeholder='WP0997C' {...field} />
-                </FormControl>
+                <FormCombobox
+                  {...field}
+                  placeholder='Wybierz pojazd.'
+                  data={trucks.data.map((truck) => {
+                    return {
+                      id: truck.id,
+                      name: truck.plate,
+                    };
+                  })}
+                />
                 <FormMessage />
               </FormItem>
             )}
