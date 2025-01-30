@@ -1,4 +1,3 @@
-import { Order } from '@/types/order';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Order } from '@/types/order';
 
 export const columns: ColumnDef<Order>[] = [
   {
@@ -25,15 +25,13 @@ export const columns: ColumnDef<Order>[] = [
     header: 'Data rozładunku',
   },
   {
-    accessorKey: 'orderLoadingPlaces',
-    accessorFn: (order) =>
-      order.orderLoadingPlaces[0] && order.orderLoadingPlaces[0].place.name,
+    accessorKey: 'loadingPlaces',
+    accessorFn: (order) => order.loadingPlaces[0]?.place?.name,
     header: 'Miejsca załadunku',
   },
   {
-    accessorKey: 'orderUnloadingPlaces',
-    accessorFn: (order) =>
-      order.orderUnloadingPlaces[0] && order.orderLoadingPlaces[0].place.name,
+    accessorKey: 'unloadingPlaces',
+    accessorFn: (order) => order.unloadingPlaces[0]?.place?.name,
     header: 'Miejsca rozładunku',
   },
   {
@@ -87,15 +85,11 @@ export const columns: ColumnDef<Order>[] = [
     },
     cell: ({ row }) => {
       const price = parseFloat(row.getValue('pricePLN'));
-      const currency = row.getValue('currency');
-      const currencyRate = parseFloat(row.original.currencyRate);
-
-      const calculatedPrice = currency === 'EUR' ? price * currencyRate : price;
 
       const formatted = new Intl.NumberFormat('pl-PL', {
         style: 'currency',
         currency: 'PLN',
-      }).format(calculatedPrice);
+      }).format(price);
       return (
         <div className='text-right font-medium text-red-600 '>{formatted}</div>
       );

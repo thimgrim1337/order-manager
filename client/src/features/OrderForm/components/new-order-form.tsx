@@ -1,4 +1,3 @@
-import { Order } from '@/types/order';
 import { FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -11,36 +10,47 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { today, tomorrow } from '@/helpers/dates';
+import { today, tomorrow, yesterday } from '@/helpers/dates';
 import { DevTool } from '@hookform/devtools';
 import FormCombobox from '@/components/ui/form/form-combobox';
-import { useSuspenseQueries } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQueries,
+} from '@tanstack/react-query';
 import customersQueryOptions from '../queries/customersQuery';
 import placesQueryOptions from '../queries/placesQuery';
 import FormMultiSelectCombobox from '@/components/ui/form/form-multiselect-combobox';
 import driversQueryOptions from '../queries/driversQuery';
 import FormSelect from '@/components/ui/form/form-select';
 import trucksQueryOptions from '../queries/trucksQuery';
+import { createOrder } from '../mutations/orderMutation';
+import { InsertOrder } from '@/types/order';
+import { fetchCurrencyRate } from '../queries/currencyRateQuery';
 
 const currencies = ['PLN', 'EUR'];
 
-export default function OrderForm() {
-  const form = useForm<Order>({
-    resolver: zodResolver(Order),
+type OrderFormProps = {
+  setIsOpen: (open: boolean) => void;
+};
+
+export default function OrderForm({ setIsOpen }: OrderFormProps) {
+  const form = useForm<InsertOrder>({
+    resolver: zodResolver(InsertOrder),
     defaultValues: {
       orderNr: '',
       startDate: today,
       endDate: tomorrow,
-      status: 'W trakcie',
-      priceCurrency: 0,
-      pricePLN: 0,
-      currencyRate: 4.2254,
+      statusID: 1,
+      priceCurrency: '',
+      pricePLN: '',
+      currencyRate: '4.2254',
       currency: 'PLN',
-      truck: undefined,
-      driver: undefined,
-      customer: undefined,
-      orderLoadingPlaces: [],
-      orderUnloadingPlaces: [],
+      truckID: undefined,
+      driverID: undefined,
+      customerID: undefined,
+      loadingPlaces: [],
+      unloadingPlaces: [],
     },
   });
 
@@ -53,17 +63,39 @@ export default function OrderForm() {
     ],
   });
 
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: createOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['orders'],
+      });
+      setIsOpen(false);
+    },
+  });
+
   function onIvalid(error: FieldErrors) {
     console.error(error);
   }
 
-  function onSubmit(values: Order) {
+  async function onSubmit(values: InsertOrder) {
     const formData = { ...values };
 
     if (formData.currency === 'PLN') formData.pricePLN = formData.priceCurrency;
-    else formData.pricePLN = formData.priceCurrency * formData.currencyRate;
+    else {
+      const currencyRate = await fetchCurrencyRate(
+        'a',
+        'eur',
+        yesterday(formData.endDate)
+      );
+      const pricePLN =
+        parseFloat(formData.priceCurrency) * currencyRate.rates[0].mid;
 
-    console.log(formData);
+      formData.currencyRate = String(currencyRate.rates[0].mid);
+      formData.pricePLN = String(pricePLN);
+    }
+
+    mutation.mutate(JSON.stringify(formData));
   }
 
   return (
@@ -73,7 +105,7 @@ export default function OrderForm() {
         className='space-y-8'
       >
         <FormField
-          name='customer'
+          name='customerID'
           control={form.control}
           render={({ field }) => (
             <FormItem>
@@ -132,7 +164,7 @@ export default function OrderForm() {
         <div className='flex justify-between gap-5'>
           <FormField
             control={form.control}
-            name='orderLoadingPlaces'
+            name='loadingPlaces'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Miejsce załadunku</FormLabel>
@@ -147,7 +179,7 @@ export default function OrderForm() {
           />
           <FormField
             control={form.control}
-            name='orderUnloadingPlaces'
+            name='unloadingPlaces'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Miejsce rozładunku</FormLabel>
@@ -196,7 +228,7 @@ export default function OrderForm() {
         <div className='flex justify-between  gap-5'>
           <FormField
             control={form.control}
-            name='driver'
+            name='driverID'
             render={({ field }) => (
               <FormItem className='w-full'>
                 <FormLabel>Kierowca</FormLabel>
@@ -216,7 +248,7 @@ export default function OrderForm() {
           />
           <FormField
             control={form.control}
-            name='truck'
+            name='truckID'
             render={({ field }) => (
               <FormItem className='w-full'>
                 <FormLabel>Pojazd</FormLabel>
@@ -235,6 +267,7 @@ export default function OrderForm() {
             )}
           />
         </div>
+
         <Button type='submit'>Dodaj</Button>
       </form>
       <DevTool control={form.control} /> {/* set up the dev tool */}

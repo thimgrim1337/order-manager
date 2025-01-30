@@ -1,9 +1,11 @@
 import { columns } from '@/features/OrdersTable/components/columns';
-import OrderForm from '@/features/OrderForm/components/new-order-form';
 import { DataTable } from '@/components/ui/data-table/data-table';
-import { Order } from '@/types/order';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { Order } from '@/types/order';
+import FormDialog from '@/components/ui/data-table/data-table-form-dialog';
+import OrderForm from '@/features/OrderForm/components/new-order-form';
+import { useState } from 'react';
 
 async function fetchOrders(): Promise<Order[]> {
   const response = await fetch('http://localhost:3000/api/v1/orders');
@@ -13,31 +15,39 @@ async function fetchOrders(): Promise<Order[]> {
   return response.json();
 }
 
-const queryOptions = {
+const orderQueryOptions = queryOptions({
   queryKey: ['orders'],
   queryFn: () => fetchOrders(),
-};
+});
 
 export const Route = createFileRoute('/orders')({
   loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(queryOptions),
+    queryClient.ensureQueryData(orderQueryOptions),
   component: OrdersComponent,
   errorComponent: ({ error }) => <div>${error.message}</div>,
 });
 
 function OrdersComponent() {
-  const ordersQuery = useSuspenseQuery(queryOptions);
+  const ordersQuery = useSuspenseQuery(orderQueryOptions);
   const { data, isError } = ordersQuery;
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
     <div className='container mx-auto py-10'>
+      <div className='flex justify-end'>
+        <FormDialog
+          dialogTriggerText='Dodaj zlecenie'
+          dialogTitle='Dodaj nowe zlecenie'
+          isOpen={isOpen}
+          onOpenChange={setIsOpen}
+        >
+          <OrderForm setIsOpen={setIsOpen} />
+        </FormDialog>
+      </div>
       {isError && <div>An errror occured. !</div>}
       <DataTable
         columns={columns}
         data={data}
-        dialogTrigerText='Dodaj zlecenie'
-        dialogTitle='Wprowadź dane aby dodać nowe zlecenie.'
-        dialogContent={<OrderForm />}
         searchInputPlaceholder='Filtruj zlecenia...'
       />
     </div>
