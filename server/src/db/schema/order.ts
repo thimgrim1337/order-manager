@@ -1,4 +1,4 @@
-import { relations, sql } from 'drizzle-orm';
+import { relations } from 'drizzle-orm';
 import {
   pgTable,
   serial,
@@ -11,8 +11,8 @@ import status from './status';
 import truck from './truck';
 import driver from './driver';
 import customer from './customer';
-import orderLoadingPlaces from './orderLoadingPlaces';
-import orderUnloadingPlaces from './orderUnloadingPlaces';
+import loadingPlaces from './loadingPlaces';
+import unloadingPlaces from './unloadingPlaces';
 
 const order = pgTable('order', {
   id: serial().primaryKey(),
@@ -59,8 +59,8 @@ export const orderRelations = relations(order, ({ one, many }) => ({
     fields: [order.customerID],
     references: [customer.id],
   }),
-  orderLoadingPlaces: many(orderLoadingPlaces),
-  orderUnloadingPlaces: many(orderUnloadingPlaces),
+  loadingPlaces: many(loadingPlaces),
+  unloadingPlaces: many(unloadingPlaces),
 }));
 
 export default order;

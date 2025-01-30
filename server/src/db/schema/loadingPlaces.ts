@@ -3,8 +3,8 @@ import order from './order';
 import place from './place';
 import { relations } from 'drizzle-orm';
 
-const orderUnloadingPlaces = pgTable(
-  'order_unloading_places',
+const loadingPlaces = pgTable(
+  'order_loading_places',
   {
     id: serial(),
     orderID: integer('order_id')
@@ -19,18 +19,15 @@ const orderUnloadingPlaces = pgTable(
   })
 );
 
-export const orderUnloadingPlacesRelations = relations(
-  orderUnloadingPlaces,
-  ({ one }) => ({
-    order: one(order, {
-      fields: [orderUnloadingPlaces.orderID],
-      references: [order.id],
-    }),
-    place: one(place, {
-      fields: [orderUnloadingPlaces.placeID],
-      references: [place.id],
-    }),
-  })
-);
+export const loadingPlacesRelations = relations(loadingPlaces, ({ one }) => ({
+  order: one(order, {
+    fields: [loadingPlaces.orderID],
+    references: [order.id],
+  }),
+  place: one(place, {
+    fields: [loadingPlaces.placeID],
+    references: [place.id],
+  }),
+}));
 
-export default orderUnloadingPlaces;
+export default loadingPlaces;

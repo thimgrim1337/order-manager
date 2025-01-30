@@ -37,7 +37,7 @@ export const OrderWithIdAndDetails = OrderWithId.extend({
   customer: z.object({
     name: z.string().min(1),
   }),
-  orderLoadingPlaces: z
+  loadingPlaces: z
     .object({
       placeID: z.number(),
       place: z.object({
@@ -45,7 +45,7 @@ export const OrderWithIdAndDetails = OrderWithId.extend({
       }),
     })
     .array(),
-  orderUnloadingPlaces: z
+  unloadingPlaces: z
     .object({
       placeID: z.number(),
       place: z.object({

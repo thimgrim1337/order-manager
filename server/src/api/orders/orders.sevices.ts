@@ -7,7 +7,7 @@ export const orderServices = {
   getOrdersQuery: () =>
     db.query.order.findMany({
       with: {
-        orderLoadingPlaces: {
+        loadingPlaces: {
           columns: {
             placeID: true,
           },
@@ -19,7 +19,7 @@ export const orderServices = {
             },
           },
         },
-        orderUnloadingPlaces: {
+        unloadingPlaces: {
           columns: {
             placeID: true,
           },
@@ -58,12 +58,12 @@ export const orderServices = {
     db.query.order.findFirst({
       where: (order) => eq(order.id, orderID),
       with: {
-        orderLoadingPlaces: {
+        loadingPlaces: {
           columns: {
             placeID: true,
           },
         },
-        orderUnloadingPlaces: {
+        unloadingPlaces: {
           columns: {
             placeID: true,
           },

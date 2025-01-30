@@ -8,9 +8,9 @@ export { default as country, countryRelations } from './country';
 export { default as status } from './status';
 export {
   default as loadingPlaces,
-  orderLoadingPlacesRelations,
-} from './orderLoadingPlaces';
+  loadingPlacesRelations as loadingPlacesRelations,
+} from './loadingPlaces';
 export {
   default as unloadingPlaces,
-  orderUnloadingPlacesRelations,
-} from './orderUnloadingPlaces';
+  unloadingPlacesRelations as unloadingPlacesRelations,
+} from './unloadingPlaces';
