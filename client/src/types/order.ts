@@ -3,8 +3,8 @@ import { z } from 'zod';
 export const InsertOrder = z.object({
   orderNr: z
     .string()
-    .min(1, 'Za krótki nr zlecenia. > 1')
-    .max(30, 'Za długi nr zlecenia. < 30'),
+    .min(1, 'Wprowadź nr zlecenia. > 1')
+    .max(30, 'Nr zlecenia jest za długi. < 30'),
   startDate: z.string().date(),
   endDate: z.string().date(),
   statusID: z.number().min(1).max(3).default(0),

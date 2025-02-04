@@ -20,7 +20,7 @@ export async function fetchCurrencyRate(
     `https://api.nbp.pl/api/exchangerates/rates/${table}/${code}/${date}/?format=json`
   );
 
-  if (!response.ok) throw new Error("Can't fetch data");
+  if (!response.ok) throw new Error("Can't fetch currency rate from API.");
 
   return await response.json();
 }

@@ -1,4 +1,4 @@
-import { FieldErrors, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Form,
@@ -27,6 +27,8 @@ import trucksQueryOptions from '../queries/trucksQuery';
 import { createOrder } from '../mutations/orderMutation';
 import { InsertOrder } from '@/types/order';
 import { fetchCurrencyRate } from '../queries/currencyRateQuery';
+import { useErrorBoundary } from 'react-error-boundary';
+import { LoaderCircle } from 'lucide-react';
 
 const currencies = ['PLN', 'EUR'];
 
@@ -44,7 +46,7 @@ export default function OrderForm({ setIsOpen }: OrderFormProps) {
       statusID: 1,
       priceCurrency: '',
       pricePLN: '',
-      currencyRate: '4.2254',
+      currencyRate: '',
       currency: 'PLN',
       truckID: undefined,
       driverID: undefined,
@@ -54,6 +56,7 @@ export default function OrderForm({ setIsOpen }: OrderFormProps) {
     },
   });
 
+  const { showBoundary } = useErrorBoundary();
   const [customers, places, drivers, trucks] = useSuspenseQueries({
     queries: [
       customersQueryOptions,
@@ -74,36 +77,33 @@ export default function OrderForm({ setIsOpen }: OrderFormProps) {
     },
   });
 
-  function onIvalid(error: FieldErrors) {
-    console.error(error);
-  }
-
   async function onSubmit(values: InsertOrder) {
-    const formData = { ...values };
+    try {
+      const formData = { ...values };
 
-    if (formData.currency === 'PLN') formData.pricePLN = formData.priceCurrency;
-    else {
-      const currencyRate = await fetchCurrencyRate(
-        'a',
-        'eur',
-        yesterday(formData.endDate)
-      );
-      const pricePLN =
-        parseFloat(formData.priceCurrency) * currencyRate.rates[0].mid;
+      if (formData.currency === 'EUR') {
+        const currencyRate = await fetchCurrencyRate(
+          'a',
+          'eur',
+          yesterday(formData.endDate)
+        );
 
-      formData.currencyRate = String(currencyRate.rates[0].mid);
-      formData.pricePLN = String(pricePLN);
+        const pricePLN =
+          parseFloat(formData.priceCurrency) * currencyRate.rates[0].mid;
+
+        formData.currencyRate = String(currencyRate.rates[0].mid);
+        formData.pricePLN = String(pricePLN);
+      } else formData.pricePLN = formData.priceCurrency;
+
+      mutation.mutate(JSON.stringify(formData));
+    } catch (error) {
+      showBoundary(error);
     }
-
-    mutation.mutate(JSON.stringify(formData));
   }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit, onIvalid)}
-        className='space-y-8'
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
         <FormField
           name='customerID'
           control={form.control}
@@ -268,7 +268,10 @@ export default function OrderForm({ setIsOpen }: OrderFormProps) {
           />
         </div>
 
-        <Button type='submit'>Dodaj</Button>
+        <Button type='submit'>
+          Dodaj
+          {mutation.isPending && <LoaderCircle className='animate-spin' />}
+        </Button>
       </form>
       <DevTool control={form.control} /> {/* set up the dev tool */}
     </Form>
