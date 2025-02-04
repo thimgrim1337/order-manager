@@ -23,9 +23,7 @@ export default function FormDialog({
 }: FormDialogProps) {
   return (
     <Dialog>
-      <DialogTrigger className='text-primary-foreground'>
-        {btnText}
-      </DialogTrigger>
+      <DialogTrigger>{btnText}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{dialogTitle}</DialogTitle>

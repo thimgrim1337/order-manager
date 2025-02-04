@@ -29,6 +29,7 @@ import { InsertOrder } from '@/types/order';
 import { fetchCurrencyRate } from '../queries/currencyRateQuery';
 import { useErrorBoundary } from 'react-error-boundary';
 import { LoaderCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const currencies = ['PLN', 'EUR'];
 
@@ -46,7 +47,7 @@ export default function OrderForm({ setIsOpen }: OrderFormProps) {
       statusID: 1,
       priceCurrency: '',
       pricePLN: '',
-      currencyRate: '',
+      currencyRate: '0',
       currency: 'PLN',
       truckID: undefined,
       driverID: undefined,
@@ -66,6 +67,7 @@ export default function OrderForm({ setIsOpen }: OrderFormProps) {
     ],
   });
 
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: createOrder,
@@ -74,6 +76,10 @@ export default function OrderForm({ setIsOpen }: OrderFormProps) {
         queryKey: ['orders'],
       });
       setIsOpen(false);
+      toast({
+        title: 'Nowe zlecenie',
+        description: 'Dodano nowe zlecenie',
+      });
     },
   });
 
