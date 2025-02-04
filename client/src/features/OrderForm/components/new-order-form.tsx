@@ -71,11 +71,31 @@ export default function OrderForm({ setIsOpen }: OrderFormProps) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: createOrder,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['orders'],
+    onMutate: async (newOrder) => {
+      await queryClient.cancelQueries({ queryKey: ['orders'] });
+
+      const previousOrders = queryClient.getQueryData(['orders']);
+
+      if (previousOrders)
+        queryClient.setQueryData(['orders'], { ...previousOrders, newOrder });
+
+      return { previousOrders };
+    },
+    onError: (err, newOrder, context) => {
+      if (context?.previousOrders) {
+        queryClient.setQueryData(['orders'], context.previousOrders);
+      }
+      toast({
+        title: 'Błąd',
+        description: 'Nie udało się dodać nowego zlecenia.',
+        variant: 'destructive',
       });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
       setIsOpen(false);
+    },
+    onSuccess: () => {
       toast({
         title: 'Nowe zlecenie',
         description: 'Dodano nowe zlecenie',
