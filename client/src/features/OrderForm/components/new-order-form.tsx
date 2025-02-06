@@ -25,11 +25,11 @@ import driversQueryOptions from '../queries/driversQuery';
 import FormSelect from '@/components/ui/form/form-select';
 import trucksQueryOptions from '../queries/trucksQuery';
 import { createOrder } from '../mutations/orderMutation';
-import { InsertOrder } from '@/types/order';
 import { fetchCurrencyRate } from '../queries/currencyRateQuery';
 import { useErrorBoundary } from 'react-error-boundary';
 import { LoaderCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { OrderCreate, OrderCreateSchema } from '../../../types/types';
 
 const currencies = ['PLN', 'EUR'];
 
@@ -38,8 +38,10 @@ type OrderFormProps = {
 };
 
 export default function OrderForm({ setIsOpen }: OrderFormProps) {
-  const form = useForm<InsertOrder>({
-    resolver: zodResolver(InsertOrder),
+  const { showBoundary } = useErrorBoundary();
+
+  const form = useForm<OrderCreate>({
+    resolver: zodResolver(OrderCreateSchema),
     defaultValues: {
       orderNr: '',
       startDate: today,
@@ -57,7 +59,6 @@ export default function OrderForm({ setIsOpen }: OrderFormProps) {
     },
   });
 
-  const { showBoundary } = useErrorBoundary();
   const [customers, places, drivers, trucks] = useSuspenseQueries({
     queries: [
       customersQueryOptions,
@@ -68,6 +69,7 @@ export default function OrderForm({ setIsOpen }: OrderFormProps) {
   });
 
   const { toast } = useToast();
+
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: createOrder,
@@ -103,33 +105,43 @@ export default function OrderForm({ setIsOpen }: OrderFormProps) {
     },
   });
 
-  async function onSubmit(values: InsertOrder) {
+  async function onSubmit(values: OrderCreate) {
     try {
       const formData = { ...values };
 
-      if (formData.currency === 'EUR') {
-        const currencyRate = await fetchCurrencyRate(
+      if (formData.currency !== 'EUR')
+        formData.pricePLN = formData.priceCurrency;
+      else {
+        const response = await fetchCurrencyRate(
           'a',
           'eur',
           yesterday(formData.endDate)
         );
 
-        const pricePLN =
-          parseFloat(formData.priceCurrency) * currencyRate.rates[0].mid;
+        const currencyRate = response.rates[0].mid;
+        const pricePLN = parseFloat(formData.priceCurrency) * currencyRate;
 
-        formData.currencyRate = String(currencyRate.rates[0].mid);
+        formData.currencyRate = String(currencyRate);
         formData.pricePLN = String(pricePLN);
-      } else formData.pricePLN = formData.priceCurrency;
+      }
 
-      mutation.mutate(JSON.stringify(formData));
+      mutation.mutate(formData);
     } catch (error) {
-      showBoundary(error);
+      showBoundary({
+        message: "Can't fetch currency rate from API. Please again later.",
+        stack: `Stack ${error}`,
+      });
     }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+      <form
+        onSubmit={form.handleSubmit(onSubmit, (errors) => {
+          console.error(errors);
+        })}
+        className='space-y-8'
+      >
         <FormField
           name='customerID'
           control={form.control}

@@ -6,6 +6,8 @@ import './index.css';
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen';
+import { Link } from 'lucide-react';
+import ErrorComponent from './components/error';
 
 const queryClient = new QueryClient();
 
@@ -17,6 +19,17 @@ const router = createRouter({
   },
   defaultPreload: 'intent',
   defaultPreloadStaleTime: 0,
+  defaultErrorComponent: ({ error, reset }) => (
+    <ErrorComponent error={error} onClick={reset} />
+  ),
+  defaultNotFoundComponent: () => {
+    return (
+      <div>
+        <p>This is the notFoundComponent configured on root route</p>
+        <Link to='/'>Start Over</Link>
+      </div>
+    );
+  },
 });
 
 // Register the router instance for type safety

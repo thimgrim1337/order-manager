@@ -1,15 +1,4 @@
-type CurrencyRate = {
-  table: string;
-  currency: string;
-  code: string;
-  rates: [
-    {
-      no: string;
-      effectiveDate: string;
-      mid: number;
-    },
-  ];
-};
+import { CurrencyRate } from '@/types/types';
 
 export async function fetchCurrencyRate(
   table: 'a' | 'b' | 'c',
@@ -22,5 +11,5 @@ export async function fetchCurrencyRate(
 
   if (!response.ok) throw new Error("Can't fetch currency rate from API.");
 
-  return await response.json();
+  return (await response.json()) satisfies CurrencyRate;
 }

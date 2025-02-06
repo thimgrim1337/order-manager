@@ -1,4 +1,4 @@
-import { Place } from '@/types/place';
+import { Place } from '@/server/src/api/places/places.model';
 import { queryOptions } from '@tanstack/react-query';
 
 async function fetchPlaces(): Promise<Place[]> {
@@ -6,7 +6,7 @@ async function fetchPlaces(): Promise<Place[]> {
 
   if (!response.ok) throw new Error("Can't fetch data");
 
-  return await response.json();
+  return (await response.json()) satisfies Place;
 }
 
 const placesQueryOptions = queryOptions({

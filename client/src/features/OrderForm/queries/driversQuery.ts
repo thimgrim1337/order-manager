@@ -1,12 +1,12 @@
-import { Driver } from '@/types/driver';
+import { Driver } from '@/types/types';
 import { queryOptions } from '@tanstack/react-query';
 
 async function fetchDrivers(): Promise<Driver[]> {
   const response = await fetch('http://localhost:3000/api/v1/drivers');
 
-  if (!response.ok) throw new Error("Can't fetch data");
+  if (!response.ok) throw new Error("Can't fetch drivers");
 
-  return await response.json();
+  return (await response.json()) satisfies Driver;
 }
 
 const driversQueryOptions = queryOptions({

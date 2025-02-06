@@ -1,4 +1,4 @@
-import { Order } from '@/types/order';
+import { Order } from '@/types/types';
 import { queryOptions } from '@tanstack/react-query';
 
 async function fetchOrders(): Promise<Order[]> {
@@ -6,7 +6,7 @@ async function fetchOrders(): Promise<Order[]> {
 
   if (!response.ok) throw new Error("Can't fetch orders form API.");
 
-  return response.json();
+  return (await response.json()) satisfies Order;
 }
 
 export const orderQueryOptions = queryOptions({

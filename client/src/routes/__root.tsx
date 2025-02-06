@@ -11,14 +11,6 @@ import { Toaster } from '@/components/ui/toaster';
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   {
     component: Root,
-    notFoundComponent: () => {
-      return (
-        <div>
-          <p>This is the notFoundComponent configured on root route</p>
-          <Link to='/'>Start Over</Link>
-        </div>
-      );
-    },
   }
 );
 
