@@ -40,10 +40,4 @@ export const addressServices = {
       where: (customer) => eq(customer.addressID, addressID),
       limit: 2,
     }),
-
-  hasPlaceReference: (addressID: number) =>
-    db.query.place.findMany({
-      where: (place) => eq(place.addressID, addressID),
-      limit: 2,
-    }),
 };

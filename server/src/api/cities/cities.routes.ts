@@ -1,27 +1,27 @@
 import { Router } from 'express';
-import * as handlers from './places.handlers';
+import * as handlers from './cities.handlers';
 import { validateRequest } from '../../middleware/validate-request';
 import { ParamsWithId } from '../../interfaces/ParamsWithId';
-import { PlaceWithFullAddress } from './places.model';
+import { CityWithId } from './cities.model';
 
 const router = Router();
 
-router.get('/', handlers.getAllPlaces);
+router.get('/', handlers.getAllCities);
 
 router.get(
   '/:id',
   validateRequest({
     params: ParamsWithId,
   }),
-  handlers.getPlaceById
+  handlers.getCityById
 );
 
 router.post(
   '/',
   validateRequest({
-    body: PlaceWithFullAddress,
+    body: CityWithId,
   }),
-  handlers.addPlace
+  handlers.addCity
 );
 
 router.delete(
@@ -29,16 +29,16 @@ router.delete(
   validateRequest({
     params: ParamsWithId,
   }),
-  handlers.deletePlace
+  handlers.deleteCity
 );
 
 router.patch(
   '/:id',
   validateRequest({
     params: ParamsWithId,
-    body: PlaceWithFullAddress,
+    body: CityWithId,
   }),
-  handlers.updatePlace
+  handlers.updateCity
 );
 
 export default router;

@@ -26,7 +26,7 @@ for (const table of [
   schema.status,
   schema.country,
   schema.address,
-  schema.place,
+  schema.city,
   schema.customer,
   // schema.order,
   schema.loadingPlaces,
@@ -40,7 +40,7 @@ await seeds.truck(db);
 await seeds.status(db);
 await seeds.country(db);
 await seeds.address(db);
-await seeds.place(db);
+await seeds.city(db);
 await seeds.customer(db);
 await seeds.order(db);
 await seeds.loadingPlaces(db);

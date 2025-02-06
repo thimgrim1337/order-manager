@@ -1,5 +1,5 @@
 {
-  "id": "e013cc97-362a-4a3c-86e1-0698f4b64472",
+  "id": "1e29588f-37f9-4132-99bd-f23db1b578ef",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -70,6 +70,74 @@
             "street",
             "street_nr",
             "city",
+            "country_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.city": {
+      "name": "city",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "postal": {
+          "name": "postal",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "country_id": {
+          "name": "country_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "city_country_id_country_id_fk": {
+          "name": "city_country_id_country_id_fk",
+          "tableFrom": "city",
+          "tableTo": "country",
+          "columnsFrom": [
+            "country_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "city_name_unique": {
+          "name": "city_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
+          ]
+        },
+        "city_pk": {
+          "name": "city_pk",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name",
+            "postal",
             "country_id"
           ]
         }
@@ -268,10 +336,10 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "order_loading_places_place_id_place_id_fk": {
-          "name": "order_loading_places_place_id_place_id_fk",
+        "order_loading_places_place_id_city_id_fk": {
+          "name": "order_loading_places_place_id_city_id_fk",
           "tableFrom": "order_loading_places",
-          "tableTo": "place",
+          "tableTo": "city",
           "columnsFrom": [
             "place_id"
           ],
@@ -438,59 +506,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.place": {
-      "name": "place",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "address_id": {
-          "name": "address_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "place_address_id_address_id_fk": {
-          "name": "place_address_id_address_id_fk",
-          "tableFrom": "place",
-          "tableTo": "address",
-          "columnsFrom": [
-            "address_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "place_name_unique": {
-          "name": "place_name_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.status": {
       "name": "status",
       "schema": "",
@@ -609,10 +624,10 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "order_unloading_places_place_id_place_id_fk": {
-          "name": "order_unloading_places_place_id_place_id_fk",
+        "order_unloading_places_place_id_city_id_fk": {
+          "name": "order_unloading_places_place_id_city_id_fk",
           "tableFrom": "order_unloading_places",
-          "tableTo": "place",
+          "tableTo": "city",
           "columnsFrom": [
             "place_id"
           ],

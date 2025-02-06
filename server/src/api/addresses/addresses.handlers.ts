@@ -55,9 +55,8 @@ export async function deleteAddress(addressID: number) {
 
 async function hasReference(addressID: number) {
   const customerRef = await addressServices.hasCustomerReference(addressID);
-  const placeRef = await addressServices.hasPlaceReference(addressID);
 
-  if (customerRef.length > 1 || placeRef.length > 1) return true;
+  if (customerRef.length > 1) return true;
 
   return false;
 }
