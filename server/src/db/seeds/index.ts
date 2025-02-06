@@ -1,7 +1,7 @@
 export { default as customer } from './customer';
 export { default as driver } from './driver';
 export { default as order } from './order';
-export { default as place } from './place';
+export { default as city } from './city';
 export { default as status } from './status';
 export { default as truck } from './truck';
 export { default as loadingPlaces } from './loadingPlace';

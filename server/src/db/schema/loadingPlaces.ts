@@ -1,6 +1,6 @@
 import { integer, pgTable, primaryKey, serial } from 'drizzle-orm/pg-core';
 import order from './order';
-import place from './place';
+import city from './city';
 import { relations } from 'drizzle-orm';
 
 const loadingPlaces = pgTable(
@@ -12,7 +12,7 @@ const loadingPlaces = pgTable(
       .references(() => order.id),
     placeID: integer('place_id')
       .notNull()
-      .references(() => place.id),
+      .references(() => city.id),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.orderID, table.placeID] }),
@@ -24,9 +24,9 @@ export const loadingPlacesRelations = relations(loadingPlaces, ({ one }) => ({
     fields: [loadingPlaces.orderID],
     references: [order.id],
   }),
-  place: one(place, {
+  place: one(city, {
     fields: [loadingPlaces.placeID],
-    references: [place.id],
+    references: [city.id],
   }),
 }));
 

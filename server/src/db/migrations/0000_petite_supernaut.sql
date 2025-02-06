@@ -8,6 +8,15 @@ CREATE TABLE IF NOT EXISTS "address" (
 	CONSTRAINT "address_street_street_nr_city_country_id_unique" UNIQUE("street","street_nr","city","country_id")
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "city" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"postal" varchar(10) NOT NULL,
+	"country_id" integer NOT NULL,
+	CONSTRAINT "city_name_unique" UNIQUE("name"),
+	CONSTRAINT "city_pk" UNIQUE("name","postal","country_id")
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "country" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" varchar(45) NOT NULL,
@@ -54,13 +63,6 @@ CREATE TABLE IF NOT EXISTS "order" (
 	"customer_id" integer NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "place" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"address_id" integer NOT NULL,
-	CONSTRAINT "place_name_unique" UNIQUE("name")
-);
---> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "status" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" varchar(20) NOT NULL,
@@ -89,6 +91,12 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "city" ADD CONSTRAINT "city_country_id_country_id_fk" FOREIGN KEY ("country_id") REFERENCES "public"."country"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "customer" ADD CONSTRAINT "customer_address_id_address_id_fk" FOREIGN KEY ("address_id") REFERENCES "public"."address"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -101,7 +109,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "order_loading_places" ADD CONSTRAINT "order_loading_places_place_id_place_id_fk" FOREIGN KEY ("place_id") REFERENCES "public"."place"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "order_loading_places" ADD CONSTRAINT "order_loading_places_place_id_city_id_fk" FOREIGN KEY ("place_id") REFERENCES "public"."city"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -131,19 +139,13 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "place" ADD CONSTRAINT "place_address_id_address_id_fk" FOREIGN KEY ("address_id") REFERENCES "public"."address"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
  ALTER TABLE "order_unloading_places" ADD CONSTRAINT "order_unloading_places_order_id_order_id_fk" FOREIGN KEY ("order_id") REFERENCES "public"."order"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "order_unloading_places" ADD CONSTRAINT "order_unloading_places_place_id_place_id_fk" FOREIGN KEY ("place_id") REFERENCES "public"."place"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "order_unloading_places" ADD CONSTRAINT "order_unloading_places_place_id_city_id_fk" FOREIGN KEY ("place_id") REFERENCES "public"."city"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

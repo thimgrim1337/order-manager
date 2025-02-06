@@ -1,5 +1,5 @@
 export { default as order, orderRelations } from './order';
-export { default as place, placeRelations } from './place';
+export { default as city, cityRelations as cityRelations } from './city';
 export { default as driver, driverRelations } from './driver';
 export { default as truck, truckRelations } from './truck';
 export { default as customer, customerRelations } from './customer';

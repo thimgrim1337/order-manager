@@ -1,7 +1,7 @@
 import { OrderWithIdAndDetails } from '@/server/src/api/orders/orders.model';
 import { CustomerWithFullAddressWithCountry } from '@/server/src/api/customers/customers.model';
 import { DriverWithId } from '@/server/src/api/drivers/drivers.model';
-import { PlaceWithIdWithFullAddress } from '@/server/src/api/places/places.model';
+import { CityWithId } from '@/server/src/api/cities/cities.model';
 import { TruckWithId } from '@/server/src/api/trucks/trucks.model';
 
 import { z } from 'zod';
@@ -35,7 +35,7 @@ export type OrderCreate = z.infer<typeof OrderCreateSchema>;
 
 export type Customer = CustomerWithFullAddressWithCountry;
 export type Driver = DriverWithId;
-export type Place = PlaceWithIdWithFullAddress;
+export type City = CityWithId;
 export type Truck = TruckWithId;
 
 export type CurrencyRate = {

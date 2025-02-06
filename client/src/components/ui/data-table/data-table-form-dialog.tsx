@@ -30,7 +30,7 @@ export default function FormDialog({
       <DialogTrigger className='text-primary-foreground'>
         {dialogTriggerText}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className='max-w-screen-lg'>
         <DialogHeader>
           <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>{dialogDescription}</DialogDescription>

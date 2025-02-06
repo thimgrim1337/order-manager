@@ -19,7 +19,7 @@ import {
   useSuspenseQueries,
 } from '@tanstack/react-query';
 import customersQueryOptions from '../queries/customersQuery';
-import placesQueryOptions from '../queries/placesQuery';
+import citiesQueryOptions from '../queries/citiesQuery';
 import FormMultiSelectCombobox from '@/components/ui/form/form-multiselect-combobox';
 import driversQueryOptions from '../queries/driversQuery';
 import FormSelect from '@/components/ui/form/form-select';
@@ -27,7 +27,7 @@ import trucksQueryOptions from '../queries/trucksQuery';
 import { createOrder } from '../mutations/orderMutation';
 import { fetchCurrencyRate } from '../queries/currencyRateQuery';
 import { useErrorBoundary } from 'react-error-boundary';
-import { LoaderCircle } from 'lucide-react';
+import { LoaderCircle, PlusIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { OrderCreate, OrderCreateSchema } from '../../../types/types';
 
@@ -59,10 +59,10 @@ export default function OrderForm({ setIsOpen }: OrderFormProps) {
     },
   });
 
-  const [customers, places, drivers, trucks] = useSuspenseQueries({
+  const [customers, cities, drivers, trucks] = useSuspenseQueries({
     queries: [
       customersQueryOptions,
-      placesQueryOptions,
+      citiesQueryOptions,
       driversQueryOptions,
       trucksQueryOptions,
     ],
@@ -209,12 +209,16 @@ export default function OrderForm({ setIsOpen }: OrderFormProps) {
                 <FormMultiSelectCombobox
                   {...field}
                   placeholder='Wybierz miejsce'
-                  data={places.data}
+                  data={cities.data}
                 />
                 <FormMessage />
+                <Button type='button'>
+                  <PlusIcon />
+                </Button>
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name='unloadingPlaces'
@@ -224,7 +228,7 @@ export default function OrderForm({ setIsOpen }: OrderFormProps) {
                 <FormMultiSelectCombobox
                   {...field}
                   placeholder='Wybierz miejsce'
-                  data={places.data}
+                  data={cities.data}
                 />
                 <FormMessage />
               </FormItem>
