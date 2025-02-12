@@ -35,8 +35,23 @@ export type OrderCreate = z.infer<typeof OrderCreateSchema>;
 
 export type Customer = CustomerWithFullAddressWithCountry;
 export type Driver = DriverWithId;
-export type City = CityWithId;
 export type Truck = TruckWithId;
+
+export type City = CityWithId;
+export const CitySchema = z.object({
+  name: z.string({ message: 'Podaj nazwę miejscowości.' }).min(1).max(255),
+  postal: z
+    .string({ message: 'Podaj kod pocztowy miejscowości.' })
+    .min(1)
+    .max(10),
+  countryID: z.number({ message: 'Wybierz kraj.' }).min(1),
+});
+
+export type Country = {
+  id: number;
+  name: string;
+  code: string;
+};
 
 export type CurrencyRate = {
   table: string;

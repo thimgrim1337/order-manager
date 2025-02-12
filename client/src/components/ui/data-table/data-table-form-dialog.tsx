@@ -9,12 +9,12 @@ import {
 } from '../dialog';
 
 type FormDialogProps = {
-  dialogTriggerText: string;
+  dialogTriggerText: ReactNode;
   dialogTitle: string;
   dialogDescription?: string;
   children?: ReactNode;
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export default function FormDialog({
