@@ -5,6 +5,7 @@ import { Order, OrderWithId, OrderWithIdAndDetails } from './orders.model';
 import { ParamsWithId } from '@/interfaces/ParamsWithId';
 import * as loadingPlacesHandler from '@/api/loadingPlaces/loading-places.handlers';
 import * as unloadingPlacesHandler from '@/api/unloadingPlaces/unloading-places.handlers';
+import getCitiesId from '../cities/helpers/getCitiesId';
 
 export const getAllOrders: RequestHandler<{}, OrderWithIdAndDetails[]> = async (
   req,
@@ -42,7 +43,7 @@ export const addOrder: RequestHandler<{}, OrderWithId, Order> = async (
   next
 ) => {
   try {
-    const { orderNr, customerID } = req.body;
+    const { orderNr, customerID, loadingPlaces, unloadingPlaces } = req.body;
 
     const existingOrder = await orderServices.getOrderByNrAndCustomerQuery(
       orderNr,
@@ -53,15 +54,19 @@ export const addOrder: RequestHandler<{}, OrderWithId, Order> = async (
     const newOrder = req.body;
 
     const createdOrder = await orderServices.addOrderQuery(newOrder);
+    if (!createdOrder) throw new AppError('Failed to create order', 500);
+
+    const loadingPlacesIds = (await getCitiesId(loadingPlaces)) as number[];
+    const unloadingPlacesIds = (await getCitiesId(unloadingPlaces)) as number[];
 
     if (createdOrder[0]) {
       await loadingPlacesHandler.addLoadingPlaces(
         createdOrder[0].id,
-        req.body.loadingPlaces
+        loadingPlacesIds
       );
       await unloadingPlacesHandler.addUnloadingPlaces(
         createdOrder[0].id,
-        req.body.unloadingPlaces
+        unloadingPlacesIds
       );
     }
 
@@ -89,14 +94,18 @@ export const updateOrder: RequestHandler<
       updatedOrderObj
     );
 
-    await loadingPlacesHandler.updateLoadingPlaces(
-      orderID,
+    const loadingPlacesIds = (await getCitiesId(
       updatedOrderObj.loadingPlaces
-    );
+    )) as number[];
+    const unloadingPlacesIds = (await getCitiesId(
+      updatedOrderObj.unloadingPlaces
+    )) as number[];
+
+    await loadingPlacesHandler.updateLoadingPlaces(orderID, loadingPlacesIds);
 
     await unloadingPlacesHandler.updateUnloadingPlaces(
       orderID,
-      updatedOrderObj.unloadingPlaces
+      unloadingPlacesIds
     );
 
     res.status(200).json(updatedOrder[0]);

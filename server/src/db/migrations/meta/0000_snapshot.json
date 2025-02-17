@@ -1,5 +1,5 @@
 {
-  "id": "1e29588f-37f9-4132-99bd-f23db1b578ef",
+  "id": "528b18c6-58f9-456e-a629-58a092d48823",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -125,13 +125,6 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "city_name_unique": {
-          "name": "city_name_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
-        },
         "city_pk": {
           "name": "city_pk",
           "nullsNotDistinct": false,

@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS "city" (
 	"name" varchar(255) NOT NULL,
 	"postal" varchar(10) NOT NULL,
 	"country_id" integer NOT NULL,
-	CONSTRAINT "city_name_unique" UNIQUE("name"),
 	CONSTRAINT "city_pk" UNIQUE("name","postal","country_id")
 );
 --> statement-breakpoint

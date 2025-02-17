@@ -26,10 +26,9 @@ export const citiesServices = {
         },
       },
     }),
-  getCityByNameQuery: (cityName: string, countryID: number) =>
+  getCityByNameQuery: (cityName: string) =>
     db.query.city.findFirst({
-      where: (city) =>
-        and(eq(city.name, cityName), eq(city.countryID, countryID)),
+      where: (city) => eq(city.name, cityName),
     }),
   addCityQuery: (newCity: City) => db.insert(city).values(newCity).returning(),
   deleteCityQuery: (cityID: number) =>

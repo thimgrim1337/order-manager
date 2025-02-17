@@ -15,8 +15,20 @@ export const Order = createInsertSchema(order, {
   driverID: z.number().min(1),
   customerID: z.number().min(1),
 }).extend({
-  loadingPlaces: z.number().array(),
-  unloadingPlaces: z.number().array(),
+  loadingPlaces: z
+    .object({
+      name: z.string(),
+      postal: z.string(),
+      countryID: z.number(),
+    })
+    .array(),
+  unloadingPlaces: z
+    .object({
+      name: z.string(),
+      postal: z.string(),
+      countryID: z.number(),
+    })
+    .array(),
 });
 export type Order = z.infer<typeof Order>;
 

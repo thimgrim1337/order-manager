@@ -8,7 +8,7 @@ const city = pgTable(
   'city',
   {
     id: serial().primaryKey(),
-    name: varchar({ length: 255 }).notNull().unique(),
+    name: varchar({ length: 255 }).notNull(),
     postal: varchar({ length: 10 }).notNull(),
     countryID: integer('country_id')
       .notNull()

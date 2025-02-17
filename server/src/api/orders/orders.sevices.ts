@@ -8,27 +8,13 @@ export const orderServices = {
     db.query.order.findMany({
       with: {
         loadingPlaces: {
-          columns: {
-            placeID: true,
-          },
           with: {
-            place: {
-              columns: {
-                name: true,
-              },
-            },
+            place: true,
           },
         },
         unloadingPlaces: {
-          columns: {
-            placeID: true,
-          },
           with: {
-            place: {
-              columns: {
-                name: true,
-              },
-            },
+            place: true,
           },
         },
         status: {
@@ -59,13 +45,13 @@ export const orderServices = {
       where: (order) => eq(order.id, orderID),
       with: {
         loadingPlaces: {
-          columns: {
-            placeID: true,
+          with: {
+            place: true,
           },
         },
         unloadingPlaces: {
-          columns: {
-            placeID: true,
+          with: {
+            place: true,
           },
         },
         status: {
