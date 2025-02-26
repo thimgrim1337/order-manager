@@ -7,7 +7,7 @@ import {
 import FormCombobox from '@/components/ui/form/form-combobox';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useFormContext } from 'react-hook-form';
-import customersQueryOptions from '../queries/customersQuery';
+import customersQueryOptions from '../../queries/customersQuery';
 
 export default function CustomerSection() {
   const { control } = useFormContext();

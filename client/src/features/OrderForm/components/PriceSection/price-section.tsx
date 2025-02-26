@@ -41,13 +41,13 @@ export default function PriceSection() {
         render={({ field }) => (
           <FormItem className='w-full'>
             <FormLabel>Waluta</FormLabel>
-            <Select {...field}>
+            <Select onValueChange={field.onChange}>
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder={'PLN'} />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent>
+              <SelectContent {...field}>
                 {currencies.map((d) => (
                   <SelectItem value={d} key={d}>
                     {d}
@@ -55,7 +55,6 @@ export default function PriceSection() {
                 ))}
               </SelectContent>
             </Select>
-
             <FormMessage />
           </FormItem>
         )}

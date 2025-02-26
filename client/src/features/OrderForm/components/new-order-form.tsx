@@ -11,12 +11,12 @@ import { DevTool } from '@hookform/devtools';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createOrder } from '../mutations/orderMutation';
 import { fetchCurrencyRate } from '../queries/currencyRateQuery';
-import CustomerSection from './customer-section';
-import OrderNumberSection from './order-number-section';
-import OrderDatesSections from './dates-sections';
-import PriceSection from './price-section';
-import TruckSection from './truck-section';
-import PlacesSection from './places-sections';
+import CustomerSection from './CustomerSection/customer-section';
+import OrderNumberSection from './OrderNumberSection/order-number-section';
+import OrderDatesSection from './DateSection/date-section';
+import PriceSection from './PriceSection/price-section';
+import TruckSection from './TruckSection/truck-section';
+import PlaceSection from './PlaceSection/places-section';
 
 type OrderFormProps = {
   setIsOpen: (open: boolean) => void;
@@ -89,7 +89,7 @@ export default function OrderForm({ setIsOpen }: OrderFormProps) {
         formData.pricePLN = formData.priceCurrency;
       else {
         const response = await fetchCurrencyRate(
-          'a',
+          'c',
           'eur',
           yesterday(formData.endDate)
         );
@@ -120,17 +120,16 @@ export default function OrderForm({ setIsOpen }: OrderFormProps) {
       >
         <CustomerSection />
         <OrderNumberSection />
-        <OrderDatesSections />
-        <PlacesSection />
+        <OrderDatesSection />
+        <PlaceSection />
         <PriceSection />
         <TruckSection />
-
         <Button type='submit'>
           Dodaj
           {mutation.isPending && <LoaderCircle className='animate-spin' />}
         </Button>
+        <DevTool control={form.control} /> {/* set up the dev tool */}
       </form>
-      <DevTool control={form.control} /> {/* set up the dev tool */}
     </Form>
   );
 }

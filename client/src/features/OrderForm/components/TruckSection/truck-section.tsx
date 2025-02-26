@@ -6,10 +6,9 @@ import {
 } from '@/components/ui/form';
 import FormCombobox from '@/components/ui/form/form-combobox';
 import { useSuspenseQueries } from '@tanstack/react-query';
-
 import { useFormContext } from 'react-hook-form';
-import driversQueryOptions from '../queries/driversQuery';
-import trucksQueryOptions from '../queries/trucksQuery';
+import driversQueryOptions from '../../queries/driversQuery';
+import trucksQueryOptions from '../../queries/trucksQuery';
 
 export default function TruckSection() {
   const { control } = useFormContext();

@@ -17,6 +17,7 @@ export const Order = createInsertSchema(order, {
 }).extend({
   loadingPlaces: z
     .object({
+      id: z.number().optional(),
       name: z.string(),
       postal: z.string(),
       countryID: z.number(),
@@ -24,6 +25,7 @@ export const Order = createInsertSchema(order, {
     .array(),
   unloadingPlaces: z
     .object({
+      id: z.number().optional(),
       name: z.string(),
       postal: z.string(),
       countryID: z.number(),
