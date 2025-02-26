@@ -12,9 +12,11 @@ export type City = z.infer<typeof City>;
 export const CityWithId = createSelectSchema(city);
 export type CityWithId = z.infer<typeof CityWithId>;
 
-export type CityWithIdAndCountry = CityWithId & {
-  country: {
-    name: string;
-    code: string;
-  };
-};
+export type CityWithIdAndCountry = z.infer<
+  typeof CityWithId & {
+    country: {
+      name: string;
+      code: string;
+    };
+  }
+>;

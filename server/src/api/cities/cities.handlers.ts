@@ -40,10 +40,7 @@ export const addCity: RequestHandler<
   try {
     const { name, countryID } = req.body;
 
-    const existingCity = await citiesServices.getCityByNameQuery(
-      name,
-      countryID
-    );
+    const existingCity = await citiesServices.getCityByNameQuery(name);
     if (existingCity) throw new AppError('City already exist', 409);
 
     const newCity = req.body;

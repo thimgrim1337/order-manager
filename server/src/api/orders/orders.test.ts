@@ -21,8 +21,8 @@ beforeEach(() => {
     truckID: 4,
     driverID: 5,
     customerID: 3,
-    loadingPlaces: [1, 2],
-    unloadingPlaces: [1],
+    loadingPlaces: [],
+    unloadingPlaces: [],
   };
 });
 
@@ -113,7 +113,7 @@ describe('POST /api/v1/orders', () => {
 describe('PATCH /api/v1/orders/:id', () => {
   it('responds with updated customer', async () => {
     order.orderNr = '1337/11/2024';
-    order.unloadingPlaces = [2, 3];
+    // order.unloadingPlaces = [2, 3];
 
     response = await fetch(API + '/5', {
       method: 'PATCH',

@@ -1,5 +1,5 @@
 {
-  "id": "1e29588f-37f9-4132-99bd-f23db1b578ef",
+  "id": "528b18c6-58f9-456e-a629-58a092d48823",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -51,12 +51,8 @@
           "name": "address_country_id_country_id_fk",
           "tableFrom": "address",
           "tableTo": "country",
-          "columnsFrom": [
-            "country_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["country_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -66,12 +62,7 @@
         "address_street_street_nr_city_country_id_unique": {
           "name": "address_street_street_nr_city_country_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "street",
-            "street_nr",
-            "city",
-            "country_id"
-          ]
+          "columns": ["street", "street_nr", "city", "country_id"]
         }
       },
       "policies": {},
@@ -113,33 +104,18 @@
           "name": "city_country_id_country_id_fk",
           "tableFrom": "city",
           "tableTo": "country",
-          "columnsFrom": [
-            "country_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["country_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "city_name_unique": {
-          "name": "city_name_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
-        },
         "city_pk": {
           "name": "city_pk",
           "nullsNotDistinct": false,
-          "columns": [
-            "name",
-            "postal",
-            "country_id"
-          ]
+          "columns": ["name", "postal", "country_id"]
         }
       },
       "policies": {},
@@ -176,16 +152,12 @@
         "country_name_unique": {
           "name": "country_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         },
         "country_code_unique": {
           "name": "country_code_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "code"
-          ]
+          "columns": ["code"]
         }
       },
       "policies": {},
@@ -227,12 +199,8 @@
           "name": "customer_address_id_address_id_fk",
           "tableFrom": "customer",
           "tableTo": "address",
-          "columnsFrom": [
-            "address_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["address_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -242,16 +210,12 @@
         "customer_tax_nr_unique": {
           "name": "customer_tax_nr_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "tax_nr"
-          ]
+          "columns": ["tax_nr"]
         },
         "customer_name_unique": {
           "name": "customer_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       },
       "policies": {},
@@ -288,10 +252,7 @@
         "full_name": {
           "name": "full_name",
           "nullsNotDistinct": false,
-          "columns": [
-            "first_name",
-            "last_name"
-          ]
+          "columns": ["first_name", "last_name"]
         }
       },
       "policies": {},
@@ -327,12 +288,8 @@
           "name": "order_loading_places_order_id_order_id_fk",
           "tableFrom": "order_loading_places",
           "tableTo": "order",
-          "columnsFrom": [
-            "order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["order_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -340,12 +297,8 @@
           "name": "order_loading_places_place_id_city_id_fk",
           "tableFrom": "order_loading_places",
           "tableTo": "city",
-          "columnsFrom": [
-            "place_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["place_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -353,10 +306,7 @@
       "compositePrimaryKeys": {
         "order_loading_places_order_id_place_id_pk": {
           "name": "order_loading_places_order_id_place_id_pk",
-          "columns": [
-            "order_id",
-            "place_id"
-          ]
+          "columns": ["order_id", "place_id"]
         }
       },
       "uniqueConstraints": {},
@@ -451,12 +401,8 @@
           "name": "order_status_id_status_id_fk",
           "tableFrom": "order",
           "tableTo": "status",
-          "columnsFrom": [
-            "status_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["status_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -464,12 +410,8 @@
           "name": "order_truck_id_truck_id_fk",
           "tableFrom": "order",
           "tableTo": "truck",
-          "columnsFrom": [
-            "truck_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["truck_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -477,12 +419,8 @@
           "name": "order_driver_id_driver_id_fk",
           "tableFrom": "order",
           "tableTo": "driver",
-          "columnsFrom": [
-            "driver_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["driver_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -490,12 +428,8 @@
           "name": "order_customer_id_customer_id_fk",
           "tableFrom": "order",
           "tableTo": "customer",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -530,9 +464,7 @@
         "status_name_unique": {
           "name": "status_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       },
       "policies": {},
@@ -577,9 +509,7 @@
         "truck_plate_unique": {
           "name": "truck_plate_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "plate"
-          ]
+          "columns": ["plate"]
         }
       },
       "policies": {},
@@ -615,12 +545,8 @@
           "name": "order_unloading_places_order_id_order_id_fk",
           "tableFrom": "order_unloading_places",
           "tableTo": "order",
-          "columnsFrom": [
-            "order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["order_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -628,12 +554,8 @@
           "name": "order_unloading_places_place_id_city_id_fk",
           "tableFrom": "order_unloading_places",
           "tableTo": "city",
-          "columnsFrom": [
-            "place_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["place_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -641,10 +563,7 @@
       "compositePrimaryKeys": {
         "order_unloading_places_order_id_place_id_pk": {
           "name": "order_unloading_places_order_id_place_id_pk",
-          "columns": [
-            "order_id",
-            "place_id"
-          ]
+          "columns": ["order_id", "place_id"]
         }
       },
       "uniqueConstraints": {},

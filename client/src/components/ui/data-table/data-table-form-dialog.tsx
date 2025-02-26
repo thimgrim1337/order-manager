@@ -9,12 +9,12 @@ import {
 } from '../dialog';
 
 type FormDialogProps = {
-  dialogTriggerText: string;
+  dialogTriggerText: ReactNode;
   dialogTitle: string;
   dialogDescription?: string;
   children?: ReactNode;
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export default function FormDialog({
@@ -30,7 +30,7 @@ export default function FormDialog({
       <DialogTrigger className='text-primary-foreground'>
         {dialogTriggerText}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className='max-w-screen-lg'>
         <DialogHeader>
           <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>{dialogDescription}</DialogDescription>
