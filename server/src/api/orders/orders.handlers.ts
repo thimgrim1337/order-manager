@@ -14,7 +14,18 @@ export const getAllOrders: RequestHandler<{}, OrderWithIdAndDetails[]> = async (
 ) => {
   try {
     const orders = await orderServices.getOrdersQuery();
-    res.status(200).json(orders);
+
+    const mapped = orders.map((order) => ({
+      ...order,
+      loadingPlaces: order.loadingPlaces.map((loadingPlace) => ({
+        ...loadingPlace.place,
+      })),
+      unloadingPlaces: order.unloadingPlaces.map((unloadingPlace) => ({
+        ...unloadingPlace.place,
+      })),
+    }));
+
+    res.status(200).json(mapped);
   } catch (error) {
     next(new AppError('Failed to fetch orders', 500));
   }
@@ -29,9 +40,15 @@ export const getOrderById: RequestHandler<
 
     if (!order) res.status(404).send({});
 
-    await loadingPlacesHandler.getAllLoadingPlacesByOrderId(+req.params.id);
+    const mapped = {
+      ...order,
+      loadingPlaces: order?.loadingPlaces.map((place) => ({ ...place.place })),
+      unloadingPlaces: order?.unloadingPlaces.map((place) => ({
+        ...place.place,
+      })),
+    };
 
-    res.status(200).json(order);
+    res.status(200).json(mapped);
   } catch (error) {
     next(new AppError('Failed to fetch order', 500));
   }

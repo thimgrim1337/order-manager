@@ -17,6 +17,7 @@ beforeEach(() => {
     startDate: '2024-12-19',
     endDate: '2024-12-19',
     statusID: 3,
+    pricePLN: '0',
     priceCurrency: '10000.00',
     truckID: 4,
     driverID: 5,
