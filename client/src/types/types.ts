@@ -53,7 +53,10 @@ export const CitySchema = z
       .string()
       .min(1, { message: 'Podaj nazwę miejscowości.' })
       .max(255)
-      .regex(/^[A-Za-z]+$/i, 'W nazwie miejscowości dostępne są tylko litery.'),
+      .regex(
+        /[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż]/,
+        'W nazwie miejscowości dostępne są tylko litery.'
+      ),
 
     postal: z
       .string()

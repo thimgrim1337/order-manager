@@ -3,10 +3,9 @@ import { DataTable } from '@/components/ui/data-table/data-table';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import FormDialog from '@/components/ui/data-table/data-table-form-dialog';
-import OrderForm from '@/features/OrderForm/components/new-order-form';
+import OrderForm from '@/features/OrderForm/components/OrderForm';
 import { Suspense, useState } from 'react';
 import orderQueryOptions from '@/features/OrderForm/queries/ordersQuery';
-import QueryErrorBoundary from '@/components/query-error-boundary';
 
 export const Route = createFileRoute('/orders')({
   loader: ({ context: { queryClient } }) =>
@@ -20,26 +19,24 @@ function OrdersComponent() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
-    <QueryErrorBoundary>
-      <div className='container mx-auto py-10'>
-        <Suspense fallback={<h1>Loading orders...</h1>}>
-          <div className='flex justify-end'>
-            <FormDialog
-              dialogTriggerText='Dodaj zlecenie'
-              dialogTitle='Dodaj nowe zlecenie'
-              isOpen={isOpen}
-              onOpenChange={setIsOpen}
-            >
-              <OrderForm setIsOpen={setIsOpen} />
-            </FormDialog>
-          </div>
-          <DataTable
-            columns={columns}
-            data={data}
-            searchInputPlaceholder='Filtruj zlecenia...'
-          />
-        </Suspense>
-      </div>
-    </QueryErrorBoundary>
+    <div className='container mx-auto py-10'>
+      <Suspense fallback={<h1>Loading orders...</h1>}>
+        <div className='flex justify-end'>
+          <FormDialog
+            triggerText='Dodaj zlecenie'
+            title='Dodaj nowe zlecenie'
+            isOpen={isOpen}
+            onOpenChange={setIsOpen}
+          >
+            <OrderForm onOpenChange={setIsOpen} />
+          </FormDialog>
+        </div>
+        <DataTable
+          columns={columns}
+          data={data}
+          searchInputPlaceholder='Filtruj zlecenia...'
+        />
+      </Suspense>
+    </div>
   );
 }
