@@ -8,7 +8,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useFormContext } from 'react-hook-form';
 
-export default function OrderNumberSection() {
+export default function NumberSection() {
   const { control } = useFormContext();
 
   return (

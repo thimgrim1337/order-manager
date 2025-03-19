@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { Dispatch, ReactNode, SetStateAction } from 'react';
 import {
   Dialog,
   DialogTrigger,
@@ -9,31 +9,35 @@ import {
 } from '../dialog';
 
 type FormDialogProps = {
-  dialogTriggerText: ReactNode;
-  dialogTitle: string;
-  dialogDescription?: string;
+  triggerText?: ReactNode;
+  title: string;
+  description?: string;
   children?: ReactNode;
   isOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  asChild?: boolean;
+  onOpenChange?: Dispatch<SetStateAction<boolean>>;
 };
 
 export default function FormDialog({
-  dialogTriggerText,
-  dialogTitle,
-  dialogDescription,
+  triggerText,
+  title,
+  description,
   children,
   isOpen,
   onOpenChange,
+  asChild,
 }: FormDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogTrigger className='text-primary-foreground'>
-        {dialogTriggerText}
-      </DialogTrigger>
+      {triggerText && (
+        <DialogTrigger className='text-primary-foreground' asChild={asChild}>
+          {triggerText}
+        </DialogTrigger>
+      )}
       <DialogContent className='max-w-screen-lg'>
         <DialogHeader>
-          <DialogTitle>{dialogTitle}</DialogTitle>
-          <DialogDescription>{dialogDescription}</DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         {children}
       </DialogContent>
