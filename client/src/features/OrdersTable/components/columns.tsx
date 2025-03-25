@@ -2,10 +2,10 @@ import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-import { Order } from '@/types/types';
+import { OrderWithDetails } from '@/types/types';
 import TableRowOptions from './TableRowOptions';
 
-export const columns: ColumnDef<Order>[] = [
+export const columns: ColumnDef<OrderWithDetails>[] = [
   {
     accessorKey: 'orderNr',
     header: 'Nr zlecenia',

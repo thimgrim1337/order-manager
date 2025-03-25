@@ -6,11 +6,10 @@ import { Button } from '@/components/ui/button';
 import { LoaderCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useErrorBoundary } from 'react-error-boundary';
-import { today, tomorrow, yesterday } from '@/helpers/dates';
+import { today, tomorrow } from '@/helpers/dates';
 import { DevTool } from '@hookform/devtools';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createOrder } from '../mutations/orderMutation';
-import { fetchCurrencyRate } from '../queries/currencyRateQuery';
+import { createOrder, updateOrder } from '../mutations/orderMutation';
 import CustomerSection from './CustomerSection/CustomerSection';
 import NumberSection from './NumberSection/NumberSection';
 import DatesSection from './DateSection/DatesSection';
@@ -18,6 +17,7 @@ import PriceSection from './PriceSection/price-section';
 import TruckSection from './TruckSection/truck-section';
 import PlacesSection from './PlaceSection/PlacesSection';
 import { Dispatch, SetStateAction } from 'react';
+import { getCurrencyRate } from '@/helpers/getCurrencyRate';
 
 type OrderFormProps = {
   onOpenChange: Dispatch<SetStateAction<boolean>>;
@@ -54,7 +54,7 @@ export default function OrderForm({
   const { toast } = useToast();
 
   const queryClient = useQueryClient();
-  const mutation = useMutation({
+  const createMutation = useMutation({
     mutationFn: createOrder,
     onMutate: async (newOrder) => {
       await queryClient.cancelQueries({ queryKey: ['orders'] });
@@ -69,6 +69,7 @@ export default function OrderForm({
     onError: (err, newOrder, context) => {
       if (context?.previousOrders) {
         queryClient.setQueryData(['orders'], context.previousOrders);
+        console.log(err);
       }
       toast({
         title: 'Błąd',
@@ -88,27 +89,47 @@ export default function OrderForm({
     },
   });
 
-  async function onSubmit(values: OrderCreate) {
+  const updateMutation = useMutation({
+    mutationFn: updateOrder,
+    onMutate: async (newOrder) => {
+      await queryClient.cancelQueries({ queryKey: ['orders', newOrder.id] });
+
+      const previousOrders = queryClient.getQueryData(['orders', newOrder.id]);
+
+      queryClient.setQueryData(['orders', newOrder.id], newOrder);
+
+      return { previousOrders, newOrder };
+    },
+    onError: (err, newOrder, context) => {
+      queryClient.setQueryData(
+        ['orders', context?.newOrder.id],
+        context?.previousOrders
+      );
+      toast({
+        title: 'Błąd',
+        description: 'Nie udało się edytować zlecenia.',
+        variant: 'destructive',
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      setIsOpen(false);
+    },
+    onSuccess: (newOrder) => {
+      toast({
+        title: 'Edycja zlecenia',
+        description: `Edytowane zlecenie nr ${newOrder.orderNr}`,
+      });
+    },
+  });
+
+  async function onSubmit(formValues: OrderCreate) {
     try {
-      const formData = { ...values };
+      const order = await getCurrencyRate(formValues);
 
-      if (formData.currency !== 'EUR')
-        formData.pricePLN = formData.priceCurrency;
-      else {
-        const response = await fetchCurrencyRate(
-          'c',
-          'eur',
-          yesterday(formData.endDate)
-        );
+      if (order.id) return updateMutation.mutate(order);
 
-        const currencyRate = response.rates[0].mid;
-        const pricePLN = parseFloat(formData.priceCurrency) * currencyRate;
-
-        formData.currencyRate = String(currencyRate);
-        formData.pricePLN = String(pricePLN);
-      }
-
-      mutation.mutate(formData);
+      return createMutation.mutate(order);
     } catch (error) {
       showBoundary({
         message: "Can't fetch currency rate from API. Please again later.",
@@ -135,8 +156,10 @@ export default function OrderForm({
         <PriceSection />
         <TruckSection />
         <Button type='submit'>
-          Dodaj
-          {mutation.isPending && <LoaderCircle className='animate-spin' />}
+          {values ? 'Edytuj' : 'Dodaj'}
+          {createMutation.isPending && (
+            <LoaderCircle className='animate-spin' />
+          )}
         </Button>
         <DevTool control={form.control} /> {/* set up the dev tool */}
       </form>
