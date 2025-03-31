@@ -1,9 +1,8 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
 import { OrderWithDetails } from '@/types/types';
-import TableRowOptions from './TableRowOptions';
+import RowOptions from './components/RowOptions';
 
 export const columns: ColumnDef<OrderWithDetails>[] = [
   {
@@ -12,7 +11,18 @@ export const columns: ColumnDef<OrderWithDetails>[] = [
   },
   {
     accessorKey: 'startDate',
-    header: 'Data załadunku',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant={'ghost'}
+          className={'bg-transparent'}
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Data załadunku
+          <ArrowUpDown className='ml-2 h-4 w-4' />
+        </Button>
+      );
+    },
   },
   {
     accessorKey: 'endDate',
@@ -94,7 +104,7 @@ export const columns: ColumnDef<OrderWithDetails>[] = [
     cell: ({ row }) => {
       const order = row.original;
 
-      return <TableRowOptions order={order} />;
+      return <RowOptions order={order} />;
     },
   },
 ];
