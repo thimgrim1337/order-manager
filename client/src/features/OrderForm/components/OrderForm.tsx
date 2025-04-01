@@ -8,7 +8,6 @@ import { useErrorBoundary } from 'react-error-boundary';
 import { today, tomorrow } from '@/helpers/dates';
 import { DevTool } from '@hookform/devtools';
 import CustomerSection from './CustomerSection/CustomerSection';
-import NumberSection from './NumberSection/NumberSection';
 import DatesSection from './DateSection/DatesSection';
 import PriceSection from './PriceSection/price-section';
 import TruckSection from './TruckSection/truck-section';
@@ -72,7 +71,6 @@ export default function OrderForm({
         className='space-y-8'
       >
         <CustomerSection />
-        <NumberSection />
         <DatesSection />
         <PlacesSection
           selectedLoadingPlaces={form.getValues('loadingPlaces')}

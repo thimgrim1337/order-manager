@@ -1,4 +1,4 @@
-import { columns } from '@/features/OrdersTable/components/columns';
+import { columns } from '@/features/OrdersTable/columns';
 import { DataTable } from '@/components/ui/data-table/data-table';
 import {
   useMutation,
@@ -6,12 +6,12 @@ import {
   useSuspenseQuery,
 } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import FormDialog from '@/components/ui/data-table/data-table-form-dialog';
 import OrderForm from '@/features/OrderForm/components/OrderForm';
 import { Suspense, useState } from 'react';
 import orderQueryOptions from '@/features/OrderForm/queries/ordersQuery';
 import { useToast } from '@/hooks/use-toast';
 import { createOrder } from '@/features/OrderForm/mutations/orderMutation';
+import CreateDialog from '@/features/OrdersTable/components/CreateDialog';
 
 export const Route = createFileRoute('/orders')({
   loader: ({ context: { queryClient } }) =>
@@ -65,17 +65,12 @@ function OrdersComponent() {
     <div className='container mx-auto py-10'>
       <Suspense fallback={<h1>Loading orders...</h1>}>
         <div className='flex justify-end'>
-          <FormDialog
-            triggerText='Dodaj zlecenie'
-            title='Dodaj nowe zlecenie'
-            isOpen={isOpen}
-            onOpenChange={setIsOpen}
-          >
+          <CreateDialog onOpenChange={setIsOpen} isOpen={isOpen}>
             <OrderForm
               mutationFn={createMutation.mutate}
               isPending={createMutation.isPending}
-            />
-          </FormDialog>
+            ></OrderForm>
+          </CreateDialog>
         </div>
         <DataTable
           columns={columns}
