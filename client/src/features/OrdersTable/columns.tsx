@@ -1,24 +1,28 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
+import { ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Order } from '@/types/types';
+import { OrderWithDetails } from '@/types/types';
+import RowOptions from './components/RowOptions';
 
-export const columns: ColumnDef<Order>[] = [
+export const columns: ColumnDef<OrderWithDetails>[] = [
   {
     accessorKey: 'orderNr',
     header: 'Nr zlecenia',
   },
   {
     accessorKey: 'startDate',
-    header: 'Data załadunku',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant={'ghost'}
+          className={'bg-transparent'}
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Data załadunku
+          <ArrowUpDown className='ml-2 h-4 w-4' />
+        </Button>
+      );
+    },
   },
   {
     accessorKey: 'endDate',
@@ -26,12 +30,12 @@ export const columns: ColumnDef<Order>[] = [
   },
   {
     accessorKey: 'loadingPlaces',
-    accessorFn: (order) => order.loadingPlaces[0]?.place?.name,
+    accessorFn: (order) => order.loadingPlaces[0]?.name,
     header: 'Miejsca załadunku',
   },
   {
     accessorKey: 'unloadingPlaces',
-    accessorFn: (order) => order.unloadingPlaces[0]?.place?.name,
+    accessorFn: (order) => order.unloadingPlaces[0]?.name,
     header: 'Miejsca rozładunku',
   },
   {
@@ -100,25 +104,7 @@ export const columns: ColumnDef<Order>[] = [
     cell: ({ row }) => {
       const order = row.original;
 
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant={'ghost'} className='h-8 w-8 p-0 bg-transparent'>
-              <span className='sr-only'>Open menu</span>
-              <MoreHorizontal className='h-4 w-4' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Akcje</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => console.log(order)}>
-              Szczegóły
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Edytuj</DropdownMenuItem>
-            <DropdownMenuItem>Usuń</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      return <RowOptions order={order} />;
     },
   },
 ];

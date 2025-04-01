@@ -8,7 +8,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useFormContext } from 'react-hook-form';
 
-export default function OrderDatesSection() {
+export default function DatesSection() {
   const { control } = useFormContext();
   return (
     <div className='flex justify-between  gap-5'>

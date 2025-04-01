@@ -8,6 +8,7 @@ import './index.css';
 import { routeTree } from './routeTree.gen';
 import { Link } from 'lucide-react';
 import ErrorComponent from './components/error';
+import QueryErrorBoundary from './components/query-error-boundary';
 
 const queryClient = new QueryClient();
 
@@ -45,9 +46,11 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
+      <QueryErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
+      </QueryErrorBoundary>
     </StrictMode>
   );
 }

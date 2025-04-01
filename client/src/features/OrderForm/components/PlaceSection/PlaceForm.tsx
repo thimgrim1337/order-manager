@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
 import { z, ZodIssue } from 'zod';
 
-type NewPlaceFormProps = {
+type PlaceFormProps = {
   onSubmit: (newPlace: CityCreate) => void;
 };
 
@@ -35,7 +35,7 @@ const initialValues = {
   name: '',
 };
 
-export default function NewPlaceForm({ onSubmit }: NewPlaceFormProps) {
+export default function PlaceForm({ onSubmit }: PlaceFormProps) {
   const [place, setPlace] = useState<CityCreate>(initialValues);
   const [errors, setErrors] = useState<FormDataErrors>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -61,6 +61,7 @@ export default function NewPlaceForm({ onSubmit }: NewPlaceFormProps) {
 
     onSubmit(place);
     setPlace(initialValues);
+    setErrors(undefined);
     setIsOpen(false);
   }
 
@@ -112,12 +113,16 @@ export default function NewPlaceForm({ onSubmit }: NewPlaceFormProps) {
         </div>
 
         {errors && (
-          <FormMessage>
-            {errors.fieldErrors.name?.map((e) => (
-              <span className='block'>{e.message}</span>
+          <FormMessage className='py-2'>
+            {errors.fieldErrors.name?.map((e, index) => (
+              <span key={index} className='block'>
+                {e.message}
+              </span>
             ))}
-            {errors.fieldErrors.postal?.map((e) => (
-              <span className='block'>{e.message}</span>
+            {errors.fieldErrors.postal?.map((e, index) => (
+              <span key={index} className='block'>
+                {e.message}
+              </span>
             ))}
           </FormMessage>
         )}

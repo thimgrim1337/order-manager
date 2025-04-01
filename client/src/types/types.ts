@@ -1,4 +1,7 @@
-import { OrderWithIdAndDetails } from '@/server/src/api/orders/orders.model';
+import {
+  OrderWithId,
+  OrderWithIdAndDetails,
+} from '@/server/src/api/orders/orders.model';
 import { CustomerWithFullAddressWithCountry } from '@/server/src/api/customers/customers.model';
 import { DriverWithId } from '@/server/src/api/drivers/drivers.model';
 import { CityWithId } from '@/server/src/api/cities/cities.model';
@@ -6,8 +9,10 @@ import { TruckWithId } from '@/server/src/api/trucks/trucks.model';
 
 import { z } from 'zod';
 
-export type Order = OrderWithIdAndDetails;
+export type Order = OrderWithId;
+export type OrderWithDetails = OrderWithIdAndDetails;
 export const OrderCreateSchema = z.object({
+  id: z.number().optional(),
   orderNr: z
     .string()
     .min(1, { message: 'Nr zlecenia jest zbyt krótki.' })
@@ -53,7 +58,10 @@ export const CitySchema = z
       .string()
       .min(1, { message: 'Podaj nazwę miejscowości.' })
       .max(255)
-      .regex(/D/i, 'W nazwie miejscowości dostępne są tylko litery.'),
+      .regex(
+        /[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż]/,
+        'W nazwie miejscowości dostępne są tylko litery.'
+      ),
 
     postal: z
       .string()

@@ -26,11 +26,11 @@ const order = pgTable('order', {
     precision: 10,
     scale: 2,
   }).notNull(),
-  pricePLN: numeric('price_pln', { precision: 10, scale: 2 }),
+  pricePLN: numeric('price_pln', { precision: 10, scale: 2 }).notNull(),
   currency: varchar('currency', { length: 3 }).notNull().default('PLN'),
-  currencyRate: numeric('currency_rate', { precision: 10, scale: 4 }).default(
-    '0'
-  ),
+  currencyRate: numeric('currency_rate', { precision: 10, scale: 4 })
+    .notNull()
+    .default('1'),
   truckID: integer('truck_id')
     .notNull()
     .references(() => truck.id),

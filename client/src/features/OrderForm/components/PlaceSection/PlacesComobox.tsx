@@ -25,7 +25,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import citiesQueryOptions from '../../queries/citiesQuery';
 import { Button } from '@/components/ui/button';
 import { Check, ChevronsUpDown } from 'lucide-react';
-import NewPlaceForm from './new-place-form';
+import PlaceForm from './PlaceForm';
 
 type PlacesComboboxProps = {
   fieldName: string;
@@ -60,7 +60,7 @@ export default function PlacesCombobox({
       render={() => (
         <FormItem className='w-full'>
           <div className='flex gap-2'>
-            <NewPlaceForm onSubmit={handleSelect} />
+            <PlaceForm onSubmit={handleSelect} />
             <Popover>
               <PopoverTrigger asChild>
                 <FormControl>

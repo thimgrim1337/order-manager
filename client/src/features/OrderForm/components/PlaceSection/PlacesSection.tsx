@@ -1,13 +1,16 @@
-import { useFormContext } from 'react-hook-form';
 import { CityCreate } from '@/types/types';
-import { SelectedPlacesList } from './places-list';
-import PlacesCombobox from './place-combobox';
+import { SelectedPlacesList } from './PlacesList';
+import PlacesCombobox from './PlacesComobox';
 
-export default function PlaceSection() {
-  const { getValues } = useFormContext();
-  const selectedLoadingPlaces = getValues('loadingPlaces') as CityCreate[];
-  const selectedUnloadingPlaces = getValues('unloadingPlaces') as CityCreate[];
+type PlaceSectionProps = {
+  selectedLoadingPlaces: CityCreate[];
+  selectedUnloadingPlaces: CityCreate[];
+};
 
+export default function PlacesSection({
+  selectedLoadingPlaces,
+  selectedUnloadingPlaces,
+}: PlaceSectionProps) {
   return (
     <div className='flex justify-between items-end gap-5'>
       <div className='flex flex-col gap-2 w-full'>

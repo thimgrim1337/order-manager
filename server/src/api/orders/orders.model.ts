@@ -53,18 +53,18 @@ export const OrderWithIdAndDetails = OrderWithId.extend({
   }),
   loadingPlaces: z
     .object({
-      placeID: z.number(),
-      place: z.object({
-        name: z.string().min(1),
-      }),
+      id: z.number(),
+      name: z.string(),
+      postal: z.string(),
+      countryID: z.number(),
     })
     .array(),
   unloadingPlaces: z
     .object({
-      placeID: z.number(),
-      place: z.object({
-        name: z.string().min(1),
-      }),
+      id: z.number(),
+      name: z.string(),
+      postal: z.string(),
+      countryID: z.number(),
     })
     .array(),
 });

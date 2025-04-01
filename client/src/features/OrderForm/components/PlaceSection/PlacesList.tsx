@@ -45,7 +45,7 @@ export function SelectedPlacesList({
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className=' space-y-2'>
       <div className='flex items-center justify-between space-x-4'>
         <h4 className='text-sm'>
-          Wybierz miejsce{' '}
+          Wybierz miejsce
           {fieldName === 'loadingPlaces' ? 'załadunku' : 'rozładunku'}
         </h4>
         <CollapsibleTrigger asChild>
@@ -55,33 +55,37 @@ export function SelectedPlacesList({
           </Button>
         </CollapsibleTrigger>
       </div>
-      <div className='rounded-md border px-4 py-2 font-mono text-sm shadow-sm'>
+      <div className='rounded-md border px-4 py-2  text-sm shadow-sm'>
         {firstPlace ? (
           <span className='flex justify-between'>
             {`${countries[firstPlace.countryID - 1].code} ${firstPlace.postal} ${firstPlace.name}`}
             <Button
               type='button'
               size={'icon'}
+              variant={'destructive'}
               onClick={() => handleRemove(firstPlace)}
             >
               <Trash />
             </Button>
           </span>
         ) : (
-          'Nie wybrano żadnego miejsca'
+          <span className='text-muted-foreground'>
+            Nie wybrano żadnego miejsca
+          </span>
         )}
       </div>
       <CollapsibleContent>
         <ul className='space-y-2'>
           {rest.map((place) => (
             <li
-              className='rounded-md border px-4 py-2 font-mono text-sm shadow-sm flex justify-between'
+              className='rounded-md border px-4 py-2 text-sm shadow-sm flex justify-between'
               key={place.name}
             >
               {`${countries[place.countryID - 1].code} ${place.postal} ${place.name}`}
               <Button
                 type='button'
                 size={'icon'}
+                variant={'destructive'}
                 onClick={() => handleRemove(place)}
               >
                 <Trash />
