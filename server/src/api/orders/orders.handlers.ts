@@ -2,18 +2,29 @@ import { RequestHandler } from 'express';
 import { orderServices } from './orders.sevices';
 import { AppError } from '@/lib/app-error';
 import { Order, OrderWithId, OrderWithIdAndDetails } from './orders.model';
-import { ParamsWithId } from '@/interfaces/ParamsWithId';
 import * as loadingPlacesHandler from '@/api/loadingPlaces/loading-places.handlers';
 import * as unloadingPlacesHandler from '@/api/unloadingPlaces/unloading-places.handlers';
 import getCitiesId from '../cities/helpers/getCitiesId';
+import { QueryParams } from '@/interfaces/QueryParams';
+import { ParamsWithId } from '@/interfaces/ParamsWithId';
 
-export const getAllOrders: RequestHandler<{}, OrderWithIdAndDetails[]> = async (
-  req,
-  res,
-  next
-) => {
+export const getAllOrders: RequestHandler<
+  {},
+  OrderWithIdAndDetails[],
+  {},
+  QueryParams
+> = async (req, res, next) => {
   try {
-    const orders = await orderServices.getOrdersQuery();
+    let orders;
+    const { truckId, startDate, endDate } = req.query;
+
+    if (truckId) {
+      orders = await orderServices.getOrderByTruckIdAndDatesQuery(
+        +truckId,
+        startDate,
+        endDate
+      );
+    } else orders = await orderServices.getOrdersQuery();
 
     const mapped = orders.map((order) => ({
       ...order,
@@ -36,7 +47,7 @@ export const getOrderById: RequestHandler<
   OrderWithIdAndDetails | {}
 > = async (req, res, next) => {
   try {
-    const order = await orderServices.getOrderByIdQuery(+req.params.id);
+    const order = await orderServices.getOrderByIdQuery(+req.params?.id);
 
     if (!order) res.status(404).send({});
 
