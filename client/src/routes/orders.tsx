@@ -14,17 +14,17 @@ import { createOrder } from '@/features/OrderForm/mutations/orderMutation';
 import CreateDialog from '@/features/OrdersTable/components/CreateDialog';
 
 export const Route = createFileRoute('/orders')({
-  loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(orderQueryOptions),
-  component: OrdersComponent,
+  loader: ({ context: { queryClient } }) => {
+    queryClient.ensureQueryData(orderQueryOptions);
+  },
+  component: RouteComponent,
 });
 
-function OrdersComponent() {
+function RouteComponent() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const ordersQuery = useSuspenseQuery(orderQueryOptions);
+  const { data: orders } = useSuspenseQuery(orderQueryOptions);
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { data: orders } = ordersQuery;
 
   const createMutation = useMutation({
     mutationFn: createOrder,

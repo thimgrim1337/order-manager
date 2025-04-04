@@ -1,6 +1,6 @@
 import { OrderCreate } from '@/types/types';
-import { yesterday } from './dates';
 import { fetchCurrencyRate } from '@/features/OrderForm/queries/currencyRateQuery';
+import { getYesterday } from './dates';
 
 export async function getCurrencyRate(order: OrderCreate) {
   if (order.currency !== 'EUR') {
@@ -13,7 +13,7 @@ export async function getCurrencyRate(order: OrderCreate) {
   const response = await fetchCurrencyRate(
     'a',
     'eur',
-    yesterday(order.endDate)
+    getYesterday(order.endDate)
   );
 
   const currencyRate = response.rates[0].mid;

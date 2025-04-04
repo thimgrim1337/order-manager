@@ -13,6 +13,7 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as TimeTableImport } from './routes/time-table'
 import { Route as OrdersImport } from './routes/orders'
 
 // Create Virtual Routes
@@ -20,6 +21,12 @@ import { Route as OrdersImport } from './routes/orders'
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
+
+const TimeTableRoute = TimeTableImport.update({
+  id: '/time-table',
+  path: '/time-table',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const OrdersRoute = OrdersImport.update({
   id: '/orders',
@@ -51,6 +58,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrdersImport
       parentRoute: typeof rootRoute
     }
+    '/time-table': {
+      id: '/time-table'
+      path: '/time-table'
+      fullPath: '/time-table'
+      preLoaderRoute: typeof TimeTableImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -59,36 +73,41 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/orders': typeof OrdersRoute
+  '/time-table': typeof TimeTableRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/orders': typeof OrdersRoute
+  '/time-table': typeof TimeTableRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
   '/orders': typeof OrdersRoute
+  '/time-table': typeof TimeTableRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/orders'
+  fullPaths: '/' | '/orders' | '/time-table'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/orders'
-  id: '__root__' | '/' | '/orders'
+  to: '/' | '/orders' | '/time-table'
+  id: '__root__' | '/' | '/orders' | '/time-table'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   OrdersRoute: typeof OrdersRoute
+  TimeTableRoute: typeof TimeTableRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   OrdersRoute: OrdersRoute,
+  TimeTableRoute: TimeTableRoute,
 }
 
 export const routeTree = rootRoute
@@ -102,7 +121,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/orders"
+        "/orders",
+        "/time-table"
       ]
     },
     "/": {
@@ -110,6 +130,9 @@ export const routeTree = rootRoute
     },
     "/orders": {
       "filePath": "orders.tsx"
+    },
+    "/time-table": {
+      "filePath": "time-table.tsx"
     }
   }
 }

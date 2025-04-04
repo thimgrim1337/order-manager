@@ -22,6 +22,9 @@ function Root() {
           <Link to='/' className='[&.active]:font-bold'>
             Home
           </Link>
+          <Link to='/time-table' className='[&.active]:font-bold'>
+            Tablica czasu
+          </Link>
           <Link to='/orders' className='[&.active]:font-bold'>
             Zlecenia
           </Link>

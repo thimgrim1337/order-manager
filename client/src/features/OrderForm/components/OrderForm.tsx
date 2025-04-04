@@ -5,7 +5,7 @@ import { OrderCreate, OrderCreateSchema } from '../../../types/types';
 import { Button } from '@/components/ui/button';
 import { LoaderCircle } from 'lucide-react';
 import { useErrorBoundary } from 'react-error-boundary';
-import { today, tomorrow } from '@/helpers/dates';
+import { getToday, getTomorrow } from '@/helpers/dates';
 import { DevTool } from '@hookform/devtools';
 import CustomerSection from './CustomerSection/CustomerSection';
 import DatesSection from './DateSection/DatesSection';
@@ -17,8 +17,8 @@ import { UseMutationResult } from '@tanstack/react-query';
 
 const defaultValues = {
   orderNr: '',
-  startDate: today,
-  endDate: tomorrow,
+  startDate: getToday(),
+  endDate: getTomorrow(getToday()),
   statusID: 1,
   priceCurrency: '',
   pricePLN: '',

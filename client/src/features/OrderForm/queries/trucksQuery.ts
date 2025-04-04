@@ -1,4 +1,4 @@
-import { Truck } from '@/server/src/api/trucks/trucks.model';
+import { Truck } from '@/types/types';
 import { queryOptions } from '@tanstack/react-query';
 
 async function fetchTrucks(): Promise<Truck[]> {
