@@ -1,83 +1,63 @@
 import { columns } from '@/features/OrdersTable/columns';
 import { DataTable } from '@/components/ui/data-table/data-table';
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import OrderForm from '@/features/OrderForm/components/OrderForm';
-import { Suspense, useState } from 'react';
+import OrderForm from '@/features/OrderForm/components/order-form';
+import { useState } from 'react';
 import orderQueryOptions from '@/features/OrderForm/queries/ordersQuery';
-import { useToast } from '@/hooks/use-toast';
 import { createOrder } from '@/features/OrderForm/mutations/orderMutation';
-import CreateDialog from '@/features/OrdersTable/components/CreateDialog';
+import { useCreateMutation } from '@/features/OrderForm/hooks/useCreateMutation';
+import Dialog from '@/components/ui/form/dialog';
+import customersQueryOptions from '@/features/OrderForm/queries/customersQuery';
+import countriesQueryOptions from '@/features/OrderForm/queries/countriesQuery';
+import { Order } from '@/types/types';
 
 export const Route = createFileRoute('/orders')({
-  loader: ({ context: { queryClient } }) => {
-    queryClient.ensureQueryData(orderQueryOptions);
-  },
-  component: RouteComponent,
+  loader: ({ context: { queryClient } }) =>
+    Promise.all([
+      queryClient.ensureQueryData(orderQueryOptions),
+      queryClient.ensureQueryData(customersQueryOptions),
+      queryClient.ensureQueryData(countriesQueryOptions),
+    ]),
+
+  pendingComponent: () => <h1>Loading...</h1>,
+  component: OrdersPage,
 });
 
-function RouteComponent() {
+function OrdersPage() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { data: orders } = useSuspenseQuery(orderQueryOptions);
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
 
-  const createMutation = useMutation({
+  const { createMutation } = useCreateMutation<Order>({
     mutationFn: createOrder,
-    onMutate: async (newOrder) => {
-      await queryClient.cancelQueries({ queryKey: ['orders'] });
-
-      const previousOrders = queryClient.getQueryData(['orders']);
-
-      if (previousOrders)
-        queryClient.setQueryData(['orders'], { ...previousOrders, newOrder });
-
-      return { previousOrders };
-    },
-    onError: (err, newOrder, context) => {
-      if (context?.previousOrders) {
-        queryClient.setQueryData(['orders'], context.previousOrders);
-        console.log(err);
-      }
-      toast({
-        title: 'Błąd',
-        description: 'Nie udało się dodać nowego zlecenia.',
-        variant: 'destructive',
-      });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-      setIsOpen(false);
-    },
-    onSuccess: () => {
-      toast({
-        title: 'Nowe zlecenie',
-        description: 'Dodano nowe zlecenie',
-      });
-    },
+    queryKey: ['orders'],
+    toastDescription: 'Dodano nowe zlecenie.',
+    toastTitle: 'Nowe zlecenie.',
+    errorDescription: 'Nie udało się dodać nowego zlecenia. Spróbuj ponownie.',
   });
 
   return (
     <div className='container mx-auto py-10'>
-      <Suspense fallback={<h1>Loading orders...</h1>}>
-        <div className='flex justify-end'>
-          <CreateDialog onOpenChange={setIsOpen} isOpen={isOpen}>
-            <OrderForm
-              mutationFn={createMutation.mutate}
-              isPending={createMutation.isPending}
-            ></OrderForm>
-          </CreateDialog>
-        </div>
-        <DataTable
-          columns={columns}
-          data={orders}
-          searchInputPlaceholder='Filtruj zlecenia...'
-        />
-      </Suspense>
+      <div className='flex justify-end'>
+        <Dialog
+          onOpenChange={setIsOpen}
+          isOpen={isOpen}
+          trigger='Dodaj zlecenie'
+          title='Dodaj nowe zlecenie'
+          description='Wypełnij wszystkie pola aby dodać nowe zlecenie.'
+          className='max-w-screen-lg'
+        >
+          <OrderForm<Order>
+            mutationFn={createMutation.mutate}
+            isPending={createMutation.isPending}
+          />
+        </Dialog>
+      </div>
+      <DataTable
+        columns={columns}
+        data={orders}
+        searchInputPlaceholder='Filtruj zlecenia...'
+      />
     </div>
   );
 }

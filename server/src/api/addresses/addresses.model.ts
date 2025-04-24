@@ -17,7 +17,6 @@ export type AddressWithId = z.infer<typeof AddressWithId>;
 
 export const AddressWithCountry = createSelectSchema(address, {
   id: (schema) => schema.id.optional(),
-  countryID: (schema) => schema.countryID.optional(),
 });
 export type AddressWithCountry = z.infer<typeof AddressWithCountry> & {
   country: Country;

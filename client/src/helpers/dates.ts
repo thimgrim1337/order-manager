@@ -6,6 +6,8 @@ import {
   eachDayOfInterval,
   startOfWeek,
   endOfWeek,
+  subWeeks,
+  addWeeks,
 } from 'date-fns';
 import { pl } from 'date-fns/locale';
 
@@ -14,15 +16,22 @@ export type Day = {
   date: string;
 };
 
-export const getToday = () => format(Date.now(), 'yyyy-MM-dd', { locale: pl });
+const formatDate = (date: Date | number, dateFormat: string = 'yyyy-MM-dd') =>
+  format(date, dateFormat, { locale: pl });
 
-export const getTomorrow = (date: string) =>
-  format(addDays(date, 1), 'yyyy-MM-dd');
+export const getToday = () => formatDate(Date.now());
 
-export const getYesterday = (date: string) =>
-  format(subDays(date, 1), 'yyyy-MM-dd');
+export const getTomorrow = (date: string) => formatDate(addDays(date, 1));
 
-export const getWeekNumber = (date: string) => getWeek(date);
+export const getYesterday = (date: string) => formatDate(subDays(date, 1));
+
+export const getWeekNumber = (date: string) => getWeek(date).toString();
+
+export const subWeek = (date: string, count: number) =>
+  formatDate(subWeeks(date, count));
+
+export const addWeek = (date: string, count: number) =>
+  formatDate(addWeeks(date, count));
 
 export const getFirstDayOfWeek = (date: string) =>
   startOfWeek(date, { weekStartsOn: 1 });
@@ -35,6 +44,6 @@ export const getDaysOfWeek = (startDate: Date, endDate: Date): Day[] =>
     start: startDate,
     end: endDate,
   }).map((day) => ({
-    name: format(day, 'eeee', { locale: pl }),
-    date: format(day, 'yyyy-MM-dd', { locale: pl }),
+    name: formatDate(day, 'eeee'),
+    date: formatDate(day),
   }));

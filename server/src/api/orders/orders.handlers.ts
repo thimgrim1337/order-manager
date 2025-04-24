@@ -88,14 +88,16 @@ export const addOrder: RequestHandler<{}, OrderWithId, Order> = async (
     const unloadingPlacesIds = (await getCitiesId(unloadingPlaces)) as number[];
 
     if (createdOrder[0]) {
-      await loadingPlacesHandler.addLoadingPlaces(
-        createdOrder[0].id,
-        loadingPlacesIds
-      );
-      await unloadingPlacesHandler.addUnloadingPlaces(
-        createdOrder[0].id,
-        unloadingPlacesIds
-      );
+      Promise.all([
+        loadingPlacesHandler.addLoadingPlaces(
+          createdOrder[0].id,
+          loadingPlacesIds
+        ),
+        unloadingPlacesHandler.addUnloadingPlaces(
+          createdOrder[0].id,
+          unloadingPlacesIds
+        ),
+      ]);
     }
 
     res.status(201).json(createdOrder[0]);
@@ -129,12 +131,10 @@ export const updateOrder: RequestHandler<
       updatedOrderObj.unloadingPlaces
     )) as number[];
 
-    await loadingPlacesHandler.updateLoadingPlaces(orderID, loadingPlacesIds);
-
-    await unloadingPlacesHandler.updateUnloadingPlaces(
-      orderID,
-      unloadingPlacesIds
-    );
+    await Promise.all([
+      loadingPlacesHandler.updateLoadingPlaces(orderID, loadingPlacesIds),
+      unloadingPlacesHandler.updateUnloadingPlaces(orderID, unloadingPlacesIds),
+    ]);
 
     res.status(200).json(updatedOrder[0]);
   } catch (error) {
@@ -153,8 +153,11 @@ export const deleteOrder: RequestHandler<ParamsWithId, OrderWithId> = async (
 
     if (!orderExist) throw new AppError('Order does not exist.', 404);
 
-    await loadingPlacesHandler.deleteLoadingPlaces(orderID);
-    await unloadingPlacesHandler.deleteUnloadingPlaces(orderID);
+    await Promise.all([
+      loadingPlacesHandler.deleteLoadingPlaces(orderID),
+      unloadingPlacesHandler.deleteUnloadingPlaces(orderID),
+    ]);
+
     const deletedOrder = await orderServices.deleteOrderQuery(orderID);
 
     res.status(200).json(deletedOrder[0]);
