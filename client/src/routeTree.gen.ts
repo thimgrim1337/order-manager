@@ -13,101 +13,132 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as TimeTableImport } from './routes/time-table'
-import { Route as OrdersImport } from './routes/orders'
+import { Route as LayoutImport } from './routes/_layout'
+import { Route as LayoutTimeTableImport } from './routes/_layout.time-table'
+import { Route as LayoutOrdersImport } from './routes/_layout.orders'
 
 // Create Virtual Routes
 
-const IndexLazyImport = createFileRoute('/')()
+const LayoutIndexLazyImport = createFileRoute('/_layout/')()
 
 // Create/Update Routes
 
-const TimeTableRoute = TimeTableImport.update({
-  id: '/time-table',
-  path: '/time-table',
+const LayoutRoute = LayoutImport.update({
+  id: '/_layout',
   getParentRoute: () => rootRoute,
 } as any)
 
-const OrdersRoute = OrdersImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const IndexLazyRoute = IndexLazyImport.update({
+const LayoutIndexLazyRoute = LayoutIndexLazyImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+  getParentRoute: () => LayoutRoute,
+} as any).lazy(() => import('./routes/_layout.index.lazy').then((d) => d.Route))
+
+const LayoutTimeTableRoute = LayoutTimeTableImport.update({
+  id: '/time-table',
+  path: '/time-table',
+  getParentRoute: () => LayoutRoute,
+} as any)
+
+const LayoutOrdersRoute = LayoutOrdersImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => LayoutRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexLazyImport
+    '/_layout': {
+      id: '/_layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof LayoutImport
       parentRoute: typeof rootRoute
     }
-    '/orders': {
-      id: '/orders'
+    '/_layout/orders': {
+      id: '/_layout/orders'
       path: '/orders'
       fullPath: '/orders'
-      preLoaderRoute: typeof OrdersImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof LayoutOrdersImport
+      parentRoute: typeof LayoutImport
     }
-    '/time-table': {
-      id: '/time-table'
+    '/_layout/time-table': {
+      id: '/_layout/time-table'
       path: '/time-table'
       fullPath: '/time-table'
-      preLoaderRoute: typeof TimeTableImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof LayoutTimeTableImport
+      parentRoute: typeof LayoutImport
+    }
+    '/_layout/': {
+      id: '/_layout/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof LayoutIndexLazyImport
+      parentRoute: typeof LayoutImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface LayoutRouteChildren {
+  LayoutOrdersRoute: typeof LayoutOrdersRoute
+  LayoutTimeTableRoute: typeof LayoutTimeTableRoute
+  LayoutIndexLazyRoute: typeof LayoutIndexLazyRoute
+}
+
+const LayoutRouteChildren: LayoutRouteChildren = {
+  LayoutOrdersRoute: LayoutOrdersRoute,
+  LayoutTimeTableRoute: LayoutTimeTableRoute,
+  LayoutIndexLazyRoute: LayoutIndexLazyRoute,
+}
+
+const LayoutRouteWithChildren =
+  LayoutRoute._addFileChildren(LayoutRouteChildren)
+
 export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute
-  '/orders': typeof OrdersRoute
-  '/time-table': typeof TimeTableRoute
+  '': typeof LayoutRouteWithChildren
+  '/orders': typeof LayoutOrdersRoute
+  '/time-table': typeof LayoutTimeTableRoute
+  '/': typeof LayoutIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute
-  '/orders': typeof OrdersRoute
-  '/time-table': typeof TimeTableRoute
+  '/orders': typeof LayoutOrdersRoute
+  '/time-table': typeof LayoutTimeTableRoute
+  '/': typeof LayoutIndexLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexLazyRoute
-  '/orders': typeof OrdersRoute
-  '/time-table': typeof TimeTableRoute
+  '/_layout': typeof LayoutRouteWithChildren
+  '/_layout/orders': typeof LayoutOrdersRoute
+  '/_layout/time-table': typeof LayoutTimeTableRoute
+  '/_layout/': typeof LayoutIndexLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/orders' | '/time-table'
+  fullPaths: '' | '/orders' | '/time-table' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/orders' | '/time-table'
-  id: '__root__' | '/' | '/orders' | '/time-table'
+  to: '/orders' | '/time-table' | '/'
+  id:
+    | '__root__'
+    | '/_layout'
+    | '/_layout/orders'
+    | '/_layout/time-table'
+    | '/_layout/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute
-  OrdersRoute: typeof OrdersRoute
-  TimeTableRoute: typeof TimeTableRoute
+  LayoutRoute: typeof LayoutRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexLazyRoute: IndexLazyRoute,
-  OrdersRoute: OrdersRoute,
-  TimeTableRoute: TimeTableRoute,
+  LayoutRoute: LayoutRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -120,19 +151,28 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
-        "/orders",
-        "/time-table"
+        "/_layout"
       ]
     },
-    "/": {
-      "filePath": "index.lazy.tsx"
+    "/_layout": {
+      "filePath": "_layout.tsx",
+      "children": [
+        "/_layout/orders",
+        "/_layout/time-table",
+        "/_layout/"
+      ]
     },
-    "/orders": {
-      "filePath": "orders.tsx"
+    "/_layout/orders": {
+      "filePath": "_layout.orders.tsx",
+      "parent": "/_layout"
     },
-    "/time-table": {
-      "filePath": "time-table.tsx"
+    "/_layout/time-table": {
+      "filePath": "_layout.time-table.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/": {
+      "filePath": "_layout.index.lazy.tsx",
+      "parent": "/_layout"
     }
   }
 }

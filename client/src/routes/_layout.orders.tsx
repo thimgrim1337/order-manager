@@ -12,7 +12,7 @@ import customersQueryOptions from '@/features/OrderForm/queries/customersQuery';
 import countriesQueryOptions from '@/features/OrderForm/queries/countriesQuery';
 import { Order } from '@/types/types';
 
-export const Route = createFileRoute('/orders')({
+export const Route = createFileRoute('/_layout/orders')({
   loader: ({ context: { queryClient } }) =>
     Promise.all([
       queryClient.ensureQueryData(orderQueryOptions),

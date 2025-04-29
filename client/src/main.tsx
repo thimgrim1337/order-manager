@@ -1,3 +1,4 @@
+import { scan } from 'react-scan';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
@@ -39,6 +40,10 @@ declare module '@tanstack/react-router' {
     router: typeof router;
   }
 }
+
+scan({
+  enabled: true,
+});
 
 // Render the app
 const rootElement = document.getElementById('root')!;
