@@ -1,8 +1,8 @@
-import { OrderCreate } from '@/types/types';
-import { yesterday } from './dates';
+import { Order, OrderWithId } from '@/types/types';
 import { fetchCurrencyRate } from '@/features/OrderForm/queries/currencyRateQuery';
+import { getYesterday } from './dates';
 
-export async function getCurrencyRate(order: OrderCreate) {
+export async function getCurrencyRate<T extends Order | OrderWithId>(order: T) {
   if (order.currency !== 'EUR') {
     order.pricePLN = order.priceCurrency;
     order.currencyRate = '0';
@@ -13,7 +13,7 @@ export async function getCurrencyRate(order: OrderCreate) {
   const response = await fetchCurrencyRate(
     'a',
     'eur',
-    yesterday(order.endDate)
+    getYesterday(order.endDate)
   );
 
   const currencyRate = response.rates[0].mid;

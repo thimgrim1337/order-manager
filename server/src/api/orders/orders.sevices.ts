@@ -1,6 +1,6 @@
 import db from '@/db/index';
 import { order } from '@/db/schema/index';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, gte, lte } from 'drizzle-orm';
 import { Order } from './orders.model';
 
 export const orderServices = {
@@ -102,6 +102,64 @@ export const orderServices = {
       where: (order) =>
         and(eq(order.orderNr, orderNr), eq(order.customerID, customerID)),
     }),
+  getOrderByTruckIdAndDatesQuery: (
+    truckID: number,
+    startDate: string | undefined,
+    endDate: string | undefined
+  ) => {
+    return db.query.order.findMany({
+      where: (order) =>
+        and(
+          eq(order.truckID, truckID),
+          startDate ? gte(order.startDate, startDate) : undefined,
+          endDate ? lte(order.endDate, endDate) : undefined
+        ),
+      with: {
+        loadingPlaces: {
+          columns: {
+            id: false,
+            orderID: false,
+            placeID: false,
+          },
+          with: {
+            place: true,
+          },
+        },
+        unloadingPlaces: {
+          columns: {
+            id: false,
+            orderID: false,
+            placeID: false,
+          },
+          with: {
+            place: true,
+          },
+        },
+        status: {
+          columns: {
+            name: true,
+          },
+        },
+        truck: {
+          columns: {
+            plate: true,
+          },
+        },
+        driver: {
+          columns: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+        customer: {
+          columns: {
+            name: true,
+          },
+        },
+      },
+    });
+  },
+
   addOrderQuery: (newOrder: Order) =>
     db.insert(order).values(newOrder).returning(),
   deleteOrderQuery: (orderID: number) =>

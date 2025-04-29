@@ -1,24 +1,24 @@
-import { useForm } from 'react-hook-form';
+import { DefaultValues, Path, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from '@/components/ui/form';
-import { OrderCreate, OrderCreateSchema } from '../../../types/types';
 import { Button } from '@/components/ui/button';
 import { LoaderCircle } from 'lucide-react';
 import { useErrorBoundary } from 'react-error-boundary';
-import { today, tomorrow } from '@/helpers/dates';
+import { getToday, getTomorrow } from '@/helpers/dates';
 import { DevTool } from '@hookform/devtools';
-import CustomerSection from './CustomerSection/CustomerSection';
-import DatesSection from './DateSection/DatesSection';
+import CustomerSection from './CustomerSection/customer';
+import DatesSection from './DateSection/dates';
 import PriceSection from './PriceSection/price-section';
 import TruckSection from './TruckSection/truck-section';
-import PlacesSection from './PlaceSection/PlacesSection';
+import PlacesSection from './PlaceSection/places';
 import { getCurrencyRate } from '@/helpers/getCurrencyRate';
 import { UseMutationResult } from '@tanstack/react-query';
+import { City, Order, OrderWithId } from '@/types/types';
 
-const defaultValues = {
+const initialValues = {
   orderNr: '',
-  startDate: today,
-  endDate: tomorrow,
+  startDate: getToday(),
+  endDate: getTomorrow(getToday()),
   statusID: 1,
   priceCurrency: '',
   pricePLN: '',
@@ -31,25 +31,25 @@ const defaultValues = {
   unloadingPlaces: [],
 };
 
-type OrderFormProps = {
-  values?: OrderCreate;
-  mutationFn: UseMutationResult<unknown, Error, OrderCreate, unknown>['mutate'];
+type OrderFormProps<T> = {
+  values?: T;
+  mutationFn: UseMutationResult<unknown, Error, T, unknown>['mutate'];
   isPending: boolean;
 };
 
-export default function OrderForm({
+export default function OrderForm<T extends Order | OrderWithId>({
   mutationFn,
   values,
   isPending,
-}: OrderFormProps) {
+}: OrderFormProps<T>) {
   const { showBoundary } = useErrorBoundary();
 
-  const form = useForm<OrderCreate>({
-    resolver: zodResolver(OrderCreateSchema),
-    defaultValues: values || defaultValues,
+  const form = useForm<T>({
+    resolver: zodResolver(Order || OrderWithId),
+    defaultValues: (values || initialValues) as DefaultValues<T>,
   });
 
-  async function onSubmit(formValues: OrderCreate) {
+  const onSubmit: SubmitHandler<T> = async (formValues) => {
     try {
       const order = await getCurrencyRate(formValues);
 
@@ -60,21 +60,28 @@ export default function OrderForm({
         stack: `Stack ${error}`,
       });
     }
-  }
+  };
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit, (errors) => {
-          console.error(errors);
-        })}
+        onSubmit={form.handleSubmit(
+          onSubmit as SubmitHandler<Order>,
+          (errors) => {
+            console.error(errors);
+          }
+        )}
         className='space-y-8'
       >
         <CustomerSection />
         <DatesSection />
         <PlacesSection
-          selectedLoadingPlaces={form.getValues('loadingPlaces')}
-          selectedUnloadingPlaces={form.getValues('unloadingPlaces')}
+          loadingPlaces={
+            (form.getValues('loadingPlaces' as Path<T>) || []) as City[]
+          }
+          unloadingPlaces={
+            (form.getValues('unloadingPlaces' as Path<T>) || []) as City[]
+          }
         />
         <PriceSection />
         <TruckSection />

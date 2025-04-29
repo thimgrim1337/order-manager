@@ -1,17 +1,13 @@
-import {
-  OrderWithId,
-  OrderWithIdAndDetails,
-} from '@/server/src/api/orders/orders.model';
-import { CustomerWithFullAddressWithCountry } from '@/server/src/api/customers/customers.model';
 import { DriverWithId } from '@/server/src/api/drivers/drivers.model';
-import { CityWithId } from '@/server/src/api/cities/cities.model';
 import { TruckWithId } from '@/server/src/api/trucks/trucks.model';
-
 import { z } from 'zod';
 
-export type Order = OrderWithId;
-export type OrderWithDetails = OrderWithIdAndDetails;
-export const OrderCreateSchema = z.object({
+export const ID = z.object({
+  id: z.number(),
+});
+export type ID = z.infer<typeof ID>;
+
+export const Order = z.object({
   id: z.number().optional(),
   orderNr: z
     .string()
@@ -29,6 +25,7 @@ export const OrderCreateSchema = z.object({
   customerID: z.number({ message: 'Wybierz zleceniodawcę.' }).min(1),
   loadingPlaces: z
     .object({
+      id: z.number().optional(),
       name: z.string(),
       postal: z.string(),
       countryID: z.number(),
@@ -37,6 +34,7 @@ export const OrderCreateSchema = z.object({
     .min(1, { message: 'Wybierz co najmniej jedno miejsce załadunku.' }),
   unloadingPlaces: z
     .object({
+      id: z.number().optional(),
       name: z.string(),
       postal: z.string(),
       countryID: z.number(),
@@ -44,14 +42,53 @@ export const OrderCreateSchema = z.object({
     .array()
     .min(1, { message: 'Wybierz co najmniej jedno miejsce rozładunku.' }),
 });
-export type OrderCreate = z.infer<typeof OrderCreateSchema>;
+export type Order = z.infer<typeof Order>;
+export const OrderWithId = Order.extend({
+  id: z.number(),
+});
+export type OrderWithId = z.infer<typeof OrderWithId>;
 
-export type Customer = CustomerWithFullAddressWithCountry;
+export const OrderWithDetails = OrderWithId.extend({
+  status: z.object({
+    name: z.string().min(1),
+  }),
+  truck: z.object({
+    plate: z.string().min(1),
+  }),
+  driver: z.object({
+    firstName: z.string().min(1),
+    lastName: z.string().min(1),
+  }),
+  customer: z.object({
+    name: z.string().min(1),
+  }),
+});
+export type OrderWithDetails = z.infer<typeof OrderWithDetails>;
+
+export const Address = z.object({
+  street: z.string().min(1, { message: 'Wprowadź nazwę ulicy.' }),
+  streetNr: z.string().min(1, { message: 'Wprowadź numer ulicy.' }),
+  postal: z.string().min(1, { message: 'Wprowadź kod pocztowy.' }),
+  city: z.string().min(1, { message: 'Wprowadź nazwę miejscowości.' }),
+  countryID: z.coerce.number(),
+});
+export type Address = z.infer<typeof Address>;
+
+export const Customer = z.object({
+  name: z.string().min(1, { message: 'Wprowadź nazwę zleceniodawcy.' }),
+  tax: z
+    .string()
+    .min(10, { message: 'NIP jest zbyt krótki.' })
+    .max(50, { message: 'NIP jest zbyt długi.' }),
+  address: Address,
+});
+export type Customer = z.infer<typeof Customer>;
+export type CustomerWithId = Customer & ID;
+
 export type Driver = DriverWithId;
 export type Truck = TruckWithId;
 
-export type City = CityWithId;
-export const CitySchema = z
+export const City = z
   .object({
     id: z.number().optional(),
     name: z
@@ -67,21 +104,18 @@ export const CitySchema = z
       .string()
       .min(1, { message: 'Podaj kod pocztowy miejscowości.' })
       .max(10, { message: 'Kod pocztowy musi być krótszy niż 10 znaków.' }),
-    countryID: z.number({ message: 'Wybierz kraj.' }).min(1),
+    countryID: z.coerce.number(),
   })
   .strict();
-export type CityCreate = z.infer<typeof CitySchema>;
-export type CityWithCountry = CityCreate & {
-  country: Country;
-};
+export type City = z.infer<typeof City>;
+export type CityWithId = City & ID;
+export type CityWithCountry = City & Country;
 
 export type Country = {
   name: string;
   code: string;
 };
-export type CountryWithId = Country & {
-  id: number;
-};
+export type CountryWithId = Country & ID;
 
 export type CurrencyRate = {
   table: string;

@@ -8,15 +8,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { OrderCreate } from '@/types/types';
+import { OrderWithId } from '@/types/types';
 import { UseMutationResult } from '@tanstack/react-query';
 import { Dispatch, SetStateAction } from 'react';
 
 type RemoveDialogProps = {
   onOpenChange: Dispatch<SetStateAction<boolean>>;
-  mutationFn: UseMutationResult<unknown, Error, OrderCreate, unknown>['mutate'];
+  mutationFn: UseMutationResult<unknown, Error, OrderWithId, unknown>['mutate'];
   isOpen: boolean;
-  order: OrderCreate;
+  order: OrderWithId;
 };
 
 export default function RemoveDialog({

@@ -5,40 +5,43 @@ import {
 } from '@/components/ui/collapsible';
 import { ChevronsUpDown, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useFieldArray, useFormContext } from 'react-hook-form';
+import {
+  FieldName,
+  FieldValues,
+  useFieldArray,
+  useFormContext,
+} from 'react-hook-form';
 import { useState } from 'react';
-import { CityCreate } from '@/types/types';
+import { City } from '@/types/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import countriesQueryOptions from '../../queries/countriesQuery';
 
-type SelectedPlacesListProps = {
-  selectedPlaces: CityCreate[];
-  fieldName: string;
+type SelectedPlacesListProps<TFieldValues extends FieldValues> = {
+  selectedPlaces: City[];
+  name: FieldName<TFieldValues>;
 };
 
-export function SelectedPlacesList({
+export function PlacesList({
   selectedPlaces,
-  fieldName,
-}: SelectedPlacesListProps) {
+  name,
+}: SelectedPlacesListProps<FieldValues>) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { control } = useFormContext();
   const { remove } = useFieldArray({
     control,
-    name: `${fieldName}`,
+    name: `${name}`,
   });
   const { data: countries } = useSuspenseQuery(countriesQueryOptions);
 
   const firstPlace = selectedPlaces[0];
   const [, ...rest] = selectedPlaces;
 
-  function handleRemove(placeRemove: CityCreate) {
+  function onRemove(placeRemove: City) {
     const index = selectedPlaces.findIndex(
       (place) => place.name === placeRemove.name
     );
 
-    if (index < 0) return;
-
-    remove(index);
+    return index < 0 ? null : remove(index);
   }
 
   return (
@@ -46,7 +49,7 @@ export function SelectedPlacesList({
       <div className='flex items-center justify-between space-x-4'>
         <h4 className='text-sm'>
           Wybierz miejsce
-          {fieldName === 'loadingPlaces' ? 'załadunku' : 'rozładunku'}
+          {name === 'loadingPlaces' ? ' załadunku' : ' rozładunku'}
         </h4>
         <CollapsibleTrigger asChild>
           <Button variant='ghost' size='sm' className='text-primary-foreground'>
@@ -63,7 +66,7 @@ export function SelectedPlacesList({
               type='button'
               size={'icon'}
               variant={'destructive'}
-              onClick={() => handleRemove(firstPlace)}
+              onClick={() => onRemove(firstPlace)}
             >
               <Trash />
             </Button>
@@ -86,7 +89,7 @@ export function SelectedPlacesList({
                 type='button'
                 size={'icon'}
                 variant={'destructive'}
-                onClick={() => handleRemove(place)}
+                onClick={() => onRemove(place)}
               >
                 <Trash />
               </Button>

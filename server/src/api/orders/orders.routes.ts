@@ -3,9 +3,17 @@ import * as handlers from './orders.handlers';
 import { validateRequest } from '@/middleware/validate-request';
 import { ParamsWithId } from '@/interfaces/ParamsWithId';
 import { Order } from './orders.model';
+import { QueryParams } from '@/interfaces/QueryParams';
 const router = Router();
 
-router.get('/', handlers.getAllOrders);
+router.get(
+  '/',
+  validateRequest({
+    query: QueryParams,
+  }),
+  handlers.getAllOrders
+);
+
 router.get(
   '/:id',
   validateRequest({
@@ -13,6 +21,7 @@ router.get(
   }),
   handlers.getOrderById
 );
+
 router.post(
   '/',
   validateRequest({
@@ -20,6 +29,7 @@ router.post(
   }),
   handlers.addOrder
 );
+
 router.patch(
   '/:id',
   validateRequest({
@@ -28,6 +38,7 @@ router.patch(
   }),
   handlers.updateOrder
 );
+
 router.delete(
   '/:id',
   validateRequest({
