@@ -1,7 +1,7 @@
 import { DefaultValues, Path, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
+import { Form } from '@/components/ui/primitives/form';
+import { Button } from '@/components/ui/primitives/button';
 import { LoaderCircle } from 'lucide-react';
 import { useErrorBoundary } from 'react-error-boundary';
 import { getToday, getTomorrow } from '@/helpers/dates';

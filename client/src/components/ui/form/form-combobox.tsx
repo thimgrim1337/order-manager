@@ -1,7 +1,6 @@
-import { FormControl } from '../form';
-import { Button } from '../button';
+import { Button } from '../primitives/button';
 import { Check, ChevronsUpDown } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '../popover';
+import { Popover, PopoverContent, PopoverTrigger } from '../primitives/popover';
 import {
   Command,
   CommandEmpty,
@@ -9,7 +8,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '../command';
+} from '../primitives/command';
 import { cn } from '@/lib/utils';
 import { forwardRef } from 'react';
 import {
@@ -36,21 +35,19 @@ const FormCombobox = forwardRef<
     <>
       <Popover>
         <PopoverTrigger asChild>
-          <FormControl>
-            <Button
-              variant='outline'
-              role='combobox'
-              className={cn(
-                'w-full justify-between',
-                !fieldValue && 'text-muted-foreground'
-              )}
-            >
-              {fieldValue === undefined || fieldValue === ''
-                ? placeholder
-                : data.find((d) => d.id === fieldValue)?.name}
-              <ChevronsUpDown className='opacity-50' />
-            </Button>
-          </FormControl>
+          <Button
+            variant='outline'
+            role='combobox'
+            className={cn(
+              'w-full justify-between',
+              !fieldValue && 'text-muted-foreground'
+            )}
+          >
+            {fieldValue === undefined || fieldValue === ''
+              ? placeholder
+              : data.find((d) => d.id === fieldValue)?.name}
+            <ChevronsUpDown className='opacity-50' />
+          </Button>
         </PopoverTrigger>
         <PopoverContent className='w-full p-0'>
           <Command>

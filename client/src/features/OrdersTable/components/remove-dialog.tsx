@@ -7,7 +7,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@/components/ui/primitives/alert-dialog';
 import { OrderWithId } from '@/types/types';
 import { UseMutationResult } from '@tanstack/react-query';
 import { Dispatch, SetStateAction } from 'react';

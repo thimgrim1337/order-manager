@@ -1,4 +1,4 @@
-import Dialog from '@/components/ui/form/dialog';
+import Dialog from '@/components/ui/dialog/dialog';
 import OrderForm from '@/features/OrderForm/components/order-form';
 import { OrderWithId } from '@/types/types';
 import { UseMutationResult } from '@tanstack/react-query';

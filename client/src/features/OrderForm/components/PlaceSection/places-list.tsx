@@ -2,9 +2,9 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+} from '@/components/ui/primitives/collapsible';
 import { ChevronsUpDown, Trash } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/primitives/button';
 import {
   FieldName,
   FieldValues,

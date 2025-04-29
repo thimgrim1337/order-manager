@@ -2,9 +2,9 @@ import { City } from '@/types/types';
 import { FieldName, FieldValues } from 'react-hook-form';
 import PlacesCombobox from './places-combobox';
 import { PlacesList } from './places-list';
-import Dialog from '@/components/ui/form/dialog';
+import Dialog from '@/components/ui/dialog/dialog';
 import PlaceForm from './place-form';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/primitives/button';
 import { Plus } from 'lucide-react';
 import { forwardRef, useState } from 'react';
 

@@ -4,13 +4,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from '@/components/ui/primitives/form';
 import FormCombobox from '@/components/ui/form/form-combobox';
 import { useFormContext } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/primitives/input';
 import CustomerForm from './customer-form';
-import Dialog from '@/components/ui/form/dialog';
-import { Button } from '@/components/ui/button';
+import Dialog from '@/components/ui/dialog/dialog';
+import { Button } from '@/components/ui/primitives/button';
 import { PlusIcon } from 'lucide-react';
 import { createCustomer } from '../../mutations/customerMutation';
 import { useCreateMutation } from '../../hooks/useCreateMutation';
@@ -18,6 +18,9 @@ import { useState } from 'react';
 import { Customer } from '@/types/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import customersQueryOptions from '../../queries/customersQuery';
+import DropdownMenu, {
+  DropdownMenuItem,
+} from '@/components/ui/dropdown/dropdown';
 
 export default function CustomerSection() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -34,6 +37,17 @@ export default function CustomerSection() {
     onOpenDialogChange: setIsOpen,
   });
 
+  const dropwdownItems: DropdownMenuItem[] = [
+    {
+      label: 'Pobierz dane z GUS',
+      onClick: setIsOpen,
+    },
+    {
+      label: 'Wprowadź dane ręcznie',
+      onClick: setIsOpen,
+    },
+  ];
+
   return (
     <div className='flex justify-between gap-5'>
       <div className='w-full'>
@@ -43,24 +57,31 @@ export default function CustomerSection() {
           render={({ field }) => (
             <FormItem className='w-full pb-2'>
               <FormLabel>Zleceniodawca</FormLabel>
-              <FormCombobox
-                {...field}
-                placeholder='Wybierz zleceniodawcę'
-                data={customers}
-              />
+              <FormControl>
+                <FormCombobox
+                  {...field}
+                  placeholder='Wybierz zleceniodawcę'
+                  data={customers}
+                />
+              </FormControl>
+
               <FormMessage />
             </FormItem>
           )}
         />
-
-        <Dialog
-          title='Dodaj nowego kontrahenta'
-          description='Wypełnij pola aby dodać nowego kontrahenta.'
+        <DropdownMenu
+          title='Dodawanie nowego kontrahenta'
           trigger={
             <Button size={'sm'}>
               <PlusIcon />
             </Button>
           }
+          items={dropwdownItems}
+        />
+
+        <Dialog
+          title='Dodaj nowego kontrahenta'
+          description='Wypełnij pola aby dodać nowego kontrahenta.'
           isOpen={isOpen}
           onOpenChange={setIsOpen}
         >

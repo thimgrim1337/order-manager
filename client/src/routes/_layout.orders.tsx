@@ -7,12 +7,12 @@ import { useState } from 'react';
 import orderQueryOptions from '@/features/OrderForm/queries/ordersQuery';
 import { createOrder } from '@/features/OrderForm/mutations/orderMutation';
 import { useCreateMutation } from '@/features/OrderForm/hooks/useCreateMutation';
-import Dialog from '@/components/ui/form/dialog';
+import Dialog from '@/components/ui/dialog/dialog';
 import customersQueryOptions from '@/features/OrderForm/queries/customersQuery';
 import countriesQueryOptions from '@/features/OrderForm/queries/countriesQuery';
 import { Order } from '@/types/types';
 
-export const Route = createFileRoute('/orders')({
+export const Route = createFileRoute('/_layout/orders')({
   loader: ({ context: { queryClient } }) =>
     Promise.all([
       queryClient.ensureQueryData(orderQueryOptions),

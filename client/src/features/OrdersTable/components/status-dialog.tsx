@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import Dialog from '@/components/ui/form/dialog';
+import { Button } from '@/components/ui/primitives/button';
+import Dialog from '@/components/ui/dialog/dialog';
 
 import { OrderWithDetails, OrderWithId } from '@/types/types';
 import { UseMutationResult } from '@tanstack/react-query';

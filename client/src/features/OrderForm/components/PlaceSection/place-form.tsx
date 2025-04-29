@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/primitives/button';
 import {
   Form,
   FormControl,
@@ -6,9 +6,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from '@/components/ui/primitives/form';
 import FormCountrySelect from '@/components/ui/form/form-country-select';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/primitives/input';
 import { City } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Dispatch, SetStateAction } from 'react';

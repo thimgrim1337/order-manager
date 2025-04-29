@@ -5,8 +5,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../select';
-import { Button } from '../button';
+} from '../primitives/select';
+import { Button } from '../primitives/button';
 import {
   ChevronLeft,
   ChevronRight,

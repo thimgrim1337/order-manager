@@ -3,7 +3,7 @@ import {
   FormField,
   FormItem,
   FormMessage,
-} from '@/components/ui/form';
+} from '@/components/ui/primitives/form';
 import { City } from '@/types/types';
 
 import { useFormContext } from 'react-hook-form';

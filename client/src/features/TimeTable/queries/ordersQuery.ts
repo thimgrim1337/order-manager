@@ -1,6 +1,6 @@
 import { OrderWithDetails } from '@/types/types';
 
-export async function fetchOrders(
+export async function fetchOrdersByTruckAndDates(
   truckId: number,
   startDate: string | undefined,
   endDate: string | undefined

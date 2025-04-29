@@ -5,17 +5,17 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command';
+} from '@/components/ui/primitives/command';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from '@/components/ui/primitives/popover';
 import { cn } from '@/lib/utils';
 import { City } from '@/types/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import citiesQueryOptions from '../../queries/citiesQuery';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/primitives/button';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import {
   FieldName,

@@ -16,7 +16,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/ui/primitives/table';
 import { DataTablePagination } from './data-table-pagination';
 import { useState } from 'react';
 import DataTableFilter from './data-table-filter';

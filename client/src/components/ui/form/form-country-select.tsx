@@ -4,11 +4,11 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui/primitives/select';
 import countriesQueryOptions from '@/features/OrderForm/queries/countriesQuery';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
-import { forwardRef } from 'react';
+import { forwardRef, useCallback } from 'react';
 import { FieldValue, FieldValues } from 'react-hook-form';
 
 type FormCountrySelectProps<TFieldValues extends FieldValues> = {
@@ -22,8 +22,10 @@ const FormCountrySelect = forwardRef<
 >(({ value, onChange }, ref) => {
   const { data: countries } = useSuspenseQuery(countriesQueryOptions);
 
+  const selectHandle = useCallback(onChange, [onChange]);
+
   return (
-    <Select defaultValue={String(value)} onValueChange={onChange}>
+    <Select defaultValue={String(value)} onValueChange={selectHandle}>
       <SelectTrigger>
         <SelectValue placeholder='PL' ref={ref}></SelectValue>
       </SelectTrigger>

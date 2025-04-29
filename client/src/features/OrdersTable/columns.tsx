@@ -1,8 +1,8 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/primitives/button';
 import { OrderWithDetails } from '@/types/types';
-import RowOptions from './components/RowOptions';
+import OrderOptions from './components/order-options';
 
 export const columns: ColumnDef<OrderWithDetails>[] = [
   {
@@ -104,7 +104,7 @@ export const columns: ColumnDef<OrderWithDetails>[] = [
     cell: ({ row }) => {
       const order = row.original;
 
-      return <RowOptions order={order} />;
+      return <OrderOptions order={order} />;
     },
   },
 ];
