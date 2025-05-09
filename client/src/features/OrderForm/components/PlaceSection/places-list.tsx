@@ -3,46 +3,30 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/primitives/collapsible';
-import { ChevronsUpDown, Trash } from 'lucide-react';
+import { ChevronsUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/primitives/button';
-import {
-  FieldName,
-  FieldValues,
-  useFieldArray,
-  useFormContext,
-} from 'react-hook-form';
-import { useState } from 'react';
-import { City } from '@/types/types';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import countriesQueryOptions from '../../queries/countriesQuery';
 
-type SelectedPlacesListProps<TFieldValues extends FieldValues> = {
+import { useState } from 'react';
+import { City, CountryWithId } from '@/types/types';
+import PlacesListItem from './places-list-item';
+
+type SelectedPlacesListProps = {
+  name: string;
+  countries: CountryWithId[];
+  onRemove: (city: City) => void;
   selectedPlaces: City[];
-  name: FieldName<TFieldValues>;
 };
 
 export function PlacesList({
-  selectedPlaces,
   name,
-}: SelectedPlacesListProps<FieldValues>) {
+  countries,
+  selectedPlaces,
+  onRemove,
+}: SelectedPlacesListProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { control } = useFormContext();
-  const { remove } = useFieldArray({
-    control,
-    name: `${name}`,
-  });
-  const { data: countries } = useSuspenseQuery(countriesQueryOptions);
 
   const firstPlace = selectedPlaces[0];
   const [, ...rest] = selectedPlaces;
-
-  function onRemove(placeRemove: City) {
-    const index = selectedPlaces.findIndex(
-      (place) => place.name === placeRemove.name
-    );
-
-    return index < 0 ? null : remove(index);
-  }
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className=' space-y-2'>
@@ -58,19 +42,13 @@ export function PlacesList({
           </Button>
         </CollapsibleTrigger>
       </div>
-      <div className='rounded-md border px-4 py-2  text-sm shadow-sm'>
+      <div>
         {firstPlace ? (
-          <span className='flex justify-between'>
-            {`${countries[firstPlace.countryID - 1].code} ${firstPlace.postal} ${firstPlace.name}`}
-            <Button
-              type='button'
-              size={'icon'}
-              variant={'destructive'}
-              onClick={() => onRemove(firstPlace)}
-            >
-              <Trash />
-            </Button>
-          </span>
+          <PlacesListItem
+            place={firstPlace}
+            onRemove={onRemove}
+            country={countries[firstPlace.countryID - 1].code}
+          />
         ) : (
           <span className='text-muted-foreground'>
             Nie wybrano żadnego miejsca
@@ -80,20 +58,12 @@ export function PlacesList({
       <CollapsibleContent>
         <ul className='space-y-2'>
           {rest.map((place) => (
-            <li
-              className='rounded-md border px-4 py-2 text-sm shadow-sm flex justify-between'
-              key={place.name}
-            >
-              {`${countries[place.countryID - 1].code} ${place.postal} ${place.name}`}
-              <Button
-                type='button'
-                size={'icon'}
-                variant={'destructive'}
-                onClick={() => onRemove(place)}
-              >
-                <Trash />
-              </Button>
-            </li>
+            <PlacesListItem
+              key={place.id}
+              place={place}
+              onRemove={onRemove}
+              country={countries[place.countryID - 1].code}
+            />
           ))}
         </ul>
       </CollapsibleContent>

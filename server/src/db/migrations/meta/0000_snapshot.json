@@ -1,5 +1,5 @@
 {
-  "id": "528b18c6-58f9-456e-a629-58a092d48823",
+  "id": "84a69c60-1ed2-482a-9ce5-fac765953c6a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -206,30 +206,10 @@
           "type": "varchar(50)",
           "primaryKey": false,
           "notNull": true
-        },
-        "address_id": {
-          "name": "address_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "customer_address_id_address_id_fk": {
-          "name": "customer_address_id_address_id_fk",
-          "tableFrom": "customer",
-          "tableTo": "address",
-          "columnsFrom": [
-            "address_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "customer_tax_nr_unique": {
@@ -403,7 +383,7 @@
           "name": "price_pln",
           "type": "numeric(10, 2)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "currency": {
           "name": "currency",
@@ -416,8 +396,8 @@
           "name": "currency_rate",
           "type": "numeric(10, 4)",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'0'"
+          "notNull": true,
+          "default": "'1'"
         },
         "truck_id": {
           "name": "truck_id",

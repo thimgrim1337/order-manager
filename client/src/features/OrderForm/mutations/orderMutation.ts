@@ -15,7 +15,6 @@ export async function createOrder(formData: Order): Promise<OrderWithId> {
 }
 
 export async function updateOrder(formData: OrderWithId): Promise<OrderWithId> {
-  console.log(formData.id);
   const response = await fetch(
     `http://localhost:3000/api/v1/orders/${formData.id}`,
     {

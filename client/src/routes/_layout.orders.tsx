@@ -1,15 +1,24 @@
 import { columns } from '@/features/OrdersTable/columns';
-import { DataTable } from '@/components/ui/data-table/data-table';
+import { DataTable } from '@/features/OrdersTable/components/data-table/data-table';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/primitives/dialog';
+import OrderForm from '@/features/OrderForm/components/order-form';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import OrderForm from '@/features/OrderForm/components/order-form';
 import { useState } from 'react';
 import orderQueryOptions from '@/features/OrderForm/queries/ordersQuery';
 import { createOrder } from '@/features/OrderForm/mutations/orderMutation';
 import { useCreateMutation } from '@/features/OrderForm/hooks/useCreateMutation';
-import Dialog from '@/components/ui/dialog/dialog';
 import customersQueryOptions from '@/features/OrderForm/queries/customersQuery';
 import countriesQueryOptions from '@/features/OrderForm/queries/countriesQuery';
+import trucksQueryOptions from '@/features/OrderForm/queries/trucksQuery';
+import driversQueryOptions from '@/features/OrderForm/queries/driversQuery';
 import { Order } from '@/types/types';
 
 export const Route = createFileRoute('/_layout/orders')({
@@ -18,9 +27,11 @@ export const Route = createFileRoute('/_layout/orders')({
       queryClient.ensureQueryData(orderQueryOptions),
       queryClient.ensureQueryData(customersQueryOptions),
       queryClient.ensureQueryData(countriesQueryOptions),
+      queryClient.ensureQueryData(trucksQueryOptions),
+      queryClient.ensureQueryData(driversQueryOptions),
     ]),
 
-  pendingComponent: () => <h1>Loading...</h1>,
+  pendingComponent: () => <h4>Loading...</h4>,
   component: OrdersPage,
 });
 
@@ -34,23 +45,28 @@ function OrdersPage() {
     toastDescription: 'Dodano nowe zlecenie.',
     toastTitle: 'Nowe zlecenie.',
     errorDescription: 'Nie udało się dodać nowego zlecenia. Spróbuj ponownie.',
+    onOpenDialogChange: setIsOpen,
   });
 
   return (
     <div className='container mx-auto py-10'>
       <div className='flex justify-end'>
-        <Dialog
-          onOpenChange={setIsOpen}
-          isOpen={isOpen}
-          trigger='Dodaj zlecenie'
-          title='Dodaj nowe zlecenie'
-          description='Wypełnij wszystkie pola aby dodać nowe zlecenie.'
-          className='max-w-screen-lg'
-        >
-          <OrderForm<Order>
-            mutationFn={createMutation.mutate}
-            isPending={createMutation.isPending}
-          />
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger className='text-primary-foreground'>
+            Dodaj zlecenie
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Dodaj nowe zlecenie</DialogTitle>
+              <DialogDescription>
+                Wypełnij wszystkie pola aby dodać nowe zlecenie.
+              </DialogDescription>
+            </DialogHeader>
+            <OrderForm<Order>
+              mutationFn={createMutation.mutate}
+              isPending={createMutation.isPending}
+            />
+          </DialogContent>
         </Dialog>
       </div>
       <DataTable

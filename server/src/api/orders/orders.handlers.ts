@@ -49,7 +49,10 @@ export const getOrderById: RequestHandler<
   try {
     const order = await orderServices.getOrderByIdQuery(+req.params?.id);
 
-    if (!order) res.status(404).send({});
+    if (!order) {
+      res.status(404).send({});
+      return;
+    }
 
     const mapped = {
       ...order,

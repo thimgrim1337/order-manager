@@ -7,7 +7,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/primitives/form';
-import FormCountrySelect from '@/components/ui/form/form-country-select';
 import { Input } from '@/components/ui/primitives/input';
 import { Customer } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,13 +18,6 @@ import { UseMutationResult } from '@tanstack/react-query';
 const initialValues: Customer = {
   name: '',
   tax: '',
-  address: {
-    street: '',
-    streetNr: '',
-    postal: '',
-    city: '',
-    countryID: 39,
-  },
 };
 
 type CustomerFormProps = {
@@ -53,7 +45,7 @@ export default function CustomerForm({ mutationFn }: CustomerFormProps) {
 
   return (
     <Form {...form}>
-      <form className='grid grid-cols-4 grid-rows-5 gap-2'>
+      <form className='grid grid-cols-3 grid-rows-2 gap-2'>
         <BriefcaseBusinessIcon
           size={'64px'}
           className='row-span-2 place-self-center'
@@ -81,76 +73,6 @@ export default function CustomerForm({ mutationFn }: CustomerFormProps) {
               <FormLabel>NIP</FormLabel>
               <FormControl>
                 <Input placeholder='PL1234567890' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='address.street'
-          render={({ field }) => (
-            <FormItem className='col-start-1 col-end-4'>
-              <FormLabel>Ulica</FormLabel>
-              <FormControl>
-                <Input placeholder='Polna' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='address.streetNr'
-          render={({ field }) => (
-            <FormItem className='col-start-4 -col-end-1'>
-              <FormLabel>Nr ulicy</FormLabel>
-              <FormControl>
-                <Input placeholder='1/2' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='address.countryID'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Kraj</FormLabel>
-              <FormControl>
-                <FormCountrySelect {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='address.postal'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Kod pocztowy</FormLabel>
-              <FormControl>
-                <Input placeholder='09-400' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='address.city'
-          render={({ field }) => (
-            <FormItem className='col-start-3 -col-end-1'>
-              <FormLabel>Miejscowość</FormLabel>
-              <FormControl>
-                <Input placeholder='Płock' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

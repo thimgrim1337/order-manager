@@ -4,32 +4,22 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/primitives/form';
-import { City } from '@/types/types';
-
-import { useFormContext } from 'react-hook-form';
 import PlaceControl from './place-control';
+import { useFormContext } from 'react-hook-form';
 
-type PlaceSectionProps = {
-  loadingPlaces: City[];
-  unloadingPlaces: City[];
-};
-
-export default function PlacesSection({
-  loadingPlaces,
-  unloadingPlaces,
-}: PlaceSectionProps) {
+export default function PlacesSection() {
   const { control } = useFormContext();
 
   return (
     <div className='flex justify-between items-end gap-5'>
       <div className='flex flex-col gap-2 w-full'>
         <FormField
-          control={control}
           name='loadingPlaces'
+          control={control}
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <PlaceControl {...field} selectedPlaces={loadingPlaces} />
+                <PlaceControl {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -38,12 +28,12 @@ export default function PlacesSection({
       </div>
       <div className='flex flex-col gap-2 w-full'>
         <FormField
-          control={control}
           name='unloadingPlaces'
+          control={control}
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <PlaceControl {...field} selectedPlaces={unloadingPlaces} />
+                <PlaceControl {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

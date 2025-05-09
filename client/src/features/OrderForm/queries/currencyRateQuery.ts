@@ -9,6 +9,9 @@ export async function fetchCurrencyRate(
     `https://api.nbp.pl/api/exchangerates/rates/${table}/${code}/${date}/?format=json`
   );
 
+  //TODO:
+  //Naprawić bład gdy próbujemy pobrać jeszcze nieogłoszony kurs.
+
   if (!response.ok) throw new Error("Can't fetch currency rate from API.");
 
   return (await response.json()) satisfies CurrencyRate;

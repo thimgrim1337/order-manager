@@ -2,7 +2,7 @@ import { Router } from 'express';
 import * as handlers from './customers.handlers';
 import { validateRequest } from '@/middleware/validate-request';
 import { ParamsWithId } from '@/interfaces/ParamsWithId';
-import { CustomerWithFullAddress } from './customers.model';
+import { Customer, CustomerWithId } from './customers.model';
 
 const router = Router();
 
@@ -19,7 +19,7 @@ router.get(
 router.post(
   '/',
   validateRequest({
-    body: CustomerWithFullAddress,
+    body: Customer,
   }),
   handlers.addCustomer
 );
@@ -36,7 +36,7 @@ router.patch(
   '/:id',
   validateRequest({
     params: ParamsWithId,
-    body: CustomerWithFullAddress,
+    body: CustomerWithId,
   }),
   handlers.updateCustomer
 );

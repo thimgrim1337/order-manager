@@ -12,46 +12,26 @@ import {
   PopoverTrigger,
 } from '@/components/ui/primitives/popover';
 import { cn } from '@/lib/utils';
-import { City } from '@/types/types';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import citiesQueryOptions from '../../queries/citiesQuery';
 import { Button } from '@/components/ui/primitives/button';
 import { Check, ChevronsUpDown } from 'lucide-react';
-import {
-  FieldName,
-  FieldValues,
-  useFieldArray,
-  useFormContext,
-} from 'react-hook-form';
-import { forwardRef } from 'react';
+import { useState } from 'react';
+import { City, CityWithId } from '@/types/types';
 
-type PlacesComboboxProps<TFieldValues extends FieldValues> = {
-  name: FieldName<TFieldValues>;
+type PlacesComboboxProps = {
+  cities: CityWithId[];
+  onSelect: (city: City) => void;
   selectedPlaces: City[];
 };
 
-const PlacesCombobox = forwardRef<
-  HTMLDivElement,
-  PlacesComboboxProps<FieldValues>
->(({ name, selectedPlaces }, ref) => {
-  const { data: cities } = useSuspenseQuery(citiesQueryOptions);
-  const { control } = useFormContext();
-  const { append, remove } = useFieldArray({
-    name,
-    control,
-    keyName: '_id',
-  });
-
-  function onSelect(selectedPlace: City) {
-    const index = selectedPlaces.findIndex(
-      (place) => place.id === selectedPlace.id
-    );
-
-    return index === -1 ? append(selectedPlace) : remove(index);
-  }
+export default function PlacesCombobox({
+  cities,
+  onSelect,
+  selectedPlaces,
+}: PlacesComboboxProps) {
+  const [open, setOpen] = useState<boolean>(false);
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant='outline'
@@ -62,8 +42,8 @@ const PlacesCombobox = forwardRef<
           <ChevronsUpDown className='opacity-50' />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className='w-full p-0'>
-        <Command ref={ref}>
+      <PopoverContent className='w-full p-0 min-w-96'>
+        <Command>
           <CommandInput placeholder='Szukaj miejsce...' className='h-9' />
           <CommandList>
             <CommandEmpty>Nie znaleziono miejsca.</CommandEmpty>
@@ -72,20 +52,15 @@ const PlacesCombobox = forwardRef<
                 <CommandItem
                   value={city.name}
                   key={city.id}
-                  onSelect={() =>
-                    onSelect({
-                      id: city.id,
-                      name: city.name,
-                      postal: city.postal,
-                      countryID: city.countryID,
-                    })
-                  }
+                  onSelect={() => onSelect(city)}
                 >
                   {city.name}
                   <Check
                     className={cn(
                       'ml-auto',
-                      selectedPlaces.find((place) => place.id === city.id)
+                      selectedPlaces.some(
+                        (selectedPlace) => selectedPlace.id === city.id
+                      )
                         ? 'opacity-100'
                         : 'opacity-0'
                     )}
@@ -98,6 +73,4 @@ const PlacesCombobox = forwardRef<
       </PopoverContent>
     </Popover>
   );
-});
-
-export default PlacesCombobox;
+}

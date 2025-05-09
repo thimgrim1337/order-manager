@@ -18,8 +18,7 @@ import { useFormContext } from 'react-hook-form';
 const currencies = ['PLN', 'EUR'];
 
 export default function PriceSection() {
-  const { control, watch } = useFormContext();
-  const currency = watch('currency');
+  const { control } = useFormContext();
 
   return (
     <div className='flex justify-between  gap-5'>
@@ -42,13 +41,13 @@ export default function PriceSection() {
         render={({ field }) => (
           <FormItem className='w-full'>
             <FormLabel>Waluta</FormLabel>
-            <Select defaultValue={currency}>
+            <Select onValueChange={field.onChange} defaultValue={field.value}>
               <FormControl>
-                <SelectTrigger>
-                  <SelectValue />
+                <SelectTrigger aria-label='Currency Selector'>
+                  <SelectValue placeholder='Select currency' />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent {...field}>
+              <SelectContent>
                 {currencies.map((d) => (
                   <SelectItem value={d} key={d}>
                     {d}

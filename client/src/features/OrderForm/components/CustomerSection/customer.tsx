@@ -5,11 +5,18 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/primitives/form';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/primitives/dialog';
 import FormCombobox from '@/components/ui/form/form-combobox';
 import { useFormContext } from 'react-hook-form';
 import { Input } from '@/components/ui/primitives/input';
 import CustomerForm from './customer-form';
-import Dialog from '@/components/ui/dialog/dialog';
 import { Button } from '@/components/ui/primitives/button';
 import { PlusIcon } from 'lucide-react';
 import { createCustomer } from '../../mutations/customerMutation';
@@ -18,9 +25,6 @@ import { useState } from 'react';
 import { Customer } from '@/types/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import customersQueryOptions from '../../queries/customersQuery';
-import DropdownMenu, {
-  DropdownMenuItem,
-} from '@/components/ui/dropdown/dropdown';
 
 export default function CustomerSection() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -36,17 +40,6 @@ export default function CustomerSection() {
     errorDescription: 'Nie udało się utworzyć kontrahenta.',
     onOpenDialogChange: setIsOpen,
   });
-
-  const dropwdownItems: DropdownMenuItem[] = [
-    {
-      label: 'Pobierz dane z GUS',
-      onClick: setIsOpen,
-    },
-    {
-      label: 'Wprowadź dane ręcznie',
-      onClick: setIsOpen,
-    },
-  ];
 
   return (
     <div className='flex justify-between gap-5'>
@@ -69,23 +62,21 @@ export default function CustomerSection() {
             </FormItem>
           )}
         />
-        <DropdownMenu
-          title='Dodawanie nowego kontrahenta'
-          trigger={
-            <Button size={'sm'}>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button>
               <PlusIcon />
             </Button>
-          }
-          items={dropwdownItems}
-        />
-
-        <Dialog
-          title='Dodaj nowego kontrahenta'
-          description='Wypełnij pola aby dodać nowego kontrahenta.'
-          isOpen={isOpen}
-          onOpenChange={setIsOpen}
-        >
-          <CustomerForm mutationFn={createMutation.mutate} />
+          </DialogTrigger>
+          <DialogContent className='max-w-screen-sm'>
+            <DialogHeader>
+              <DialogTitle>Dodaj nowego zleceniodawcę</DialogTitle>
+              <DialogDescription>
+                Wypełnij wszystkie pola aby dodać nowego zleceniodawcę.
+              </DialogDescription>
+            </DialogHeader>
+            <CustomerForm mutationFn={createMutation.mutate} />
+          </DialogContent>
         </Dialog>
       </div>
 

@@ -1,4 +1,4 @@
-import { DefaultValues, Path, SubmitHandler, useForm } from 'react-hook-form';
+import { DefaultValues, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from '@/components/ui/primitives/form';
 import { Button } from '@/components/ui/primitives/button';
@@ -13,7 +13,7 @@ import TruckSection from './TruckSection/truck-section';
 import PlacesSection from './PlaceSection/places';
 import { getCurrencyRate } from '@/helpers/getCurrencyRate';
 import { UseMutationResult } from '@tanstack/react-query';
-import { City, Order, OrderWithId } from '@/types/types';
+import { Order } from '@/types/types';
 
 const initialValues = {
   orderNr: '',
@@ -37,7 +37,7 @@ type OrderFormProps<T> = {
   isPending: boolean;
 };
 
-export default function OrderForm<T extends Order | OrderWithId>({
+export default function OrderForm<T extends Order>({
   mutationFn,
   values,
   isPending,
@@ -45,7 +45,7 @@ export default function OrderForm<T extends Order | OrderWithId>({
   const { showBoundary } = useErrorBoundary();
 
   const form = useForm<T>({
-    resolver: zodResolver(Order || OrderWithId),
+    resolver: zodResolver(Order),
     defaultValues: (values || initialValues) as DefaultValues<T>,
   });
 
@@ -56,7 +56,7 @@ export default function OrderForm<T extends Order | OrderWithId>({
       mutationFn(order);
     } catch (error) {
       showBoundary({
-        message: 'An error occured. Please again later.',
+        message: 'An error occured. Please try again later.',
         stack: `Stack ${error}`,
       });
     }
@@ -75,21 +75,14 @@ export default function OrderForm<T extends Order | OrderWithId>({
       >
         <CustomerSection />
         <DatesSection />
-        <PlacesSection
-          loadingPlaces={
-            (form.getValues('loadingPlaces' as Path<T>) || []) as City[]
-          }
-          unloadingPlaces={
-            (form.getValues('unloadingPlaces' as Path<T>) || []) as City[]
-          }
-        />
+        <PlacesSection />
         <PriceSection />
         <TruckSection />
         <Button type='submit'>
           {values ? 'Edytuj' : 'Dodaj'}
           {isPending && <LoaderCircle className='animate-spin' />}
         </Button>
-        <DevTool control={form.control} /> {/* set up the dev tool */}
+        <DevTool control={form.control} />
       </form>
     </Form>
   );

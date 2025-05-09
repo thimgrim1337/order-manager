@@ -28,26 +28,26 @@ const items = [
     url: '/orders',
     icon: ReceiptEuro,
   },
-  {
-    title: 'Zleceniodawcy',
-    url: '/orders',
-    icon: ReceiptEuro,
-  },
-  {
-    title: 'Kierowcy',
-    url: '/orders',
-    icon: ReceiptEuro,
-  },
-  {
-    title: 'Pojazdy',
-    url: '/orders',
-    icon: ReceiptEuro,
-  },
-  {
-    title: 'Settings',
-    url: '#',
-    icon: Settings,
-  },
+  // {
+  //   title: 'Zleceniodawcy',
+  //   url: '/orders',
+  //   icon: ReceiptEuro,
+  // },
+  // {
+  //   title: 'Kierowcy',
+  //   url: '/orders',
+  //   icon: ReceiptEuro,
+  // },
+  // {
+  //   title: 'Pojazdy',
+  //   url: '/orders',
+  //   icon: ReceiptEuro,
+  // },
+  // {
+  //   title: 'Settings',
+  //   url: '#',
+  //   icon: Settings,
+  // },
 ];
 
 export default function AppSidebar() {

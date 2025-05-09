@@ -1,9 +1,5 @@
 import { beforeEach, describe, expect, expectTypeOf, it } from 'vitest';
-import {
-  Customer,
-  CustomerWithFullAddress,
-  CustomerWithIdWithFullAddress,
-} from './customers.model';
+import { Customer } from './customers.model';
 
 const API = 'http://localhost:3000/api/v1/customers';
 
@@ -14,18 +10,11 @@ let body: Array<{ [key: string]: unknown }> & {
   tax?: string;
 };
 
-let customer: CustomerWithFullAddress;
+let customer: Customer;
 beforeEach(() => {
   customer = {
     name: 'Test Comapny',
     tax: 'PL123445678',
-    address: {
-      street: 'Otolińska',
-      streetNr: '21/101',
-      postal: '09-400',
-      city: 'Płock',
-      countryID: 1,
-    },
   };
 });
 
@@ -37,9 +26,7 @@ describe('GET /api/v1/customers', () => {
     expect(response.status).toBe(200);
     expect(response.headers.get('Content-Type')).toContain('application/json');
     expectTypeOf(body).toBeArray();
-    expect(() =>
-      CustomerWithIdWithFullAddress.parse(body[0])
-    ).not.toThrowError();
+    expect(() => Customer.parse(body[0])).not.toThrowError();
   });
 });
 
@@ -51,7 +38,7 @@ describe('GET /api/v1/customers/:id', () => {
     expect(response.status).toBe(200);
     expect(response.headers.get('Content-Type')).toContain('application/json');
     expectTypeOf(body).toBeObject();
-    expect(() => CustomerWithIdWithFullAddress.parse(body)).not.toThrowError();
+    expect(() => Customer.parse(body)).not.toThrowError();
   });
 
   it('responds with 404', async () => {
@@ -123,13 +110,6 @@ describe('POST /api/v1/customer', () => {
     customer.id = 6;
     customer.tax = '7743211111';
     customer.name = 'Firma Krzak';
-    customer.address = {
-      street: 'Jana Pawła',
-      streetNr: '78/48',
-      postal: '09-410',
-      city: 'Płock',
-      countryID: 1,
-    };
 
     response = await fetch(API, {
       method: 'POST',
@@ -175,13 +155,6 @@ describe('PATCH /api/v1/customers/:id', () => {
   it('responds with updated customer including new address', async () => {
     customer.name = 'Dawid 2 Company';
     customer.tax = '7743241621';
-    customer.address = {
-      street: 'Testowa',
-      streetNr: '404/1',
-      city: 'Płock',
-      postal: '09-404',
-      countryID: 1,
-    };
 
     response = await fetch(API + '/5', {
       method: 'PATCH',

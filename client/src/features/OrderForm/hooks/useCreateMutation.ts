@@ -1,4 +1,5 @@
 import { useToast } from '@/hooks/use-toast';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Dispatch, SetStateAction } from 'react';
 
@@ -9,6 +10,7 @@ type useCreateMutationProps<T> = {
   toastTitle: string;
   toastDescription: string;
   onOpenDialogChange?: Dispatch<SetStateAction<boolean>>;
+  isOptimistic?: boolean;
 };
 
 export function useCreateMutation<T>({
@@ -18,6 +20,7 @@ export function useCreateMutation<T>({
   toastTitle,
   toastDescription,
   onOpenDialogChange,
+  isOptimistic = false,
 }: useCreateMutationProps<T>) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -27,17 +30,16 @@ export function useCreateMutation<T>({
     onMutate: async (newItem) => {
       await queryClient.cancelQueries({ queryKey: queryKey });
 
-      const previousItems = queryClient.getQueryData(queryKey);
-
-      if (previousItems)
-        queryClient.setQueryData(queryKey, (old: T[]) => [...old, newItem]);
-
-      return { previousItems };
+      if (isOptimistic) {
+        const previousItems = queryClient.getQueryData(queryKey);
+        if (previousItems)
+          queryClient.setQueryData(queryKey, (old: T[]) => [...old, newItem]);
+        return { previousItems };
+      }
     },
     onError: (err, newItem, context) => {
       if (context?.previousItems) {
         queryClient.setQueryData(queryKey, context.previousItems);
-        console.log(err);
       }
       toast({
         title: 'Błąd',

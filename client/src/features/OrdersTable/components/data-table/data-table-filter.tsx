@@ -1,5 +1,5 @@
 import { Table } from '@tanstack/react-table';
-import { Input } from '../primitives/input';
+import { Input } from '@/components/ui/primitives/input';
 
 type DataTableFilter<TData> = {
   globalFilterState: string[];
