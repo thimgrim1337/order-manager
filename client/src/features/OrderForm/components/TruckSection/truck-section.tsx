@@ -3,7 +3,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from '@/components/ui/primitives/form';
 import FormCombobox from '@/components/ui/form/form-combobox';
 import { useSuspenseQueries } from '@tanstack/react-query';
 import { useFormContext } from 'react-hook-form';

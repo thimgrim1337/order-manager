@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/primitives/button';
 import { Truck } from '@/types/types';
 import { MouseEvent } from 'react';
 

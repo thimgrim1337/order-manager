@@ -1,4 +1,11 @@
-import Dialog from '@/components/ui/form/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/primitives/dialog';
 import OrderForm from '@/features/OrderForm/components/order-form';
 import { OrderWithId } from '@/types/types';
 import { UseMutationResult } from '@tanstack/react-query';
@@ -26,14 +33,21 @@ export default function EditDialog({
   isPending,
 }: EditDialogProps) {
   return (
-    <Dialog
-      onOpenChange={onOpenChange}
-      isOpen={isOpen}
-      title={`Edytuj zlecenie nr ${order.orderNr}`}
-      description={'W tym oknie możesz edytować swoje zlecenie.'}
-      className='max-w-screen-lg'
-    >
-      <OrderForm values={order} mutationFn={mutationFn} isPending={isPending} />
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogTrigger asChild></DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edytuj zlecenie nr ${order.orderNr}</DialogTitle>
+          <DialogDescription>
+            W tym oknie możesz edytować swoje zlecenie.
+          </DialogDescription>
+        </DialogHeader>
+        <OrderForm
+          values={order}
+          mutationFn={mutationFn}
+          isPending={isPending}
+        />
+      </DialogContent>
     </Dialog>
   );
 }

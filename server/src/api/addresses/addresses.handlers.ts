@@ -31,7 +31,6 @@ export async function addAddress(address: Address) {
 
 export async function updateAddress(addressID: number, address: Address) {
   try {
-    if (await hasReference(addressID)) return await addAddress(address);
     const updatedAddress = await addressServices.updateAddressQuery(
       addressID,
       address
@@ -45,18 +44,8 @@ export async function updateAddress(addressID: number, address: Address) {
 
 export async function deleteAddress(addressID: number) {
   try {
-    if (!(await hasReference(addressID))) {
-      await addressServices.deleteAddressQuery(addressID);
-    }
+    await addressServices.deleteAddressQuery(addressID);
   } catch (error) {
     throw new AppError('An error occured when delete address.', 500);
   }
-}
-
-async function hasReference(addressID: number) {
-  const customerRef = await addressServices.hasCustomerReference(addressID);
-
-  if (customerRef.length > 1) return true;
-
-  return false;
 }

@@ -34,10 +34,4 @@ export const addressServices = {
       .set(addressToUpdate)
       .where(eq(address.id, addressId))
       .returning(),
-
-  hasCustomerReference: (addressID: number) =>
-    db.query.customer.findMany({
-      where: (customer) => eq(customer.addressID, addressID),
-      limit: 2,
-    }),
 };

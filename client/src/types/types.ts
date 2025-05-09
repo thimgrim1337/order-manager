@@ -65,22 +65,12 @@ export const OrderWithDetails = OrderWithId.extend({
 });
 export type OrderWithDetails = z.infer<typeof OrderWithDetails>;
 
-export const Address = z.object({
-  street: z.string().min(1, { message: 'Wprowadź nazwę ulicy.' }),
-  streetNr: z.string().min(1, { message: 'Wprowadź numer ulicy.' }),
-  postal: z.string().min(1, { message: 'Wprowadź kod pocztowy.' }),
-  city: z.string().min(1, { message: 'Wprowadź nazwę miejscowości.' }),
-  countryID: z.coerce.number(),
-});
-export type Address = z.infer<typeof Address>;
-
 export const Customer = z.object({
   name: z.string().min(1, { message: 'Wprowadź nazwę zleceniodawcy.' }),
   tax: z
     .string()
     .min(10, { message: 'NIP jest zbyt krótki.' })
     .max(50, { message: 'NIP jest zbyt długi.' }),
-  address: Address,
 });
 export type Customer = z.infer<typeof Customer>;
 export type CustomerWithId = Customer & ID;

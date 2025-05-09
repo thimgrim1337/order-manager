@@ -5,8 +5,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../select';
-import { Button } from '../button';
+} from '@/components/ui/primitives/select';
+import { Button } from '@/components/ui/primitives/button';
 import {
   ChevronLeft,
   ChevronRight,
@@ -86,7 +86,7 @@ export function DataTablePagination<TData>({
         </Button>
       </div>
       <div className='flex w-[100px] items-center justify-center text-sm font-medium'>
-        Strona {table.getState().pagination.pageIndex + 1} z{' '}
+        Strona {table.getState().pagination.pageIndex + 1} z
         {table.getPageCount()}
       </div>
     </div>

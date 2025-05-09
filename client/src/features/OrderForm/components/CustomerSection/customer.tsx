@@ -4,13 +4,20 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from '@/components/ui/primitives/form';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/primitives/dialog';
 import FormCombobox from '@/components/ui/form/form-combobox';
 import { useFormContext } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/primitives/input';
 import CustomerForm from './customer-form';
-import Dialog from '@/components/ui/form/dialog';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/primitives/button';
 import { PlusIcon } from 'lucide-react';
 import { createCustomer } from '../../mutations/customerMutation';
 import { useCreateMutation } from '../../hooks/useCreateMutation';
@@ -43,28 +50,33 @@ export default function CustomerSection() {
           render={({ field }) => (
             <FormItem className='w-full pb-2'>
               <FormLabel>Zleceniodawca</FormLabel>
-              <FormCombobox
-                {...field}
-                placeholder='Wybierz zleceniodawcę'
-                data={customers}
-              />
+              <FormControl>
+                <FormCombobox
+                  {...field}
+                  placeholder='Wybierz zleceniodawcę'
+                  data={customers}
+                />
+              </FormControl>
+
               <FormMessage />
             </FormItem>
           )}
         />
-
-        <Dialog
-          title='Dodaj nowego kontrahenta'
-          description='Wypełnij pola aby dodać nowego kontrahenta.'
-          trigger={
-            <Button size={'sm'}>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button>
               <PlusIcon />
             </Button>
-          }
-          isOpen={isOpen}
-          onOpenChange={setIsOpen}
-        >
-          <CustomerForm mutationFn={createMutation.mutate} />
+          </DialogTrigger>
+          <DialogContent className='max-w-screen-sm'>
+            <DialogHeader>
+              <DialogTitle>Dodaj nowego zleceniodawcę</DialogTitle>
+              <DialogDescription>
+                Wypełnij wszystkie pola aby dodać nowego zleceniodawcę.
+              </DialogDescription>
+            </DialogHeader>
+            <CustomerForm mutationFn={createMutation.mutate} />
+          </DialogContent>
         </Dialog>
       </div>
 

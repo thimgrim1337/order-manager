@@ -32,7 +32,6 @@ CREATE TABLE IF NOT EXISTS "customer" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"tax_nr" varchar(15) NOT NULL,
 	"name" varchar(50) NOT NULL,
-	"address_id" integer NOT NULL,
 	CONSTRAINT "customer_tax_nr_unique" UNIQUE("tax_nr"),
 	CONSTRAINT "customer_name_unique" UNIQUE("name")
 );
@@ -58,9 +57,9 @@ CREATE TABLE IF NOT EXISTS "order" (
 	"end_date" date DEFAULT now() NOT NULL,
 	"status_id" integer NOT NULL,
 	"price_currency" numeric(10, 2) NOT NULL,
-	"price_pln" numeric(10, 2),
+	"price_pln" numeric(10, 2) NOT NULL,
 	"currency" varchar(3) DEFAULT 'PLN' NOT NULL,
-	"currency_rate" numeric(10, 4) DEFAULT '0',
+	"currency_rate" numeric(10, 4) DEFAULT '1' NOT NULL,
 	"truck_id" integer NOT NULL,
 	"driver_id" integer NOT NULL,
 	"customer_id" integer NOT NULL
@@ -95,12 +94,6 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "city" ADD CONSTRAINT "city_country_id_country_id_fk" FOREIGN KEY ("country_id") REFERENCES "public"."country"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "customer" ADD CONSTRAINT "customer_address_id_address_id_fk" FOREIGN KEY ("address_id") REFERENCES "public"."address"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

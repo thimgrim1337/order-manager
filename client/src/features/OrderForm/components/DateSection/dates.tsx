@@ -4,8 +4,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui/primitives/form';
+import { Input } from '@/components/ui/primitives/input';
 import { useFormContext } from 'react-hook-form';
 
 export default function DatesSection() {
