@@ -11,7 +11,6 @@ import DatesSection from './DateSection/dates';
 import PriceSection from './PriceSection/price-section';
 import TruckSection from './TruckSection/truck-section';
 import PlacesSection from './PlaceSection/places';
-import { getCurrencyRate } from '@/helpers/getCurrencyRate';
 import { UseMutationResult } from '@tanstack/react-query';
 import { Order } from '@/types/types';
 
@@ -49,9 +48,15 @@ export default function OrderForm<T extends Order>({
     defaultValues: (values || initialValues) as DefaultValues<T>,
   });
 
-  const onSubmit: SubmitHandler<T> = async (formValues) => {
+  const submitHanlder: SubmitHandler<T> = async (formValues) => {
     try {
-      const order = await getCurrencyRate(formValues);
+      const order = { ...formValues };
+
+      if (order.currency !== 'PLN') {
+        order.pricePLN = String(
+          parseFloat(order.priceCurrency) * parseFloat(order.currencyRate)
+        );
+      } else order.pricePLN = order.priceCurrency;
 
       mutationFn(order);
     } catch (error) {
@@ -66,7 +71,7 @@ export default function OrderForm<T extends Order>({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(
-          onSubmit as SubmitHandler<Order>,
+          submitHanlder as SubmitHandler<Order>,
           (errors) => {
             console.error(errors);
           }
