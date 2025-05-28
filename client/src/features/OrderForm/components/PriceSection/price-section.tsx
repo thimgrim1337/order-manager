@@ -13,12 +13,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/primitives/select';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
+import { Currencies, Order } from '@/types/types';
+import { LoaderCircle } from 'lucide-react';
+import useCurrencyRate from '../../hooks/useCurrencyRate';
 
-const currencies = ['PLN', 'EUR'];
+const currencies: Currencies[] = ['PLN', 'EUR'];
 
 export default function PriceSection() {
-  const { control } = useFormContext();
+  const { control } = useFormContext<Order>();
+  const endDate = useWatch({ name: 'endDate' });
+  const currency: Currencies = useWatch({ name: 'currency' });
+  const { isLoading, isError, error } = useCurrencyRate({
+    currency: currency,
+    date: endDate,
+  });
 
   return (
     <div className='flex justify-between  gap-5'>
@@ -41,20 +50,28 @@ export default function PriceSection() {
         render={({ field }) => (
           <FormItem className='w-full'>
             <FormLabel>Waluta</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl>
-                <SelectTrigger aria-label='Currency Selector'>
-                  <SelectValue placeholder='Select currency' />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {currencies.map((d) => (
-                  <SelectItem value={d} key={d}>
-                    {d}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger aria-label='Currency Selector'>
+                    <SelectValue placeholder='Select currency' />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {currencies.map((d) => (
+                    <SelectItem value={d} key={d}>
+                      {d}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {isLoading && <LoaderCircle className='animate-spin' />}
+              {isError && (
+                <p className='text-[0.8rem] font-medium text-destructive'>
+                  {error?.message}
+                </p>
+              )}
+            </>
             <FormMessage />
           </FormItem>
         )}

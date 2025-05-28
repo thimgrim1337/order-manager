@@ -8,6 +8,7 @@ import {
   endOfWeek,
   subWeeks,
   addWeeks,
+  previousFriday,
 } from 'date-fns';
 import { pl } from 'date-fns/locale';
 
@@ -47,3 +48,6 @@ export const getDaysOfWeek = (startDate: Date, endDate: Date): Day[] =>
     name: formatDate(day, 'eeee'),
     date: formatDate(day),
   }));
+
+export const getPreviousFriday = (date: string) =>
+  formatDate(previousFriday(date));

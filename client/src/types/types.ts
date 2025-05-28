@@ -18,7 +18,7 @@ export const Order = z.object({
   statusID: z.number().min(1).max(3).default(1),
   priceCurrency: z.string({ message: 'Wprowadź cenę transportu.' }),
   pricePLN: z.string(),
-  currency: z.string({ message: 'Wybierz walutę.' }),
+  currency: z.enum(['PLN', 'EUR'], { message: 'Wybierz walutę.' }),
   currencyRate: z.string(),
   truckID: z.number({ message: 'Wybierz pojazd.' }).min(1),
   driverID: z.number({ message: 'Wybierz kierowcę.' }).min(1),
@@ -118,4 +118,19 @@ export type CurrencyRate = {
       mid: number;
     },
   ];
+};
+
+export type Currencies = 'PLN' | 'EUR';
+
+export type OpenHolidaysResponse = {
+  comment: [{ language: string; text: string }];
+  endDate: string;
+  id: string;
+  name: [language: string, text: string];
+  nationalwide: boolean;
+  regionalScope: string;
+  startDate: string;
+  subdivisions: [code: string, shortName: string];
+  temporalScope: string;
+  type: string;
 };
