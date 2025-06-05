@@ -1,7 +1,8 @@
+import { createFileRoute, useLoaderData } from '@tanstack/react-router';
+import { lazy, useMemo } from 'react';
 import countriesQueryOptions from '@/features/OrderForm/queries/countriesQuery';
 import trucksQueryOptions from '@/features/OrderForm/queries/trucksQuery';
-import { fetchOrdersByTruckAndDates } from '@/features/TimeTable/queries/ordersQuery';
-import TimeTable from '@/features/TimeTable/components/time-table';
+import { getOrdersQueryOptions } from '@/features/TimeTable/queries/ordersQuery';
 import {
   getDaysOfWeek,
   getFirstDayOfWeek,
@@ -9,66 +10,88 @@ import {
   getToday,
   getWeekNumber,
 } from '@/helpers/dates';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
-import { MouseEvent, useState } from 'react';
-import TimeTableHeader from '@/features/TimeTable/components/time-table-header';
+
 import TimeTablePagination from '@/features/TimeTable/components/time-table-pagination';
+import QueryErrorBoundary from '@/components/ui/error/query-error-boundary';
+import { useTimeTableData } from '@/features/TimeTable/hooks/useTimeTableData';
+import { z } from 'zod';
+
+const TimeTable = lazy(
+  () => import('@/features/TimeTable/components/time-table')
+);
+const TimeTableHeader = lazy(
+  () => import('@/features/TimeTable/components/time-table-header')
+);
+
+const today = getToday();
+const initialDate = getFirstDayOfWeek(today);
+
+const OrderFilterSchema = z.object({
+  truckId: z.coerce.number().min(1),
+  startDate: z.string().default(initialDate),
+});
 
 export const Route = createFileRoute('/_layout/time-table')({
-  loader: ({ context: { queryClient } }) => {
-    queryClient.ensureQueryData(trucksQueryOptions);
-    queryClient.ensureQueryData(countriesQueryOptions);
+  loaderDeps: ({ search }) => ({
+    truckId: search.truckId,
+    startDate: search.startDate,
+  }),
+  loader: async ({
+    context: { queryClient },
+    deps: { startDate, truckId },
+  }) => {
+    const weekNumber = getWeekNumber(startDate);
+    const firstDayOfWeek = getFirstDayOfWeek(startDate);
+    const lastDayOfWeek = getLastDayOfWeek(startDate);
+
+    await Promise.all([
+      queryClient.ensureQueryData(trucksQueryOptions),
+      queryClient.ensureQueryData(countriesQueryOptions),
+      queryClient.ensureQueryData(
+        getOrdersQueryOptions(truckId, firstDayOfWeek, lastDayOfWeek)
+      ),
+    ]);
+
+    return {
+      weekNumber,
+      truckId,
+      firstDayOfWeek,
+      lastDayOfWeek,
+    };
   },
+  validateSearch: (search: Record<string, unknown>) =>
+    OrderFilterSchema.parse(search),
   component: TimetablePage,
-  pendingComponent: () => <h1>Loading...</h1>,
 });
-const today = getToday();
 
 function TimetablePage() {
-  const [selectedTruck, setSelectedTruck] = useState<number>(1);
-  const [selectedWeek, setSelectedWeek] = useState<string>(today);
-
-  const firstDayOfWeek = getFirstDayOfWeek(selectedWeek);
-  const lastDayOfWeek = getLastDayOfWeek(selectedWeek);
-  const daysOfWeek = getDaysOfWeek(firstDayOfWeek, lastDayOfWeek);
-  const weekNumber = getWeekNumber(selectedWeek);
-
-  const { data: orders } = useSuspenseQuery({
-    queryKey: ['orders', selectedTruck, weekNumber],
-    queryFn: () =>
-      fetchOrdersByTruckAndDates(
-        selectedTruck,
-        daysOfWeek[0].date,
-        daysOfWeek[daysOfWeek.length - 1].date
-      ),
+  const { weekNumber, lastDayOfWeek, firstDayOfWeek, truckId } = useLoaderData({
+    from: '/_layout/time-table',
   });
-  const { data: trucks } = useSuspenseQuery(trucksQueryOptions);
-  const { data: countries } = useSuspenseQuery(countriesQueryOptions);
 
-  function onTruckChange(e: MouseEvent<HTMLUListElement>) {
-    if (e.target instanceof HTMLElement && selectedTruck !== +e.target.id)
-      setSelectedTruck(+e.target.id);
-  }
+  const { orders, trucks, countries } = useTimeTableData(
+    truckId,
+    firstDayOfWeek,
+    lastDayOfWeek
+  );
 
-  function onWeekChange(value: string) {
-    setSelectedWeek(value);
-  }
+  const daysOfWeek = useMemo(
+    () => getDaysOfWeek(firstDayOfWeek, lastDayOfWeek),
+    [firstDayOfWeek, lastDayOfWeek]
+  );
 
   return (
     <div className='container mx-auto py-10'>
-      <TimeTableHeader
-        trucks={trucks}
-        onSelectTruck={onTruckChange}
-        selectedTruck={selectedTruck}
-      />
-      <TimeTable
-        orders={orders}
-        countries={countries}
-        daysOfWeek={daysOfWeek}
-        weekNumber={weekNumber}
-      />
-      <TimeTablePagination selectedWeek={selectedWeek} onClick={onWeekChange} />
+      <QueryErrorBoundary>
+        <TimeTableHeader trucks={trucks} />
+        <TimeTable
+          orders={orders}
+          countries={countries}
+          daysOfWeek={daysOfWeek}
+          weekNumber={weekNumber}
+        />
+        <TimeTablePagination />
+      </QueryErrorBoundary>
     </div>
   );
 }

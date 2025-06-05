@@ -1,3 +1,8 @@
+import {
+  getNextMonday,
+  getPreviousFriday,
+  getWeekNumber,
+} from '@/helpers/dates';
 import { OrderWithDetails } from '@/types/types';
 
 export async function fetchOrdersByTruckAndDates(
@@ -9,10 +14,24 @@ export async function fetchOrdersByTruckAndDates(
   const endDateQuery = endDate ? `&endDate=${endDate}` : '';
 
   const response = await fetch(
-    `http://localhost:3000/api/v1/orders?truckId=${truckId}${startDateQuery}${endDateQuery}`
+    `api/v1/orders?truckId=${truckId}${startDateQuery}${endDateQuery}`
   );
 
   if (!response.ok) throw new Error("Can't fetch orders form API.");
 
   return (await response.json()) satisfies OrderWithDetails;
 }
+
+export const getOrdersQueryOptions = (
+  truckId: number,
+  start: string,
+  end: string
+) => ({
+  queryKey: ['orders', truckId, getWeekNumber(start)],
+  queryFn: () =>
+    fetchOrdersByTruckAndDates(
+      truckId,
+      getPreviousFriday(start),
+      getNextMonday(end)
+    ),
+});
