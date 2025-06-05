@@ -2,7 +2,7 @@ import { CustomerWithId } from '@/types/types';
 import { queryOptions } from '@tanstack/react-query';
 
 async function fetchCustomers(): Promise<CustomerWithId[]> {
-  const response = await fetch('http://localhost:3000/api/v1/customers');
+  const response = await fetch('api/v1/customers');
 
   if (!response.ok) throw new Error("Can't fetch customer from API.");
 

@@ -2,7 +2,7 @@ import { CountryWithId } from '@/types/types';
 import { queryOptions } from '@tanstack/react-query';
 
 async function fetchCountries(): Promise<CountryWithId[]> {
-  const response = await fetch('http://localhost:3000/api/v1/countries');
+  const response = await fetch('api/v1/countries');
 
   if (!response.ok) throw new Error("Can't fetch country data");
 
