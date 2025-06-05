@@ -9,6 +9,7 @@ type useUpdateMutationProps<T> = {
   toastTitle: string;
   toastDescription: string;
   onOpenDialogChange?: Dispatch<SetStateAction<boolean>>;
+  variant?: 'default' | 'destructive' | undefined | null;
 };
 
 export function useUpdateMutation<T>({
@@ -18,6 +19,7 @@ export function useUpdateMutation<T>({
   toastTitle,
   toastDescription,
   onOpenDialogChange,
+  variant,
 }: useUpdateMutationProps<T>) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -49,6 +51,7 @@ export function useUpdateMutation<T>({
       toast({
         title: toastTitle,
         description: toastDescription,
+        variant: variant,
       });
     },
   });
