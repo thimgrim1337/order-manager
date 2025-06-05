@@ -8,10 +8,11 @@ import './index.css';
 // Import the generated route tree
 import { routeTree } from './routeTree.gen';
 import { Link } from 'lucide-react';
-import ErrorComponent from './components/error';
-import QueryErrorBoundary from './components/query-error-boundary';
+import ErrorComponent from './components/ui/error/error';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: 0 } },
+});
 
 // Create a new router instance
 const router = createRouter({
@@ -32,6 +33,7 @@ const router = createRouter({
       </div>
     );
   },
+  defaultStructuralSharing: true,
 });
 
 // Register the router instance for type safety
@@ -51,11 +53,9 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <QueryErrorBoundary>
-        <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} />
-        </QueryClientProvider>
-      </QueryErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
     </StrictMode>
   );
 }

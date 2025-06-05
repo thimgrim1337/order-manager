@@ -1,7 +1,9 @@
 import { ErrorBoundary } from 'react-error-boundary';
-import ErrorComponent from '@/components/error';
+import ErrorComponent from '@/components/ui/error/error';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { ReactNode } from '@tanstack/react-router';
+import { Suspense } from 'react';
+import { LoaderCircleIcon } from 'lucide-react';
 
 export default function QueryErrorBoundary({
   children,
@@ -17,7 +19,9 @@ export default function QueryErrorBoundary({
             <ErrorComponent error={error} onClick={resetErrorBoundary} />
           )}
         >
-          {children}
+          <Suspense fallback={<LoaderCircleIcon className='animate-spin' />}>
+            {children}
+          </Suspense>
         </ErrorBoundary>
       )}
     </QueryErrorResetBoundary>
