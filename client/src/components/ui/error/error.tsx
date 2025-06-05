@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { Button } from './ui/primitives/button';
+import { Button } from '../primitives/button';
 
 export default function ErrorComponent({
   error,
