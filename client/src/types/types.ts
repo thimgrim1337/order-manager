@@ -1,5 +1,6 @@
 import { DriverWithId } from '@/server/src/api/drivers/drivers.model';
 import { TruckWithId } from '@/server/src/api/trucks/trucks.model';
+import { isAfter } from 'date-fns';
 import { z } from 'zod';
 
 export const ID = z.object({
@@ -7,48 +8,66 @@ export const ID = z.object({
 });
 export type ID = z.infer<typeof ID>;
 
-export const Order = z.object({
-  id: z.number().optional(),
-  orderNr: z
-    .string()
-    .min(1, { message: 'Nr zlecenia jest zbyt krótki.' })
-    .max(30, { message: 'Nr zlecenia jest zbyt długi.' }),
-  startDate: z.string().date(),
-  endDate: z.string().date(),
-  statusID: z.number().min(1).max(3).default(1),
-  priceCurrency: z.string({ message: 'Wprowadź cenę transportu.' }),
-  pricePLN: z.string(),
-  currency: z.enum(['PLN', 'EUR'], { message: 'Wybierz walutę.' }),
-  currencyRate: z.string(),
-  truckID: z.number({ message: 'Wybierz pojazd.' }).min(1),
-  driverID: z.number({ message: 'Wybierz kierowcę.' }).min(1),
-  customerID: z.number({ message: 'Wybierz zleceniodawcę.' }).min(1),
-  loadingPlaces: z
-    .object({
-      id: z.number().optional(),
-      name: z.string(),
-      postal: z.string(),
-      countryID: z.number(),
-    })
-    .array()
-    .min(1, { message: 'Wybierz co najmniej jedno miejsce załadunku.' }),
-  unloadingPlaces: z
-    .object({
-      id: z.number().optional(),
-      name: z.string(),
-      postal: z.string(),
-      countryID: z.number(),
-    })
-    .array()
-    .min(1, { message: 'Wybierz co najmniej jedno miejsce rozładunku.' }),
-});
-export type Order = z.infer<typeof Order>;
-export const OrderWithId = Order.extend({
-  id: z.number(),
-});
-export type OrderWithId = z.infer<typeof OrderWithId>;
+export const Order = z
+  .object({
+    id: z.number().optional(),
+    orderNr: z
+      .string()
+      .min(1, { message: 'Nr zlecenia jest zbyt krótki.' })
+      .max(30, { message: 'Nr zlecenia jest zbyt długi.' }),
+    startDate: z.string().date(),
+    endDate: z.string().date(),
+    statusID: z.number().min(1).max(3).default(1),
+    priceCurrency: z
+      .string()
+      .transform((val, ctx) => {
+        const num = Number(val);
+        if (isNaN(num)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Wartość musi być liczbą.',
+          });
+          return z.NEVER;
+        }
+        return num;
+      })
+      .refine((val) => val > 0, { message: 'Cena musi być większa od 0.' })
+      .transform((val) => String(val)),
+    pricePLN: z.string(),
+    currency: z.enum(['PLN', 'EUR'], { message: 'Wybierz walutę.' }),
+    currencyRate: z.string(),
+    truckID: z.number({ message: 'Wybierz pojazd.' }).min(1),
+    driverID: z.number({ message: 'Wybierz kierowcę.' }).min(1),
+    customerID: z.number({ message: 'Wybierz zleceniodawcę.' }).min(1),
+    loadingPlaces: z
+      .object({
+        id: z.number().optional(),
+        name: z.string(),
+        postal: z.string(),
+        countryID: z.number(),
+      })
+      .array()
+      .min(1, { message: 'Wybierz co najmniej jedno miejsce załadunku.' }),
+    unloadingPlaces: z
+      .object({
+        id: z.number().optional(),
+        name: z.string(),
+        postal: z.string(),
+        countryID: z.number(),
+      })
+      .array()
+      .min(1, { message: 'Wybierz co najmniej jedno miejsce rozładunku.' }),
+  })
+  .refine((data) => isAfter(data.endDate, data.startDate), {
+    message: 'Data załadunku nie może być późniejsza niż data rozładunku.',
+    path: ['startDate'],
+  });
 
-export const OrderWithDetails = OrderWithId.extend({
+export type Order = z.infer<typeof Order>;
+
+export type OrderWithId = Order & ID;
+
+export const OrderDetails = z.object({
   status: z.object({
     name: z.string().min(1),
   }),
@@ -63,12 +82,14 @@ export const OrderWithDetails = OrderWithId.extend({
     name: z.string().min(1),
   }),
 });
-export type OrderWithDetails = z.infer<typeof OrderWithDetails>;
+export type OrderDetails = z.infer<typeof OrderDetails>;
+export type OrderWithDetails = OrderWithId & OrderDetails;
 
 export const Customer = z.object({
   name: z.string().min(1, { message: 'Wprowadź nazwę zleceniodawcy.' }),
   tax: z
     .string()
+    .min(1, { message: 'Wprowadź NIP.' })
     .min(10, { message: 'NIP jest zbyt krótki.' })
     .max(50, { message: 'NIP jest zbyt długi.' }),
 });

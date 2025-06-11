@@ -28,15 +28,18 @@ export function PlacesList({
   const firstPlace = selectedPlaces[0];
   const [, ...rest] = selectedPlaces;
 
+  const getCountryCode = (countryID: number) =>
+    countries.find((c) => c.id === countryID)?.code || '??';
+
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className=' space-y-2'>
       <div className='flex items-center justify-between space-x-4'>
-        <h4 className='text-sm'>
+        <h4 className='text-sm font-medium`'>
           Wybierz miejsce
           {name === 'loadingPlaces' ? ' załadunku' : ' rozładunku'}
         </h4>
         <CollapsibleTrigger asChild>
-          <Button variant='ghost' size='sm' className='text-primary-foreground'>
+          <Button variant='ghost' size='sm' className='text-primary'>
             <ChevronsUpDown className='h-4 w-4' />
             <span className='sr-only'>Toggle</span>
           </Button>
@@ -47,7 +50,7 @@ export function PlacesList({
           <PlacesListItem
             place={firstPlace}
             onRemove={onRemove}
-            country={countries[firstPlace.countryID - 1].code}
+            country={getCountryCode(firstPlace.countryID)}
           />
         ) : (
           <span className='text-muted-foreground'>
@@ -62,7 +65,7 @@ export function PlacesList({
               key={place.id}
               place={place}
               onRemove={onRemove}
-              country={countries[place.countryID - 1].code}
+              country={getCountryCode(place.countryID)}
             />
           ))}
         </ul>

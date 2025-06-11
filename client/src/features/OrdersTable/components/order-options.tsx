@@ -11,7 +11,7 @@ import {
   removeOrder,
   updateOrder,
 } from '@/features/OrderForm/mutations/orderMutation';
-import { OrderWithDetails, OrderWithId } from '@/types/types';
+import { OrderDetails, OrderWithId } from '@/types/types';
 import { MoreHorizontal } from 'lucide-react';
 import { MouseEvent, useState } from 'react';
 import StatusDialog from './status-dialog';
@@ -20,7 +20,7 @@ import RemoveDialog from './remove-dialog';
 import { useUpdateMutation } from '@/features/OrderForm/hooks/useUpdateMutation';
 
 type TableRowDropdownProps = {
-  order: OrderWithDetails;
+  order: OrderDetails;
 };
 
 export default function OrderOptions({ order }: TableRowDropdownProps) {

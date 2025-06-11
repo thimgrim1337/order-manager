@@ -12,7 +12,6 @@ import { Customer } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { BriefcaseBusinessIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { useErrorBoundary } from 'react-error-boundary';
 import { UseMutationResult } from '@tanstack/react-query';
 
 const initialValues: Customer = {
@@ -22,25 +21,20 @@ const initialValues: Customer = {
 
 type CustomerFormProps = {
   mutationFn: UseMutationResult<unknown, Error, Customer, unknown>['mutate'];
+  isPending: UseMutationResult<unknown, Error, Customer, unknown>['isPending'];
 };
 
-export default function CustomerForm({ mutationFn }: CustomerFormProps) {
-  const { showBoundary } = useErrorBoundary();
-
+export default function CustomerForm({
+  mutationFn,
+  isPending,
+}: CustomerFormProps) {
   const form = useForm<Customer>({
     resolver: zodResolver(Customer),
     defaultValues: initialValues,
   });
 
-  async function submitHandle(formData: Customer) {
-    try {
-      mutationFn(formData);
-    } catch (error) {
-      showBoundary({
-        message: 'An error occured. Please again later.',
-        stack: `Stack ${error}`,
-      });
-    }
+  async function handleSubmitForm(formData: Customer) {
+    mutationFn(formData);
   }
 
   return (
@@ -82,7 +76,8 @@ export default function CustomerForm({ mutationFn }: CustomerFormProps) {
         <Button
           type='button'
           className='row-start-5 col-start-1 -col-end-1 self-center'
-          onClick={form.handleSubmit(submitHandle)}
+          onClick={form.handleSubmit(handleSubmitForm)}
+          disabled={isPending}
         >
           Zapisz
         </Button>

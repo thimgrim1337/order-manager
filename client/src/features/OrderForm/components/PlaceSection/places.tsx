@@ -4,7 +4,7 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/primitives/form';
-import PlaceControl from './place-control';
+import PlaceSelector from './place-selector';
 import { useFormContext } from 'react-hook-form';
 
 export default function PlacesSection() {
@@ -19,7 +19,7 @@ export default function PlacesSection() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <PlaceControl {...field} />
+                <PlaceSelector {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -33,7 +33,7 @@ export default function PlacesSection() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <PlaceControl {...field} />
+                <PlaceSelector {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

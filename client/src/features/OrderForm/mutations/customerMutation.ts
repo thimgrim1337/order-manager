@@ -3,7 +3,7 @@ import { Customer, CustomerWithId } from '@/types/types';
 export async function createCustomer(
   formData: Customer
 ): Promise<CustomerWithId> {
-  const response = await fetch('http://localhost:3000/api/v1/customers', {
+  const response = await fetch('/api/v1/customers', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -15,10 +15,10 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/primitives/button';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { useState } from 'react';
-import { City, CityWithId } from '@/types/types';
+import { City } from '@/types/types';
 
 type PlacesComboboxProps = {
-  cities: CityWithId[];
+  cities: City[];
   onSelect: (city: City) => void;
   selectedPlaces: City[];
 };
@@ -34,15 +34,16 @@ export default function PlacesCombobox({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          aria-label='Wybierz miejsca'
           variant='outline'
           role='combobox'
-          className={cn('w-full justify-between text-muted-foreground')}
+          className={cn('w-full justify-between')}
         >
           Wybierz miejsca
           <ChevronsUpDown className='opacity-50' />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className='w-full p-0 min-w-96'>
+      <PopoverContent className='w-full p-0'>
         <Command>
           <CommandInput placeholder='Szukaj miejsce...' className='h-9' />
           <CommandList>
@@ -58,9 +59,7 @@ export default function PlacesCombobox({
                   <Check
                     className={cn(
                       'ml-auto',
-                      selectedPlaces.some(
-                        (selectedPlace) => selectedPlace.id === city.id
-                      )
+                      selectedPlaces.some((p) => p.id === city.id)
                         ? 'opacity-100'
                         : 'opacity-0'
                     )}

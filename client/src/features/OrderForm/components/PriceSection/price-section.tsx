@@ -38,7 +38,7 @@ export default function PriceSection() {
           <FormItem className='w-full'>
             <FormLabel>Cena w walucie</FormLabel>
             <FormControl>
-              <Input placeholder='5000' {...field} />
+              <Input placeholder='5000' type='number' {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -50,28 +50,28 @@ export default function PriceSection() {
         render={({ field }) => (
           <FormItem className='w-full'>
             <FormLabel>Waluta</FormLabel>
-            <>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger aria-label='Currency Selector'>
-                    <SelectValue placeholder='Select currency' />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {currencies.map((d) => (
-                    <SelectItem value={d} key={d}>
-                      {d}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {isLoading && <LoaderCircle className='animate-spin' />}
-              {isError && (
-                <p className='text-[0.8rem] font-medium text-destructive'>
-                  {error?.message}
-                </p>
-              )}
-            </>
+
+            <Select onValueChange={field.onChange} value={field.value}>
+              <FormControl>
+                <SelectTrigger aria-label='Currency Selector'>
+                  <SelectValue placeholder='Select currency' />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {currencies.map((d) => (
+                  <SelectItem value={d} key={d}>
+                    {d}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {isLoading && <LoaderCircle className='animate-spin' />}
+            {isError && (
+              <p className='text-[0.8rem] font-medium text-destructive'>
+                {error?.message}
+              </p>
+            )}
+
             <FormMessage />
           </FormItem>
         )}

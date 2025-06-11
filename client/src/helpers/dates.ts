@@ -9,6 +9,7 @@ import {
   subWeeks,
   addWeeks,
   previousFriday,
+  nextMonday,
 } from 'date-fns';
 import { pl } from 'date-fns/locale';
 
@@ -17,12 +18,18 @@ export type Day = {
   date: string;
 };
 
-const formatDate = (date: Date | number, dateFormat: string = 'yyyy-MM-dd') =>
-  format(date, dateFormat, { locale: pl });
+export const formatDate = (
+  date: Date | number | undefined,
+  dateFormat: string = 'yyyy-MM-dd'
+) => {
+  if (!date) return '';
 
-export const getToday = () => formatDate(Date.now());
+  return format(date, dateFormat, { locale: pl });
+};
 
-export const getTomorrow = (date: string) => formatDate(addDays(date, 1));
+export const getToday = () => new Date(Date.now());
+
+export const getTomorrow = (date: Date) => addDays(date, 1);
 
 export const getYesterday = (date: string) => formatDate(subDays(date, 1));
 
@@ -35,12 +42,12 @@ export const addWeek = (date: string, count: number) =>
   formatDate(addWeeks(date, count));
 
 export const getFirstDayOfWeek = (date: string) =>
-  startOfWeek(date, { weekStartsOn: 1 });
+  formatDate(startOfWeek(date, { weekStartsOn: 1 }));
 
 export const getLastDayOfWeek = (date: string) =>
-  endOfWeek(date, { weekStartsOn: 1 });
+  formatDate(endOfWeek(date, { weekStartsOn: 1 }));
 
-export const getDaysOfWeek = (startDate: Date, endDate: Date): Day[] =>
+export const getDaysOfWeek = (startDate: string, endDate: string): Day[] =>
   eachDayOfInterval({
     start: startDate,
     end: endDate,
@@ -51,3 +58,11 @@ export const getDaysOfWeek = (startDate: Date, endDate: Date): Day[] =>
 
 export const getPreviousFriday = (date: string) =>
   formatDate(previousFriday(date));
+
+export const getNextMonday = (date: string) => formatDate(nextMonday(date));
+
+export const isValidDate = (date: Date | undefined) => {
+  if (!date) return false;
+
+  return !isNaN(date.getTime());
+};
