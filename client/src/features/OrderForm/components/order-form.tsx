@@ -4,7 +4,7 @@ import { Form } from '@/components/ui/primitives/form';
 import { Button } from '@/components/ui/primitives/button';
 import { LoaderCircle } from 'lucide-react';
 import { useErrorBoundary } from 'react-error-boundary';
-import { getToday, getTomorrow } from '@/helpers/dates';
+import { formatDate, getToday, getTomorrow } from '@/helpers/dates';
 import { DevTool } from '@hookform/devtools';
 import CustomerSection from './CustomerSection/customer';
 import DatesSection from './DateSection/dates';
@@ -14,30 +14,33 @@ import PlacesSection from './PlaceSection/places';
 import { UseMutationResult } from '@tanstack/react-query';
 import { Order } from '@/types/types';
 
+const today = getToday();
+const tomorrow = getTomorrow(today);
+
 const initialValues = {
   orderNr: '',
-  startDate: getToday(),
-  endDate: getTomorrow(getToday()),
-  statusID: 1,
+  startDate: formatDate(today),
+  endDate: formatDate(tomorrow),
+  statusId: 1,
   priceCurrency: '',
   pricePLN: '',
   currencyRate: '0',
   currency: 'PLN',
-  truckID: undefined,
-  driverID: undefined,
-  customerID: undefined,
+  truckId: undefined,
+  driverId: undefined,
+  customerId: undefined,
   loadingPlaces: [],
   unloadingPlaces: [],
 };
 
 type OrderFormProps<T> = {
   values?: T;
-  mutationFn: UseMutationResult<unknown, Error, T, unknown>['mutate'];
+  mutation: UseMutationResult<unknown, Error, T, unknown>;
   isPending: boolean;
 };
 
 export default function OrderForm<T extends Order>({
-  mutationFn,
+  mutation,
   values,
   isPending,
 }: OrderFormProps<T>) {
@@ -48,17 +51,18 @@ export default function OrderForm<T extends Order>({
     defaultValues: (values || initialValues) as DefaultValues<T>,
   });
 
-  const submitHanlder: SubmitHandler<T> = async (formValues) => {
+  const handleSubmit: SubmitHandler<T> = async (formValues) => {
     try {
       const order = { ...formValues };
 
-      if (order.currency !== 'PLN') {
-        order.pricePLN = String(
-          parseFloat(order.priceCurrency) * parseFloat(order.currencyRate)
-        );
-      } else order.pricePLN = order.priceCurrency;
+      order.pricePLN =
+        order.currency !== 'PLN'
+          ? String(
+              parseFloat(order.priceCurrency) * parseFloat(order.currencyRate)
+            )
+          : order.priceCurrency;
 
-      mutationFn(order);
+      mutation.mutate(order);
     } catch (error) {
       showBoundary({
         message: 'An error occured. Please try again later.',
@@ -70,12 +74,9 @@ export default function OrderForm<T extends Order>({
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(
-          submitHanlder as SubmitHandler<Order>,
-          (errors) => {
-            console.error(errors);
-          }
-        )}
+        onSubmit={form.handleSubmit(handleSubmit, (errors) => {
+          console.error(errors);
+        })}
         className='space-y-8'
       >
         <CustomerSection />
@@ -83,7 +84,10 @@ export default function OrderForm<T extends Order>({
         <PlacesSection />
         <PriceSection />
         <TruckSection />
-        <Button type='submit'>
+        <Button
+          type='submit'
+          aria-label={values ? 'Edytuj zlecenie' : 'Dodaj zlecenie'}
+        >
           {values ? 'Edytuj' : 'Dodaj'}
           {isPending && <LoaderCircle className='animate-spin' />}
         </Button>

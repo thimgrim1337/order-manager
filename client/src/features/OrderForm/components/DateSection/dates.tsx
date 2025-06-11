@@ -5,8 +5,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/primitives/form';
-import { Input } from '@/components/ui/primitives/input';
 import { useFormContext } from 'react-hook-form';
+import { Calendar } from './calendar';
 
 export default function DatesSection() {
   const { control } = useFormContext();
@@ -19,7 +19,7 @@ export default function DatesSection() {
           <FormItem className='w-full'>
             <FormLabel>Data załadunku</FormLabel>
             <FormControl>
-              <Input placeholder='2025/01/01' {...field} type='date' />
+              <Calendar {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -33,7 +33,7 @@ export default function DatesSection() {
           <FormItem className='w-full'>
             <FormLabel>Data rozładunku</FormLabel>
             <FormControl>
-              <Input placeholder='2025/01/01' {...field} type='date' />
+              <Calendar {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>

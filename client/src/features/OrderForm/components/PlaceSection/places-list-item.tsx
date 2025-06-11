@@ -14,12 +14,13 @@ export default function PlacesListItem({
   onRemove,
 }: PlaceListItemProps) {
   return (
-    <li
-      className='rounded-md border px-4 py-2 text-sm shadow-sm flex justify-between'
-      key={place.name}
-    >
-      {`${country} ${place.postal} ${place.name}`}
+    <li className='rounded-md border px-4 py-2 text-sm shadow-sm flex  items-center'>
+      <span className='font-medium '>{place.name}</span>
+      <span className='text-muted-foreground flex-grow text-right mr-2'>
+        {country} {place.postal}
+      </span>
       <Button
+        aria-label={`Usuń miejsce ${place.name}`}
         type='button'
         size={'icon'}
         variant={'destructive'}

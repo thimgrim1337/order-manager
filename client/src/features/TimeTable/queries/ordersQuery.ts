@@ -3,13 +3,13 @@ import {
   getPreviousFriday,
   getWeekNumber,
 } from '@/helpers/dates';
-import { OrderWithDetails } from '@/types/types';
+import { OrderDetails } from '@/types/types';
 
 export async function fetchOrdersByTruckAndDates(
   truckId: number,
   startDate: string | undefined,
   endDate: string | undefined
-): Promise<OrderWithDetails[]> {
+): Promise<OrderDetails[]> {
   const startDateQuery = startDate ? `&startDate=${startDate}` : '';
   const endDateQuery = endDate ? `&endDate=${endDate}` : '';
 
@@ -19,7 +19,7 @@ export async function fetchOrdersByTruckAndDates(
 
   if (!response.ok) throw new Error("Can't fetch orders form API.");
 
-  return (await response.json()) satisfies OrderWithDetails;
+  return (await response.json()) satisfies OrderDetails;
 }
 
 export const getOrdersQueryOptions = (

@@ -20,7 +20,7 @@ import CustomerForm from './customer-form';
 import { Button } from '@/components/ui/primitives/button';
 import { PlusIcon } from 'lucide-react';
 import { createCustomer } from '../../mutations/customerMutation';
-import { useCreateMutation } from '../../hooks/useCreateMutation';
+import { useOptimisticMutation } from '../../hooks/useOptimisticMutation';
 import { useState } from 'react';
 import { Customer } from '@/types/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -32,11 +32,10 @@ export default function CustomerSection() {
 
   const { data: customers } = useSuspenseQuery(customersQueryOptions);
 
-  const { createMutation } = useCreateMutation<Customer>({
+  const { createMutation } = useOptimisticMutation<Customer>({
     mutationFn: createCustomer,
     queryKey: ['customers'],
     toastDescription: 'Udało się stworzyć nowego kontrahenta.',
-    toastTitle: 'Nowy kontrahent',
     errorDescription: 'Nie udało się utworzyć kontrahenta.',
     onOpenDialogChange: setIsOpen,
   });
@@ -75,7 +74,10 @@ export default function CustomerSection() {
                 Wypełnij wszystkie pola aby dodać nowego zleceniodawcę.
               </DialogDescription>
             </DialogHeader>
-            <CustomerForm mutationFn={createMutation.mutate} />
+            <CustomerForm
+              mutationFn={createMutation.mutate}
+              isPending={createMutation.isPending}
+            />
           </DialogContent>
         </Dialog>
       </div>
