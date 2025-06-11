@@ -10,26 +10,31 @@ import {
   CommandList,
 } from '../primitives/command';
 import { cn } from '@/lib/utils';
-import { forwardRef } from 'react';
 import {
-  FieldName,
-  FieldValue,
+  FieldPath,
   FieldValues,
+  PathValue,
   useFormContext,
 } from 'react-hook-form';
 
-type FormComboboxProps<TFieldValues extends FieldValues> = {
-  value: FieldValue<TFieldValues>;
-  name: FieldName<TFieldValues>;
-  placeholder: string;
-  data: TFieldValues[];
+type ComboboxOption = {
+  id: string | number;
+  name: string;
 };
 
-const FormCombobox = forwardRef<
-  HTMLInputElement,
-  FormComboboxProps<FieldValues>
->(({ value: fieldValue, name: fieldName, data, placeholder }, ref) => {
-  const { setValue } = useFormContext();
+type FormComboboxProps<TFieldValues extends FieldValues> = {
+  name: FieldPath<TFieldValues>;
+  placeholder: string;
+  data: ComboboxOption[];
+};
+
+export default function FormCombobox<T extends FieldValues>({
+  name,
+  placeholder,
+  data,
+}: FormComboboxProps<T>) {
+  const { setValue, watch } = useFormContext<T>();
+  const selectedValue = watch(name);
 
   return (
     <>
@@ -38,37 +43,46 @@ const FormCombobox = forwardRef<
           <Button
             variant='outline'
             role='combobox'
+            aria-expanded='true'
+            aria-controls='combobox-list'
             className={cn(
               'w-full justify-between',
-              !fieldValue && 'text-muted-foreground'
+              !selectedValue && 'text-muted-foreground'
             )}
           >
-            {fieldValue === undefined || fieldValue === ''
+            {selectedValue === undefined || selectedValue === ''
               ? placeholder
-              : data.find((d) => d.id === fieldValue)?.name}
+              : data.find((d) => d.id === selectedValue)?.name}
             <ChevronsUpDown className='opacity-50' />
           </Button>
         </PopoverTrigger>
         <PopoverContent className='w-full p-0'>
           <Command>
             <CommandInput placeholder='Szukaj...' className='h-9' />
-            <CommandList>
+            <CommandList id='combobox-list'>
               <CommandEmpty>Nic nie znaleziono.</CommandEmpty>
               <CommandGroup>
                 {data.map((d) => (
                   <CommandItem
+                    aria-selected={d.id === selectedValue}
                     value={d.name}
-                    key={d.name}
-                    ref={ref}
+                    key={d.id}
                     onSelect={() => {
-                      setValue(fieldName, d.id, { shouldDirty: true });
+                      setValue(name, d.id as PathValue<T, typeof name>, {
+                        shouldDirty: true,
+                      });
+                    }}
+                    onBlur={() => {
+                      setValue(name, d.id as PathValue<T, typeof name>, {
+                        shouldDirty: true,
+                      });
                     }}
                   >
                     {d.name}
                     <Check
                       className={cn(
                         'ml-auto',
-                        d.id === fieldValue ? 'opacity-100' : 'opacity-0'
+                        d.id !== selectedValue && 'opacity-0'
                       )}
                     />
                   </CommandItem>
@@ -80,6 +94,4 @@ const FormCombobox = forwardRef<
       </Popover>
     </>
   );
-});
-
-export default FormCombobox;
+}
