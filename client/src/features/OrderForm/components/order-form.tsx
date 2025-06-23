@@ -1,5 +1,4 @@
 import { DefaultValues, SubmitHandler, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from '@/components/ui/primitives/form';
 import { Button } from '@/components/ui/primitives/button';
 import { LoaderCircle } from 'lucide-react';
@@ -12,7 +11,10 @@ import PriceSection from './PriceSection/price-section';
 import TruckSection from './TruckSection/truck-section';
 import PlacesSection from './PlaceSection/places';
 import { UseMutationResult } from '@tanstack/react-query';
-import { Order } from '@/types/types';
+import { Order, OrderWithId } from '@/types/types';
+import { Dispatch, SetStateAction } from 'react';
+
+import { customResolver } from '@/lib/customResolver';
 
 const today = getToday();
 const tomorrow = getTomorrow(today);
@@ -37,17 +39,19 @@ type OrderFormProps<T> = {
   values?: T;
   mutation: UseMutationResult<unknown, Error, T, unknown>;
   isPending: boolean;
+  onOpenChange?: Dispatch<SetStateAction<boolean>>;
 };
 
 export default function OrderForm<T extends Order>({
   mutation,
   values,
   isPending,
+  onOpenChange,
 }: OrderFormProps<T>) {
   const { showBoundary } = useErrorBoundary();
 
   const form = useForm<T>({
-    resolver: zodResolver(Order),
+    resolver: customResolver<T>(values ? OrderWithId : Order),
     defaultValues: (values || initialValues) as DefaultValues<T>,
   });
 
@@ -62,7 +66,9 @@ export default function OrderForm<T extends Order>({
             )
           : order.priceCurrency;
 
-      mutation.mutate(order);
+      mutation.mutate(order, {
+        onSettled: () => onOpenChange && onOpenChange(false),
+      });
     } catch (error) {
       showBoundary({
         message: 'An error occured. Please try again later.',

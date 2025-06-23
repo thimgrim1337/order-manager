@@ -1,12 +1,12 @@
-import { Truck } from '@/types/types';
+import { TruckWithId } from '@/types/types';
 import { queryOptions } from '@tanstack/react-query';
 
-async function fetchTrucks(): Promise<Truck[]> {
+async function fetchTrucks(): Promise<TruckWithId[]> {
   const response = await fetch('api/v1/trucks');
 
   if (!response.ok) throw new Error("Can't fetch data");
 
-  return (await response.json()) satisfies Truck;
+  return (await response.json()) satisfies TruckWithId;
 }
 
 const trucksQueryOptions = queryOptions({

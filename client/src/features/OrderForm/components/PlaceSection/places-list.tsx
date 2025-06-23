@@ -62,7 +62,7 @@ export function PlacesList({
         <ul className='space-y-2'>
           {rest.map((place) => (
             <PlacesListItem
-              key={place.id}
+              key={`${place.postal} - ${place.name}`}
               place={place}
               onRemove={onRemove}
               country={getCountryCode(place.countryID)}

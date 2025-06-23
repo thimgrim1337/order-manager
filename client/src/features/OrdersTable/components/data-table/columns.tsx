@@ -2,7 +2,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/primitives/button';
 import { OrderWithDetails } from '@/types/types';
-import OrderOptions from './components/order-options';
+import OrderOptions from '../order-options';
 
 export const columns: ColumnDef<OrderWithDetails>[] = [
   {

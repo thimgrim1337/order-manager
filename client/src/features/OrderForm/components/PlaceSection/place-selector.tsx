@@ -40,9 +40,9 @@ export default function PlaceSelector<T extends FieldValues>({
   const selectedPlaces: City[] = watch(name) || [];
 
   function togglePlace(city: City) {
-    const isSelected = selectedPlaces.some((place) => place.id === city.id);
+    const isSelected = selectedPlaces.some((place) => place.name === city.name);
     const updated = isSelected
-      ? selectedPlaces.filter((place) => place.id !== city.id)
+      ? selectedPlaces.filter((place) => place.name !== city.name)
       : [...selectedPlaces, city];
 
     setValue(name, updated as PathValue<T, typeof name>, { shouldDirty: true });

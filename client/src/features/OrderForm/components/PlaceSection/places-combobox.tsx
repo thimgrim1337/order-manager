@@ -52,14 +52,14 @@ export default function PlacesCombobox({
               {cities.map((city) => (
                 <CommandItem
                   value={city.name}
-                  key={city.id}
+                  key={`${city.name} - ${city.postal}`}
                   onSelect={() => onSelect(city)}
                 >
                   {city.name}
                   <Check
                     className={cn(
                       'ml-auto',
-                      selectedPlaces.some((p) => p.id === city.id)
+                      selectedPlaces.some((p) => p.name === city.name)
                         ? 'opacity-100'
                         : 'opacity-0'
                     )}

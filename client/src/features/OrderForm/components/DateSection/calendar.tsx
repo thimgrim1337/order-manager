@@ -6,7 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/primitives/popover';
-import { formatDate, getToday, isValidDate } from '@/helpers/dates';
+import { formatDate, getToday, isValidDate, parseDate } from '@/helpers/dates';
 import { CalendarIcon } from 'lucide-react';
 import { ChangeEvent, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -19,10 +19,12 @@ type CalendarProps = {
 
 export function Calendar({ name }: CalendarProps) {
   const { setValue, watch } = useFormContext();
-  const [open, setOpen] = useState(false);
-  const [date, setDate] = useState<Date | undefined>(today);
-
   const value = watch(name);
+  const existingDate = parseDate(watch(name));
+
+  const [open, setOpen] = useState(false);
+  const [date, setDate] = useState<Date | undefined>(existingDate || today);
+
   let formatedDate = formatDate(value);
 
   function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
@@ -37,9 +39,11 @@ export function Calendar({ name }: CalendarProps) {
   }
 
   function handleSelectDate(date: Date | undefined) {
-    setValue(name, formatDate(date));
-    setDate(date);
-    setOpen(false);
+    if (isValidDate(date)) {
+      setValue(name, formatDate(date));
+      setDate(date);
+      setOpen(false);
+    }
   }
 
   return (

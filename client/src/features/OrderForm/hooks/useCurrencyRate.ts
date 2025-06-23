@@ -3,20 +3,21 @@ import { fetchCurrencyRate } from '../queries/currencyRateQuery';
 import { Currencies, Order } from '@/types/types';
 import { useFormContext } from 'react-hook-form';
 import { useEffect } from 'react';
-import { getYesterday } from '@/helpers/dates';
+import { formatDate, getYesterday } from '@/helpers/dates';
 import { fetchHolidays } from '../queries/holidaysQuery';
 import { isFuture, isWeekend } from 'date-fns';
 
 type useCurrencyRateParams = {
   currency: Currencies;
-  date: string;
+  date: Date;
 };
 
 export default function useCurrencyRate({
   currency,
   date,
 }: useCurrencyRateParams) {
-  const currencyDate = useCurrencyDateCheck(date);
+  const formatedDate = formatDate(date);
+  const currencyDate = useCurrencyDateCheck(formatedDate);
   const { setValue } = useFormContext<Order>();
   const {
     data: rate,
@@ -42,7 +43,7 @@ export function useCurrencyDateCheck(date: string) {
   });
 
   function checkCurrencyDate(date: string) {
-    const yesterday = getYesterday(date);
+    const yesterday = formatDate(getYesterday(date));
 
     const isHoliday = holidays?.some((day) => day.endDate === yesterday);
 

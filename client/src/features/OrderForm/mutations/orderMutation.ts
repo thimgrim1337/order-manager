@@ -1,7 +1,7 @@
-import { Order, OrderWithId } from '@/types/types';
+import { ApiError, Order, OrderWithId } from '@/types/types';
 
-export async function createOrder(formData: Order): Promise<OrderWithId> {
-  const response = await fetch('http://localhost:3000/api/v1/orders', {
+export async function createOrder(formData: Order): Promise<Order> {
+  const response = await fetch('/api/v1/orders', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -9,40 +9,52 @@ export async function createOrder(formData: Order): Promise<OrderWithId> {
     body: JSON.stringify(formData),
   });
 
-  if (!response.ok) throw new Error("Can't create an order");
+  const data = await response.json();
 
-  return (await response.json()) satisfies OrderWithId;
+  if (!response.ok)
+    throw {
+      message: data?.error?.message || 'Nie udało się utworzyć zlecenia.',
+      statusCode: response.status,
+    } satisfies ApiError;
+
+  return data as Order;
 }
 
 export async function updateOrder(formData: OrderWithId): Promise<OrderWithId> {
-  const response = await fetch(
-    `http://localhost:3000/api/v1/orders/${formData.id}`,
-    {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    }
-  );
+  const response = await fetch(`api/v1/orders/${formData.id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(formData),
+  });
 
-  if (!response.ok) throw new Error("Can't update an order");
+  const data = await response.json();
 
-  return (await response.json()) satisfies OrderWithId;
+  if (!response.ok)
+    throw {
+      message: data?.error?.message || 'Nie udało się utworzyć zlecenia.',
+      statusCode: response.status,
+    } satisfies ApiError;
+
+  return data as OrderWithId;
 }
 
 export async function removeOrder(formData: OrderWithId): Promise<OrderWithId> {
-  const response = await fetch(
-    `http://localhost:3000/api/v1/orders/${formData.id}`,
-    {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  );
+  const response = await fetch(`api/v1/orders/${formData.id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 
-  if (!response.ok) throw new Error("Can't delete an order");
+  const data = await response.json();
 
-  return (await response.json()) satisfies OrderWithId;
+  if (!response.ok)
+    throw {
+      message: data?.error?.message || 'Nie udało się utworzyć zlecenia.',
+      statusCode: response.status,
+    } satisfies ApiError;
+
+  return data as OrderWithId;
 }

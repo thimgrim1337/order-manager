@@ -32,12 +32,10 @@ export default function CustomerSection() {
 
   const { data: customers } = useSuspenseQuery(customersQueryOptions);
 
-  const { createMutation } = useOptimisticMutation<Customer>({
+  const createMutation = useOptimisticMutation<Customer>({
     mutationFn: createCustomer,
     queryKey: ['customers'],
-    toastDescription: 'Udało się stworzyć nowego kontrahenta.',
-    errorDescription: 'Nie udało się utworzyć kontrahenta.',
-    onOpenDialogChange: setIsOpen,
+    successMessage: 'Udało się stworzyć nowego kontrahenta.',
   });
 
   return (
@@ -75,8 +73,9 @@ export default function CustomerSection() {
               </DialogDescription>
             </DialogHeader>
             <CustomerForm
-              mutationFn={createMutation.mutate}
+              mutation={createMutation}
               isPending={createMutation.isPending}
+              onOpenChange={setIsOpen}
             />
           </DialogContent>
         </Dialog>
