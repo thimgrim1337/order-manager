@@ -11,16 +11,16 @@ import {
   removeOrder,
   updateOrder,
 } from '@/features/OrderForm/mutations/orderMutation';
-import { OrderDetails, OrderWithId } from '@/types/types';
+import { OrderWithDetails, OrderWithId } from '@/types/types';
 import { MoreHorizontal } from 'lucide-react';
-import { MouseEvent, useState } from 'react';
+import { useState } from 'react';
 import StatusDialog from './status-dialog';
 import EditDialog from './edit-dialog';
 import RemoveDialog from './remove-dialog';
-import { useUpdateMutation } from '@/features/OrderForm/hooks/useUpdateMutation';
+import { useOptimisticMutation } from '@/features/OrderForm/hooks/useOptimisticMutation';
 
 type TableRowDropdownProps = {
-  order: OrderDetails;
+  order: OrderWithDetails;
 };
 
 export default function OrderOptions({ order }: TableRowDropdownProps) {
@@ -28,57 +28,56 @@ export default function OrderOptions({ order }: TableRowDropdownProps) {
   const [isStatusOpen, setIsStatusOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
 
-  const { mutation: updateMutation } = useUpdateMutation<OrderWithId>({
+  const editMutation = useOptimisticMutation<OrderWithId>({
     mutationFn: updateOrder,
     queryKey: ['orders'],
-    toastTitle: 'Edycja zlecenia',
-    toastDescription: `Edytowanie zlecenia nr ${order.orderNr}.`,
-    errorDescription: 'Nie udało się edytować zlecenia. Spróbuj ponownie.',
-    onOpenDialogChange: setIsEditOpen,
+    successMessage: `Edytowanie zlecenia nr ${order.orderNr}.`,
+    errorMessage: 'Nie udało się edytować zlecenia. Spróbuj ponownie.',
   });
 
-  const { mutation: removeMutation } = useUpdateMutation<OrderWithId>({
+  const statusMutation = useOptimisticMutation<OrderWithId>({
+    mutationFn: updateOrder,
+    queryKey: ['orders'],
+    successMessage: `Zmiana statusu zlecenia nr ${order.orderNr}.`,
+    errorMessage: 'Nie udało się zmienić statusu zlecenia. Spróbuj ponownie.',
+  });
+
+  const removeMutation = useOptimisticMutation<OrderWithId>({
     mutationFn: removeOrder,
     queryKey: ['orders'],
-    toastTitle: 'Usuwanie zlecenia',
-    toastDescription: `Pomyślnie usuniętlo zlecenie nr ${order.orderNr}.`,
-    errorDescription: 'Nie udało się usunąc zlecenia. Spróbuj ponownie.',
-    onOpenDialogChange: setIsRemoveOpen,
+    successMessage: `Pomyślnie usuniętlo zlecenie nr ${order.orderNr}.`,
+    errorMessage: 'Nie udało się usunąć zlecenia. Spróbuj ponownie.',
   });
-
-  function onClick(e: MouseEvent<HTMLElement>) {
-    if (e.target instanceof HTMLElement) {
-      const id = e.target.id;
-
-      if (id === 'status') setIsStatusOpen(true);
-      if (id === 'edit') setIsEditOpen(true);
-      if (id === 'remove') setIsRemoveOpen(true);
-    }
-  }
 
   return (
     <>
-      <StatusDialog
-        isOpen={isStatusOpen}
-        onOpenChange={setIsStatusOpen}
-        order={order}
-        mutationFn={updateMutation.mutate}
-      />
+      {isStatusOpen && (
+        <StatusDialog
+          isOpen={isStatusOpen}
+          onOpenChange={setIsStatusOpen}
+          order={order}
+          mutation={statusMutation}
+        />
+      )}
 
-      <EditDialog
-        isOpen={isEditOpen}
-        onOpenChange={setIsEditOpen}
-        order={order}
-        isPending={updateMutation.isPending}
-        mutationFn={updateMutation.mutate}
-      />
+      {isEditOpen && (
+        <EditDialog
+          isOpen={isEditOpen}
+          onOpenChange={setIsEditOpen}
+          order={order}
+          isPending={editMutation.isPending}
+          mutation={editMutation}
+        />
+      )}
 
-      <RemoveDialog
-        onOpenChange={setIsRemoveOpen}
-        isOpen={isRemoveOpen}
-        mutationFn={removeMutation.mutate}
-        order={order}
-      />
+      {isRemoveOpen && (
+        <RemoveDialog
+          onOpenChange={setIsRemoveOpen}
+          isOpen={isRemoveOpen}
+          mutation={removeMutation}
+          order={order}
+        />
+      )}
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -87,12 +86,18 @@ export default function OrderOptions({ order }: TableRowDropdownProps) {
             <MoreHorizontal className='h-4 w-4' />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' onClick={onClick}>
+        <DropdownMenuContent align='end'>
           <DropdownMenuLabel>Akcje</DropdownMenuLabel>
-          <DropdownMenuItem id='status'>Status</DropdownMenuItem>
+          <DropdownMenuItem id='status' onClick={() => setIsStatusOpen(true)}>
+            Status
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem id='edit'>Edytuj</DropdownMenuItem>
-          <DropdownMenuItem id='remove'>Usuń</DropdownMenuItem>
+          <DropdownMenuItem id='edit' onClick={() => setIsEditOpen(true)}>
+            Edytuj
+          </DropdownMenuItem>
+          <DropdownMenuItem id='remove' onClick={() => setIsRemoveOpen(true)}>
+            Usuń
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </>

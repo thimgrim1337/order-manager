@@ -4,12 +4,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/primitives/dialog';
 import OrderForm from '@/features/OrderForm/components/order-form';
 import { OrderWithId } from '@/types/types';
 import { UseMutationResult } from '@tanstack/react-query';
-
 import { Dispatch, SetStateAction } from 'react';
 
 type EditDialogProps = {
@@ -21,7 +19,7 @@ type EditDialogProps = {
     OrderWithId,
     unknown
   >['isPending'];
-  mutationFn: UseMutationResult<unknown, Error, OrderWithId, unknown>['mutate'];
+  mutation: UseMutationResult<unknown, Error, OrderWithId, unknown>;
   order: OrderWithId;
 };
 
@@ -29,23 +27,23 @@ export default function EditDialog({
   isOpen,
   onOpenChange,
   order,
-  mutationFn,
+  mutation,
   isPending,
 }: EditDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild></DialogTrigger>
-      <DialogContent>
+      <DialogContent className='max-w-screen-lg'>
         <DialogHeader>
-          <DialogTitle>Edytuj zlecenie nr ${order.orderNr}</DialogTitle>
+          <DialogTitle>Edytuj zlecenie nr {order.orderNr}</DialogTitle>
           <DialogDescription>
             W tym oknie możesz edytować swoje zlecenie.
           </DialogDescription>
         </DialogHeader>
-        <OrderForm
+        <OrderForm<OrderWithId>
           values={order}
-          mutationFn={mutationFn}
+          mutation={mutation}
           isPending={isPending}
+          onOpenChange={onOpenChange}
         />
       </DialogContent>
     </Dialog>

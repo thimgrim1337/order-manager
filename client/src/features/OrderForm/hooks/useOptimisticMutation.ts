@@ -1,22 +1,19 @@
 import { QueryKey, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Dispatch, SetStateAction } from 'react';
 import { toast } from 'sonner';
 
 type useOptimisticMutationProps<T> = {
   mutationFn: (formData: T) => Promise<T>;
   queryKey: QueryKey;
-  errorDescription?: string;
-  toastDescription: string;
-  onOpenDialogChange?: Dispatch<SetStateAction<boolean>>;
+  successMessage: string;
+  errorMessage?: string;
   isOptimistic?: boolean;
 };
 
 export function useOptimisticMutation<T>({
   mutationFn,
   queryKey,
-  errorDescription,
-  toastDescription,
-  onOpenDialogChange,
+  successMessage,
+  errorMessage,
   isOptimistic = false,
 }: useOptimisticMutationProps<T>) {
   const queryClient = useQueryClient();
@@ -40,14 +37,13 @@ export function useOptimisticMutation<T>({
       if (context?.previousItems) {
         queryClient.setQueryData(queryKey, context.previousItems);
       }
-      toast.error(errorDescription || 'Wystąpił błąd podczas zapisu.');
+      toast.error(errorMessage || err.message);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKey });
-      if (onOpenDialogChange) onOpenDialogChange(false);
     },
     onSuccess: () => {
-      toast.success(toastDescription);
+      toast.success(successMessage);
     },
   });
 }

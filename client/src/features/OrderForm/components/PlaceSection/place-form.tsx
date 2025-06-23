@@ -10,7 +10,6 @@ import {
 import FormCountrySelect from '@/components/ui/form/form-country-select';
 import { Input } from '@/components/ui/primitives/input';
 import { City } from '@/types/types';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Dispatch, SetStateAction } from 'react';
 import { useErrorBoundary } from 'react-error-boundary';
 import {
@@ -20,6 +19,7 @@ import {
   useForm,
   useFormContext,
 } from 'react-hook-form';
+import { customResolver } from '@/lib/customResolver';
 
 const initialValues: City = {
   countryID: 39,
@@ -44,7 +44,7 @@ export default function PlaceForm({
   });
 
   const form = useForm<City>({
-    resolver: zodResolver(City),
+    resolver: customResolver(City),
     defaultValues: initialValues,
   });
 

@@ -14,7 +14,7 @@ import { Dispatch, SetStateAction } from 'react';
 
 type RemoveDialogProps = {
   onOpenChange: Dispatch<SetStateAction<boolean>>;
-  mutationFn: UseMutationResult<unknown, Error, OrderWithId, unknown>['mutate'];
+  mutation: UseMutationResult<unknown, Error, OrderWithId, unknown>;
   isOpen: boolean;
   order: OrderWithId;
 };
@@ -22,7 +22,7 @@ type RemoveDialogProps = {
 export default function RemoveDialog({
   isOpen,
   onOpenChange,
-  mutationFn,
+  mutation,
   order,
 }: RemoveDialogProps) {
   return (
@@ -36,7 +36,11 @@ export default function RemoveDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Anuluj</AlertDialogCancel>
-          <AlertDialogAction onClick={() => mutationFn(order)}>
+          <AlertDialogAction
+            onClick={() =>
+              mutation.mutate(order, { onSettled: () => onOpenChange(false) })
+            }
+          >
             Usuń
           </AlertDialogAction>
         </AlertDialogFooter>

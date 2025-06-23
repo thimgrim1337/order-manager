@@ -9,10 +9,11 @@ import {
 } from '@/components/ui/primitives/form';
 import { Input } from '@/components/ui/primitives/input';
 import { Customer } from '@/types/types';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { BriefcaseBusinessIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { UseMutationResult } from '@tanstack/react-query';
+import { Dispatch, SetStateAction } from 'react';
+import { customResolver } from '@/lib/customResolver';
 
 const initialValues: Customer = {
   name: '',
@@ -20,21 +21,25 @@ const initialValues: Customer = {
 };
 
 type CustomerFormProps = {
-  mutationFn: UseMutationResult<unknown, Error, Customer, unknown>['mutate'];
+  mutation: UseMutationResult<unknown, Error, Customer, unknown>;
   isPending: UseMutationResult<unknown, Error, Customer, unknown>['isPending'];
+  onOpenChange: Dispatch<SetStateAction<boolean>>;
 };
 
 export default function CustomerForm({
-  mutationFn,
+  mutation,
   isPending,
+  onOpenChange,
 }: CustomerFormProps) {
   const form = useForm<Customer>({
-    resolver: zodResolver(Customer),
+    resolver: customResolver(Customer),
     defaultValues: initialValues,
   });
 
   async function handleSubmitForm(formData: Customer) {
-    mutationFn(formData);
+    mutation.mutate(formData, {
+      onSuccess: () => onOpenChange(false),
+    });
   }
 
   return (

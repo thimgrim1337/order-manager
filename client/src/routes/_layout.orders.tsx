@@ -1,4 +1,4 @@
-import { columns } from '@/features/OrdersTable/columns';
+import { columns } from '@/features/OrdersTable/components/data-table/columns';
 import { DataTable } from '@/features/OrdersTable/components/data-table/data-table';
 import {
   Dialog,
@@ -14,16 +14,17 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import orderQueryOptions from '@/features/OrderForm/queries/ordersQuery';
 import { createOrder } from '@/features/OrderForm/mutations/orderMutation';
-import { useCreateMutation } from '@/features/OrderForm/hooks/useCreateMutation';
+import { useOptimisticMutation } from '@/features/OrderForm/hooks/useOptimisticMutation';
 import customersQueryOptions from '@/features/OrderForm/queries/customersQuery';
 import countriesQueryOptions from '@/features/OrderForm/queries/countriesQuery';
 import trucksQueryOptions from '@/features/OrderForm/queries/trucksQuery';
 import driversQueryOptions from '@/features/OrderForm/queries/driversQuery';
 import { Order } from '@/types/types';
+import { Button } from '@/components/ui/primitives/button';
 
 export const Route = createFileRoute('/_layout/orders')({
   loader: ({ context: { queryClient } }) =>
-    Promise.all([
+    Promise.allSettled([
       queryClient.ensureQueryData(orderQueryOptions),
       queryClient.ensureQueryData(customersQueryOptions),
       queryClient.ensureQueryData(countriesQueryOptions),
@@ -39,23 +40,22 @@ function OrdersPage() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { data: orders } = useSuspenseQuery(orderQueryOptions);
 
-  const { createMutation } = useCreateMutation<Order>({
+  const createMutation = useOptimisticMutation<Order>({
     mutationFn: createOrder,
     queryKey: ['orders'],
-    toastDescription: 'Dodano nowe zlecenie.',
-    toastTitle: 'Nowe zlecenie.',
-    errorDescription: 'Nie udało się dodać nowego zlecenia. Spróbuj ponownie.',
-    onOpenDialogChange: setIsOpen,
+    successMessage: 'Dodano nowe zlecenie.',
+    errorMessage: 'Nie udało się dodać nowego zlecenia. Spróbuj ponownie.',
   });
 
   return (
     <div className='container mx-auto py-10'>
-      <div className='flex justify-end'>
+      <div className='flex justify-end mb-4'>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger className='text-primary-foreground'>
-            Dodaj zlecenie
+          <DialogTrigger asChild>
+            <Button>Dodaj zlecenie</Button>
           </DialogTrigger>
-          <DialogContent>
+
+          <DialogContent className='max-w-screen-lg'>
             <DialogHeader>
               <DialogTitle>Dodaj nowe zlecenie</DialogTitle>
               <DialogDescription>
@@ -63,7 +63,8 @@ function OrdersPage() {
               </DialogDescription>
             </DialogHeader>
             <OrderForm<Order>
-              mutationFn={createMutation.mutate}
+              onOpenChange={setIsOpen}
+              mutation={createMutation}
               isPending={createMutation.isPending}
             />
           </DialogContent>

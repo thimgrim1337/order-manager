@@ -4,29 +4,33 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/primitives/dialog';
 import { Button } from '@/components/ui/primitives/button';
 import { OrderWithDetails, OrderWithId } from '@/types/types';
 import { UseMutationResult } from '@tanstack/react-query';
 import { Dispatch, SetStateAction } from 'react';
 
+const statusOptions = [
+  { label: 'Zakończone', id: 3 },
+  { label: 'W trakcie', id: 1 },
+  { label: 'Anulowane', id: 2 },
+];
+
 type StatusDialogProps = {
   isOpen: boolean;
   onOpenChange: Dispatch<SetStateAction<boolean>>;
-  mutationFn: UseMutationResult<unknown, Error, OrderWithId, unknown>['mutate'];
+  mutation: UseMutationResult<unknown, Error, OrderWithId, unknown>;
   order: OrderWithDetails;
 };
 
 export default function StatusDialog({
   onOpenChange,
   isOpen,
-  mutationFn,
+  mutation,
   order,
 }: StatusDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild></DialogTrigger>
       <DialogContent className='max-w-screen-sm'>
         <DialogHeader>
           <DialogTitle>Zmień status zlecenia nr ${order.orderNr}</DialogTitle>
@@ -37,29 +41,20 @@ export default function StatusDialog({
         </DialogHeader>
         <div className='flex flex-col gap-2 '>
           <span className='text-sm text-gray-500'>Wybierz nowy status:</span>
-          <Button
-            onClick={() => {
-              mutationFn({ ...order, statusID: 3 });
-            }}
-          >
-            Zakończone
-          </Button>
-          <Button
-            variant={'secondary'}
-            onClick={() => {
-              mutationFn({ ...order, statusID: 1 });
-            }}
-          >
-            W trakcie
-          </Button>
-          <Button
-            variant={'secondary'}
-            onClick={() => {
-              mutationFn({ ...order, statusID: 2 });
-            }}
-          >
-            Anulowane
-          </Button>
+          {statusOptions.map((status) => (
+            <Button
+              key={status.id}
+              variant={status.id === 3 ? 'default' : 'secondary'}
+              onClick={() =>
+                mutation.mutate(
+                  { ...order, statusID: status.id },
+                  { onSettled: () => onOpenChange(false) }
+                )
+              }
+            >
+              {status.label}
+            </Button>
+          ))}
         </div>
       </DialogContent>
     </Dialog>

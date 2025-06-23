@@ -15,7 +15,7 @@ export async function fetchCurrencyRate(
     throw new Error(`Failed to fetch currency rate ${code} for date: ${date}.`);
 
   if (!response.ok)
-    throw new Error(`FDailed to fetch currency rate. Please try again later.`);
+    throw new Error(`Failed to fetch currency rate. Please try again later.`);
 
   return (await response.json()) satisfies CurrencyRate;
 }

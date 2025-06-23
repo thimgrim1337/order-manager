@@ -10,6 +10,7 @@ import {
   addWeeks,
   previousFriday,
   nextMonday,
+  parse,
 } from 'date-fns';
 import { pl } from 'date-fns/locale';
 
@@ -27,27 +28,30 @@ export const formatDate = (
   return format(date, dateFormat, { locale: pl });
 };
 
+export const parseDate = (date: string) =>
+  parse(date, 'yyyy-MM-dd', new Date());
+
 export const getToday = () => new Date(Date.now());
 
-export const getTomorrow = (date: Date) => addDays(date, 1);
+export const getTomorrow = (date: Date | string) => addDays(date, 1);
 
-export const getYesterday = (date: string) => formatDate(subDays(date, 1));
+export const getYesterday = (date: Date | string) => subDays(date, 1);
 
-export const getWeekNumber = (date: string) => getWeek(date).toString();
+export const getWeekNumber = (date: Date | string) => getWeek(date).toString();
 
-export const subWeek = (date: string, count: number) =>
-  formatDate(subWeeks(date, count));
+export const subWeek = (date: Date | string, count: number) =>
+  subWeeks(date, count);
 
-export const addWeek = (date: string, count: number) =>
-  formatDate(addWeeks(date, count));
+export const addWeek = (date: Date | string, count: number) =>
+  addWeeks(date, count);
 
-export const getFirstDayOfWeek = (date: string) =>
-  formatDate(startOfWeek(date, { weekStartsOn: 1 }));
+export const getFirstDayOfWeek = (date: Date | string) =>
+  startOfWeek(date, { weekStartsOn: 1 });
 
-export const getLastDayOfWeek = (date: string) =>
-  formatDate(endOfWeek(date, { weekStartsOn: 1 }));
+export const getLastDayOfWeek = (date: Date | string) =>
+  endOfWeek(date, { weekStartsOn: 1 });
 
-export const getDaysOfWeek = (startDate: string, endDate: string): Day[] =>
+export const getDaysOfWeek = (startDate: Date, endDate: Date): Day[] =>
   eachDayOfInterval({
     start: startDate,
     end: endDate,
@@ -56,10 +60,9 @@ export const getDaysOfWeek = (startDate: string, endDate: string): Day[] =>
     date: formatDate(day),
   }));
 
-export const getPreviousFriday = (date: string) =>
-  formatDate(previousFriday(date));
+export const getPreviousFriday = (date: Date | string) => previousFriday(date);
 
-export const getNextMonday = (date: string) => formatDate(nextMonday(date));
+export const getNextMonday = (date: Date | string) => nextMonday(date);
 
 export const isValidDate = (date: Date | undefined) => {
   if (!date) return false;
