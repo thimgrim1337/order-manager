@@ -4,6 +4,7 @@ import countriesQueryOptions from '@/features/OrderForm/queries/countriesQuery';
 import trucksQueryOptions from '@/features/OrderForm/queries/trucksQuery';
 import { getOrdersQueryOptions } from '@/features/TimeTable/queries/ordersQuery';
 import {
+  formatDate,
   getDaysOfWeek,
   getFirstDayOfWeek,
   getLastDayOfWeek,
@@ -12,7 +13,6 @@ import {
 } from '@/helpers/dates';
 
 import TimeTablePagination from '@/features/TimeTable/components/time-table-pagination';
-import QueryErrorBoundary from '@/components/ui/error/query-error-boundary';
 import { useTimeTableData } from '@/features/TimeTable/hooks/useTimeTableData';
 import { z } from 'zod';
 
@@ -24,11 +24,11 @@ const TimeTableHeader = lazy(
 );
 
 const today = getToday();
-const initialDate = getFirstDayOfWeek(today);
+const initialDate = formatDate(getFirstDayOfWeek(today));
 
 const OrderFilterSchema = z.object({
-  truckId: z.coerce.number().min(1),
-  startDate: z.string().default(initialDate),
+  truckId: z.coerce.number().min(1).default(1),
+  startDate: z.string().date().default(initialDate),
 });
 
 export const Route = createFileRoute('/_layout/time-table')({
@@ -44,7 +44,7 @@ export const Route = createFileRoute('/_layout/time-table')({
     const firstDayOfWeek = getFirstDayOfWeek(startDate);
     const lastDayOfWeek = getLastDayOfWeek(startDate);
 
-    await Promise.all([
+    await Promise.allSettled([
       queryClient.ensureQueryData(trucksQueryOptions),
       queryClient.ensureQueryData(countriesQueryOptions),
       queryClient.ensureQueryData(
@@ -82,16 +82,14 @@ function TimetablePage() {
 
   return (
     <div className='container mx-auto py-10'>
-      <QueryErrorBoundary>
-        <TimeTableHeader trucks={trucks} />
-        <TimeTable
-          orders={orders}
-          countries={countries}
-          daysOfWeek={daysOfWeek}
-          weekNumber={weekNumber}
-        />
-        <TimeTablePagination />
-      </QueryErrorBoundary>
+      <TimeTableHeader trucks={trucks} />
+      <TimeTable
+        orders={orders}
+        countries={countries}
+        daysOfWeek={daysOfWeek}
+        weekNumber={weekNumber}
+      />
+      <TimeTablePagination />
     </div>
   );
 }

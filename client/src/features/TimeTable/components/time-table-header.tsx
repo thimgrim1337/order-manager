@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 import { Link, useSearch } from '@tanstack/react-router';
-import { Truck } from '@/types/types';
+import { TruckWithId } from '@/types/types';
 import { Button } from '@/components/ui/primitives/button';
 
 type TimeTableHeaderProps = {
-  trucks: Truck[];
+  trucks: TruckWithId[];
 };
 
 export default function TimeTableHeader({ trucks }: TimeTableHeaderProps) {
@@ -18,7 +18,7 @@ export default function TimeTableHeader({ trucks }: TimeTableHeaderProps) {
 }
 
 type TimeTableHeaderButtonProps = {
-  truck: Truck;
+  truck: TruckWithId;
 };
 
 function TimeTableHeaderButton({ truck }: TimeTableHeaderButtonProps) {
