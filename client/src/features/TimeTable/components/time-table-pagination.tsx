@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/primitives/button';
-import { addWeek, getToday, subWeek } from '@/helpers/dates';
+import { addWeek, formatDate, getToday, subWeek } from '@/helpers/dates';
 import { Link, useSearch } from '@tanstack/react-router';
 import {
   Calendar1,
@@ -56,7 +56,7 @@ export default function TimeTablePagination() {
 type TablePaginationButtonProps = {
   span: string;
   icon: ReactNode;
-  calculateDate: (date: string) => string;
+  calculateDate: (date: string) => Date;
 };
 
 function TablePaginationButton({
@@ -67,7 +67,7 @@ function TablePaginationButton({
   const { truckId, startDate } = useSearch({ from: '/_layout/time-table' });
 
   const search = useMemo(
-    () => ({ truckId, startDate: calculateDate(startDate) }),
+    () => ({ truckId, startDate: formatDate(calculateDate(startDate)) }),
     [startDate, truckId, calculateDate]
   );
 
