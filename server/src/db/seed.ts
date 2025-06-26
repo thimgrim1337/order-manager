@@ -35,13 +35,13 @@ for (const table of [
   await resetTable(db, table);
 }
 
+await seeds.customer(db);
 await seeds.driver(db);
 await seeds.truck(db);
 await seeds.status(db);
 await seeds.country(db);
 await seeds.address(db);
 await seeds.city(db);
-await seeds.customer(db);
 await seeds.order(db);
 await seeds.loadingPlaces(db);
 await seeds.unloadingPlaces(db);

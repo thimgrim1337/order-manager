@@ -4,8 +4,11 @@ import { and, eq, gte, lte } from 'drizzle-orm';
 import { Order } from './orders.model';
 
 export const orderServices = {
-  getOrdersQuery: () =>
+  getOrdersQuery: (page = 1, pageSize = 10) =>
     db.query.order.findMany({
+      orderBy: (order, { asc }) => asc(order.id),
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
       with: {
         loadingPlaces: {
           columns: {

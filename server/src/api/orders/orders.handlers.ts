@@ -16,7 +16,7 @@ export const getAllOrders: RequestHandler<
 > = async (req, res, next) => {
   try {
     let orders;
-    const { truckId, startDate, endDate } = req.query;
+    const { truckId, startDate, endDate, page, pageSize } = req.query;
 
     if (truckId) {
       orders = await orderServices.getOrderByTruckIdAndDatesQuery(
@@ -24,7 +24,7 @@ export const getAllOrders: RequestHandler<
         startDate,
         endDate
       );
-    } else orders = await orderServices.getOrdersQuery();
+    } else orders = await orderServices.getOrdersQuery(+page, +pageSize);
 
     const mapped = orders.map((order) => ({
       ...order,

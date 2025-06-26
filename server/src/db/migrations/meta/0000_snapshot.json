@@ -1,5 +1,5 @@
 {
-  "id": "84a69c60-1ed2-482a-9ce5-fac765953c6a",
+  "id": "52b7fdee-cd52-4f6e-812e-89d789c1b142",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -394,10 +394,9 @@
         },
         "currency_rate": {
           "name": "currency_rate",
-          "type": "numeric(10, 4)",
+          "type": "numeric(5, 4)",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'1'"
+          "notNull": true
         },
         "truck_id": {
           "name": "truck_id",

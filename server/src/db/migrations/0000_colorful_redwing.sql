@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS "order" (
 	"price_currency" numeric(10, 2) NOT NULL,
 	"price_pln" numeric(10, 2) NOT NULL,
 	"currency" varchar(3) DEFAULT 'PLN' NOT NULL,
-	"currency_rate" numeric(10, 4) DEFAULT '1' NOT NULL,
+	"currency_rate" numeric(5, 4) NOT NULL,
 	"truck_id" integer NOT NULL,
 	"driver_id" integer NOT NULL,
 	"customer_id" integer NOT NULL
