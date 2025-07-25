@@ -1,80 +1,56 @@
 import { RequestHandler } from 'express';
 import { orderServices } from './orders.sevices';
 import { AppError } from '@/lib/app-error';
-import { Order, OrderWithId, OrderWithIdAndDetails } from './orders.model';
-import * as loadingPlacesHandler from '@/api/loadingPlaces/loading-places.handlers';
-import * as unloadingPlacesHandler from '@/api/unloadingPlaces/unloading-places.handlers';
-import getCitiesId from '../cities/helpers/getCitiesId';
-import { QueryParams } from '@/interfaces/QueryParams';
+import {
+  OrderFilters,
+  OrderWithIdAndPlaces,
+  OrderWithPlaces,
+} from './orders.model';
+import getCitiesIds from '../cities/helpers/getCitiesId';
 import { ParamsWithId } from '@/interfaces/ParamsWithId';
+import * as placesHandler from '@/api/places/places.handlers';
+import db from '@/db';
 
-export const getAllOrders: RequestHandler<
-  {},
-  OrderWithIdAndDetails[],
-  {},
-  QueryParams
-> = async (req, res, next) => {
+export const getFilterdOrders: RequestHandler = async (req, res, next) => {
   try {
-    let orders;
-    const { truckId, startDate, endDate, page, pageSize } = req.query;
+    const { pageIndex, pageSize, sortBy, ...filters } =
+      req.query as unknown as OrderFilters;
 
-    if (truckId) {
-      orders = await orderServices.getOrderByTruckIdAndDatesQuery(
-        +truckId,
-        startDate,
-        endDate
-      );
-    } else orders = await orderServices.getOrdersQuery(+page, +pageSize);
+    const orders = await orderServices.getOrdersQuery(
+      pageIndex,
+      pageSize,
+      sortBy,
+      filters
+    );
 
-    const mapped = orders.map((order) => ({
-      ...order,
-      loadingPlaces: order.loadingPlaces.map((loadingPlace) => ({
-        ...loadingPlace.place,
-      })),
-      unloadingPlaces: order.unloadingPlaces.map((unloadingPlace) => ({
-        ...unloadingPlace.place,
-      })),
-    }));
+    const orderCount = await orderServices.getOrderCount();
 
-    res.status(200).json(mapped);
+    res.status(200).json({
+      data: [...orders],
+      rowCount: orderCount[0]?.count ?? 0,
+    });
   } catch (error) {
-    next(new AppError('Failed to fetch orders', 500));
+    next(new AppError('Failed to fetch orders: ' + error, 500));
   }
 };
 
-export const getOrderById: RequestHandler<
-  ParamsWithId,
-  OrderWithIdAndDetails | {}
-> = async (req, res, next) => {
+export const getOrderById: RequestHandler = async (req, res, next) => {
   try {
-    const order = await orderServices.getOrderByIdQuery(+req.params?.id);
+    const { id } = req.params as ParamsWithId;
+    const order = await orderServices.getOrderByIdQuery(+id);
 
-    if (!order) {
-      res.status(404).send({});
-      return;
-    }
+    if (!order) throw new AppError('Order does not exist.', 404);
 
-    const mapped = {
-      ...order,
-      loadingPlaces: order?.loadingPlaces.map((place) => ({ ...place.place })),
-      unloadingPlaces: order?.unloadingPlaces.map((place) => ({
-        ...place.place,
-      })),
-    };
-
-    res.status(200).json(mapped);
+    res.status(200).json(order);
   } catch (error) {
-    next(new AppError('Failed to fetch order', 500));
+    next(error);
   }
 };
 
-export const addOrder: RequestHandler<{}, OrderWithId, Order> = async (
-  req,
-  res,
-  next
-) => {
+export const createOrder: RequestHandler = async (req, res, next) => {
   try {
-    const { orderNr, customerID, loadingPlaces, unloadingPlaces } = req.body;
+    const { orderNr, customerID, loadingPlaces, unloadingPlaces } =
+      req.body as OrderWithPlaces;
 
     const existingOrder = await orderServices.getOrderByNrAndCustomerQuery(
       orderNr,
@@ -82,89 +58,98 @@ export const addOrder: RequestHandler<{}, OrderWithId, Order> = async (
     );
     if (existingOrder) throw new AppError('Order already exist.', 409);
 
-    const newOrder = req.body;
+    const loadingPlacesIds = await getCitiesIds(loadingPlaces);
+    const unloadingPlacesIds = await getCitiesIds(unloadingPlaces);
 
-    const createdOrder = await orderServices.addOrderQuery(newOrder);
-    if (!createdOrder) throw new AppError('Failed to create order', 500);
+    if (!loadingPlacesIds.length || !unloadingPlacesIds.length)
+      throw new AppError('Invalid places provided', 400);
 
-    const loadingPlacesIds = (await getCitiesId(loadingPlaces)) as number[];
-    const unloadingPlacesIds = (await getCitiesId(unloadingPlaces)) as number[];
+    const createdOrder = await db.transaction(async (trx) => {
+      const order = await orderServices.createOrderQuery(req.body, trx);
 
-    if (createdOrder[0]) {
-      Promise.all([
-        loadingPlacesHandler.addLoadingPlaces(
-          createdOrder[0].id,
-          loadingPlacesIds
-        ),
-        unloadingPlacesHandler.addUnloadingPlaces(
-          createdOrder[0].id,
-          unloadingPlacesIds
-        ),
-      ]);
-    }
+      await placesHandler.addPlaces(
+        order?.id,
+        loadingPlacesIds,
+        'loadingPlace',
+        trx
+      );
+      await placesHandler.addPlaces(
+        order.id,
+        unloadingPlacesIds,
+        'unloadingPlace',
+        trx
+      );
 
-    res.status(201).json(createdOrder[0]);
+      return order;
+    });
+
+    res.status(201).json(createdOrder);
   } catch (error) {
     next(error);
   }
 };
 
-export const updateOrder: RequestHandler<
-  ParamsWithId,
-  OrderWithId,
-  Order
-> = async (req, res, next) => {
+export const updateOrder: RequestHandler = async (req, res, next) => {
   try {
-    const orderID = +req.params.id;
+    const { id, loadingPlaces, unloadingPlaces } =
+      req.body as OrderWithIdAndPlaces;
 
-    const existingOrder = await orderServices.getOrderByIdQuery(orderID);
-    if (!existingOrder) throw new AppError('Order does not exist', 404);
+    const existingOrder = await orderServices.getOrderByIdQuery(id);
 
-    const updatedOrderObj = req.body;
+    if (!existingOrder) throw new AppError('Order does not exist.', 404);
 
-    const updatedOrder = await orderServices.updateOrderQuery(
-      orderID,
-      updatedOrderObj
-    );
+    const loadingPlacesIds = await getCitiesIds(loadingPlaces);
+    const unloadingPlacesIds = await getCitiesIds(unloadingPlaces);
 
-    const loadingPlacesIds = (await getCitiesId(
-      updatedOrderObj.loadingPlaces
-    )) as number[];
-    const unloadingPlacesIds = (await getCitiesId(
-      updatedOrderObj.unloadingPlaces
-    )) as number[];
+    if (!loadingPlacesIds.length || !unloadingPlacesIds.length)
+      throw new AppError('Invalid places provided', 400);
 
-    await Promise.all([
-      loadingPlacesHandler.updateLoadingPlaces(orderID, loadingPlacesIds),
-      unloadingPlacesHandler.updateUnloadingPlaces(orderID, unloadingPlacesIds),
-    ]);
+    const updatedOrder = await db.transaction(async (trx) => {
+      const order = await orderServices.updateOrderQuery(
+        existingOrder.id,
+        req.body,
+        trx
+      );
 
-    res.status(200).json(updatedOrder[0]);
+      await placesHandler.updatePlaces(
+        existingOrder.id,
+        'loadingPlace',
+        loadingPlacesIds,
+        trx
+      );
+
+      await placesHandler.updatePlaces(
+        existingOrder.id,
+        'unloadingPlace',
+        unloadingPlacesIds,
+        trx
+      );
+
+      return order;
+    });
+    res.status(200).json(updatedOrder);
   } catch (error) {
     next(error);
   }
 };
 
-export const deleteOrder: RequestHandler<ParamsWithId, OrderWithId> = async (
-  req,
-  res,
-  next
-) => {
+export const deleteOrder: RequestHandler = async (req, res, next) => {
   try {
-    const orderID = +req.params.id;
-    const orderExist = await orderServices.getOrderByIdQuery(orderID);
+    const { id } = req.params as ParamsWithId;
+    const existingOrder = await orderServices.getOrderByIdQuery(+id);
 
-    if (!orderExist) throw new AppError('Order does not exist.', 404);
+    if (!existingOrder) throw new AppError('Order doest not exist.', 404);
 
-    await Promise.all([
-      loadingPlacesHandler.deleteLoadingPlaces(orderID),
-      unloadingPlacesHandler.deleteUnloadingPlaces(orderID),
-    ]);
+    const deletedOrder = await db.transaction(async (trx) => {
+      await placesHandler.removePlaces(existingOrder.id, 'loadingPlace', trx);
+      await placesHandler.removePlaces(existingOrder.id, 'unloadingPlace', trx);
+      const order = await orderServices.deleteOrderQuery(existingOrder.id, trx);
 
-    const deletedOrder = await orderServices.deleteOrderQuery(orderID);
+      return order;
+    });
 
-    res.status(200).json(deletedOrder[0]);
+    res.status(200).json(deletedOrder);
   } catch (error) {
-    next(error);
+    next(new AppError('Failed to delete an order: ' + error, 500));
   }
 };

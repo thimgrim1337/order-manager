@@ -2,7 +2,7 @@ import { Router } from 'express';
 import * as handlers from './cities.handlers';
 import { validateRequest } from '../../middleware/validate-request';
 import { ParamsWithId } from '../../interfaces/ParamsWithId';
-import { CityWithId } from './cities.model';
+import { City, CityWithId } from './cities.model';
 
 const router = Router();
 
@@ -21,7 +21,7 @@ router.post(
   validateRequest({
     body: CityWithId,
   }),
-  handlers.addCity
+  handlers.createCity
 );
 
 router.delete(
@@ -36,7 +36,7 @@ router.patch(
   '/:id',
   validateRequest({
     params: ParamsWithId,
-    body: CityWithId,
+    body: City,
   }),
   handlers.updateCity
 );

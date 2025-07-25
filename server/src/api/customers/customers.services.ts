@@ -6,22 +6,48 @@ import { Customer } from './customers.model';
 export const customerServices = {
   getCustomersQuery: () => db.query.customer.findMany(),
 
-  getCustomerByIdQuery: (customerID: number) =>
-    db.query.customer.findFirst({
+  getCustomerByIdQuery: (customerID: number) => {
+    if (!customerID || customerID < 1)
+      throw new Error('CustomerID must be provided and higher than 0.');
+    return db.query.customer.findFirst({
       where: (customer) => eq(customer.id, customerID),
-    }),
+    });
+  },
+
   getCustomerByTaxQuery: (customerTax: string) =>
     db.query.customer.findFirst({
       where: (customer) => eq(customer.tax, customerTax),
     }),
-  addCustomerQuery: (newCustomer: Customer) =>
-    db.insert(customer).values(newCustomer).returning(),
-  deleteCustomerQuery: (customerID: number) =>
-    db.delete(customer).where(eq(customer.id, customerID)).returning(),
-  updateCustomerQuery: (customerToUpdate: Customer, customerID: number) =>
-    db
+  addCustomerQuery: async (newCustomer: Customer) => {
+    const createdCustomer = await db
+      .insert(customer)
+      .values(newCustomer)
+      .returning();
+
+    return createdCustomer[0];
+  },
+  deleteCustomerQuery: async (customerID: number) => {
+    if (!customerID || customerID < 1)
+      throw new Error('CustomerID must be provided and higher than 0.');
+    const deletedCustomer = await db
+      .delete(customer)
+      .where(eq(customer.id, customerID))
+      .returning();
+
+    return deletedCustomer[0];
+  },
+  updateCustomerQuery: async (
+    customerID: number,
+    customerToUpdate: Customer
+  ) => {
+    if (!customerID || customerID < 1)
+      throw new Error('CustomerID must be provided and higher than 0.');
+    const updatedCustomer = await db
       .update(customer)
       .set(customerToUpdate)
       .where(eq(customer.id, customerID))
-      .returning(),
+      .returning();
+
+    return updatedCustomer[0];
+  },
 };

@@ -8,7 +8,7 @@ import { checkIfDirExist, readData, writeData } from '@/lib/file';
 const formatDate = (date: Date | number, dateFormat: string = 'yyyy-MM-dd') =>
   format(date, dateFormat, { locale: pl });
 
-export const getAllHolidays: RequestHandler<{}> = async (req, res, next) => {
+export const getAllHolidays: RequestHandler = async (req, res, next) => {
   try {
     const dirPath = path.join(process.cwd(), 'data');
     const filePath = path.join(dirPath, 'holidays.json');

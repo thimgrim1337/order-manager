@@ -1,6 +1,6 @@
 import { relations } from 'drizzle-orm';
 import { pgTable, serial, varchar } from 'drizzle-orm/pg-core';
-import address from './address';
+
 import city from './city';
 
 const country = pgTable('country', {
@@ -10,7 +10,6 @@ const country = pgTable('country', {
 });
 
 export const countryRelations = relations(country, ({ many }) => ({
-  addresses: many(address),
   cities: many(city),
 }));
 

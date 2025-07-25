@@ -1,4 +1,4 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
+import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from './schema/index';
 import env from '../env';
@@ -14,5 +14,6 @@ export const db = drizzle(connection, {
 });
 
 export type db = typeof db;
+export type dbTransaction = PostgresJsDatabase<typeof schema>;
 
 export default db;

@@ -5,11 +5,11 @@ import { Order } from '@/api/orders/orders.model';
 import { faker } from '@faker-js/faker';
 import { format } from 'date-fns';
 import { pl } from 'date-fns/locale';
-import { City } from '@/api/cities/cities.model';
 import { appendData } from '@/lib/file';
-import { dirname, join } from 'path';
+import { join } from 'path';
+import { __dirname } from '@/server';
 
-export const formatDate = (
+const formatDate = (
   date: Date | number | undefined,
   dateFormat: string = 'yyyy-MM-dd'
 ) => {
@@ -18,16 +18,7 @@ export const formatDate = (
   return format(date, dateFormat, { locale: pl });
 };
 
-function createFakeCity(): City {
-  return {
-    id: faker.number.int({ min: 1 }),
-    name: faker.location.city(),
-    postal: faker.location.zipCode(),
-    countryID: faker.number.int({ min: 1, max: 48 }),
-  };
-}
-
-export function createFakeOrder(): Order {
+function createFakeOrder(): Order {
   const currency = faker.helpers.arrayElement(['EUR', 'PLN']);
   const currencyRate = String(
     currency === 'EUR'
@@ -49,19 +40,18 @@ export function createFakeOrder(): Order {
     priceCurrency: priceCurrency,
     startDate: formatDate(faker.date.recent({ days: 7 })),
     endDate: formatDate(faker.date.recent({ days: 7 })),
-    loadingPlaces: [createFakeCity()],
-    unloadingPlaces: [createFakeCity()],
   };
 }
 
 export default async function seed(db: db) {
   try {
-    // const orders = [];
-    // for (let i = 0; i < 999; i++) {
-    //   orders.push(createFakeOrder());
-    // }
+    const orders = [];
+    for (let i = 0; i < 999; i++) {
+      orders.push(createFakeOrder());
+    }
 
-    // await appendData(join(__dirname, 'db/seeds/data/orders.json'), orders);
+    await appendData(join(__dirname, 'data/orders.json'), orders);
+
     await db.insert(order).values(orders);
   } catch (error) {
     console.error(error);

@@ -23,6 +23,6 @@
     "resolveFullPaths": true,
     "verbose": false
   },
-  "include": ["src", "src/drizzle.config.ts"],
+  "include": ["src", "drizzle.config.ts"],
   "exclude": ["node_modules"]
 }

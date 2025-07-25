@@ -6,30 +6,49 @@ import { Driver } from './drivers.model';
 export const driverServices = {
   getDriversQuery: () => db.query.driver.findMany(),
 
-  getDriverByIdQuery: (driverId: number) =>
-    db.query.driver.findFirst({
+  getDriverByIdQuery: (driverId: number) => {
+    if (!driverId || driverId < 1)
+      throw new Error('DriverID must be provided and be higher than 0.');
+    return db.query.driver.findFirst({
       where: (driver) => eq(driver.id, driverId),
-    }),
+    });
+  },
 
-  getDriverByNameQuery: (fullName: { firstName: string; lastName: string }) =>
-    db.query.driver.findFirst({
+  getDriverByNameQuery: (fullName: { firstName: string; lastName: string }) => {
+    return db.query.driver.findFirst({
       where: (driver) =>
         and(
           eq(driver.firstName, fullName.firstName),
           eq(driver.lastName, fullName.lastName)
         ),
-    }),
+    });
+  },
 
-  createDriverQuery: (newDriver: Driver) =>
-    db.insert(driver).values(newDriver).returning(),
+  createDriverQuery: async (newDriver: Driver) => {
+    const createdDriver = await db.insert(driver).values(newDriver).returning();
+    return createdDriver[0];
+  },
 
-  deleteDriverQuery: (driverId: number) =>
-    db.delete(driver).where(eq(driver.id, driverId)).returning(),
+  deleteDriverQuery: async (driverId: number) => {
+    if (!driverId || driverId < 1)
+      throw new Error('DriverID must be provided and be higher than 0.');
 
-  updateDriverQuery: (driverToUpdate: Driver, driverId: number) =>
-    db
+    const deletedDriver = await db
+      .delete(driver)
+      .where(eq(driver.id, driverId))
+      .returning();
+
+    return deletedDriver[0];
+  },
+
+  updateDriverQuery: async (driverId: number, driverToUpdate: Driver) => {
+    if (!driverId || driverId < 1)
+      throw new Error('DriverID must be provided and be higher than 0.');
+    const updatedDriver = await db
       .update(driver)
       .set(driverToUpdate)
       .where(eq(driver.id, driverId))
-      .returning(),
+      .returning();
+    return updatedDriver[0];
+  },
 };

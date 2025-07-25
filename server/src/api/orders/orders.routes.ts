@@ -2,16 +2,21 @@ import { Router } from 'express';
 import * as handlers from './orders.handlers';
 import { validateRequest } from '@/middleware/validate-request';
 import { ParamsWithId } from '@/interfaces/ParamsWithId';
-import { Order } from './orders.model';
-import { QueryParams } from '@/interfaces/QueryParams';
+import {
+  Order,
+  OrderFilters,
+  OrderWithIdAndPlaces,
+  OrderWithPlaces,
+} from './orders.model';
+
 const router = Router();
 
 router.get(
   '/',
   validateRequest({
-    query: QueryParams,
+    query: OrderFilters,
   }),
-  handlers.getAllOrders
+  handlers.getFilterdOrders
 );
 
 router.get(
@@ -25,16 +30,16 @@ router.get(
 router.post(
   '/',
   validateRequest({
-    body: Order,
+    body: OrderWithPlaces,
   }),
-  handlers.addOrder
+  handlers.createOrder
 );
 
 router.patch(
   '/:id',
   validateRequest({
     params: ParamsWithId,
-    body: Order,
+    body: OrderWithIdAndPlaces,
   }),
   handlers.updateOrder
 );

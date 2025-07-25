@@ -32,6 +32,6 @@ export async function appendData(path: string, data: string | object) {
     console.log(data);
     await appendFile(path, JSON.stringify(data));
   } catch (error) {
-    console.error('An error occured when trying save data to file.');
+    console.error('An error occured when trying save data to file.' + error);
   }
 }

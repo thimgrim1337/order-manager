@@ -21,7 +21,7 @@ router.post(
   validateRequest({
     body: Truck,
   }),
-  handlers.addTruck
+  handlers.createTruck
 );
 
 router.delete(

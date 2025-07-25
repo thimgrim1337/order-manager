@@ -21,7 +21,7 @@ router.post(
   validateRequest({
     body: Customer,
   }),
-  handlers.addCustomer
+  handlers.createCustomer
 );
 
 router.delete(
@@ -36,7 +36,7 @@ router.patch(
   '/:id',
   validateRequest({
     params: ParamsWithId,
-    body: CustomerWithId,
+    body: Customer,
   }),
   handlers.updateCustomer
 );
