@@ -1,15 +1,21 @@
 import { and, eq } from 'drizzle-orm';
-import db from '@/db/index';
+import db, { dbTransaction } from '@/db/index';
 import { driver } from '../../db/schema/index';
 import { Driver } from './drivers.model';
 
 export const driverServices = {
-  getDriversQuery: () => db.query.driver.findMany(),
+  getDriversQuery: () =>
+    db.query.driver.findMany({
+      orderBy: (driver) => driver.id,
+    }),
 
-  getDriverByIdQuery: (driverId: number) => {
+  getDriverByIdQuery: (driverId: number, trx?: dbTransaction) => {
     if (!driverId || driverId < 1)
       throw new Error('DriverID must be provided and be higher than 0.');
-    return db.query.driver.findFirst({
+
+    const query = trx ? trx.query.driver : db.query.driver;
+
+    return query.findFirst({
       where: (driver) => eq(driver.id, driverId),
     });
   },
@@ -41,14 +47,35 @@ export const driverServices = {
     return deletedDriver[0];
   },
 
-  updateDriverQuery: async (driverId: number, driverToUpdate: Driver) => {
+  updateDriverQuery: async (
+    driverId: number,
+    newDriverData: Partial<Driver>,
+    trx?: dbTransaction
+  ) => {
     if (!driverId || driverId < 1)
       throw new Error('DriverID must be provided and be higher than 0.');
-    const updatedDriver = await db
-      .update(driver)
-      .set(driverToUpdate)
+
+    const query = trx ? trx.update(driver) : db.update(driver);
+    const updatedDriver = await query
+      .set(newDriverData)
       .where(eq(driver.id, driverId))
       .returning();
     return updatedDriver[0];
+  },
+
+  ensureDriverHasAssigedTruck: async (
+    driverID: number,
+    truckID: number,
+    trx: dbTransaction
+  ) => {
+    if (!driverID || !truckID) return;
+
+    const driver = await driverServices.getDriverByIdQuery(driverID, trx);
+
+    if (!driver) throw new Error('Driver doest not exist.');
+
+    if (!driver.truckID) {
+      await driverServices.updateDriverQuery(driverID, { truckID }, trx);
+    }
   },
 };

@@ -1,22 +1,30 @@
-import { relations } from 'drizzle-orm';
-import { integer, pgTable, serial, unique, varchar } from 'drizzle-orm/pg-core';
+import { relations, sql } from 'drizzle-orm';
+import {
+  index,
+  integer,
+  pgTable,
+  serial,
+  unique,
+  text,
+} from 'drizzle-orm/pg-core';
 import loadingPlaces from './loadingPlaces';
 import unloadingPlaces from './unloadingPlaces';
 import country from './country';
 
 const city = pgTable(
-  'city',
+  'cities',
   {
     id: serial().primaryKey(),
-    name: varchar({ length: 255 }).notNull(),
-    postal: varchar({ length: 10 }).notNull(),
+    name: text().notNull(),
+    postal: text().notNull(),
     countryID: integer('country_id')
       .notNull()
       .references(() => country.id),
   },
-  (table) => ({
-    pk: unique('city_pk').on(table.name, table.postal, table.countryID),
-  })
+  (table) => [
+    unique().on(table.name, table.postal, table.countryID),
+    index('idx_cities_name_lower').using('btree', sql`LOWER(${table.name})`),
+  ]
 );
 
 export const cityRelations = relations(city, ({ one, many }) => ({

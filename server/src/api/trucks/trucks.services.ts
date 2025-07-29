@@ -1,16 +1,21 @@
 import { eq } from 'drizzle-orm';
-import db from '../../db/index';
+import db, { dbTransaction } from '../../db/index';
 import truck from '../../db/schema/truck';
 import { Truck } from './trucks.model';
 
 export const truckServices = {
-  getTrucksQuery: () => db.query.truck.findMany(),
+  getTrucksQuery: () =>
+    db.query.truck.findMany({
+      orderBy: (truck) => truck.id,
+    }),
 
-  getTruckByIdQuery: (truckId: number) => {
+  getTruckByIdQuery: (truckId: number, trx?: dbTransaction) => {
     if (!truckId || truckId < 1)
       throw new Error('TruckID must be provided and higher than 0.');
 
-    return db.query.truck.findFirst({
+    const query = trx ? trx.query.truck : db.query.truck;
+
+    return query.findFirst({
       where: (truck) => eq(truck.id, truckId),
     });
   },
@@ -38,12 +43,17 @@ export const truckServices = {
     return deletedTruck[0];
   },
 
-  updateTruckQuery: async (truckId: number, truckToUpdate: Truck) => {
+  updateTruckQuery: async (
+    truckId: number,
+    newTruckData: Partial<Truck>,
+    trx?: dbTransaction
+  ) => {
     if (!truckId || truckId < 1)
       throw new Error('TruckID must be provided and higher than 0.');
-    const updatedTruck = await db
-      .update(truck)
-      .set(truckToUpdate)
+
+    const query = trx ? trx.update(truck) : db.update(truck);
+    const updatedTruck = await query
+      .set(newTruckData)
       .where(eq(truck.id, truckId))
       .returning();
 

@@ -3,9 +3,7 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
-  SortingState,
   useReactTable,
 } from '@tanstack/react-table';
 
@@ -18,47 +16,68 @@ import {
   TableRow,
 } from '@/components/ui/primitives/table';
 import { DataTablePagination } from './data-table-pagination';
-import { useState } from 'react';
 import DataTableFilter from './data-table-filter';
+import { sortByToState, stateToSortBy } from '@/lib/utils';
+import { useFilters } from '../../hooks/useFilters';
+import { DEFAULT_PAGE_INDEX, DEFAULT_PAGE_SIZE } from '@/routes/_layout.orders';
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   searchInputPlaceholder: string;
+  rowCount: number;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  rowCount,
   searchInputPlaceholder,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [globalFilter, setGlobalFilter] = useState<any>([]);
+  const { filters, setFilters, resetFilters } = useFilters('/_layout/orders');
+
+  const PaginationState = {
+    pageIndex: filters.pageIndex ?? DEFAULT_PAGE_INDEX,
+    pageSize: filters.pageSize ?? DEFAULT_PAGE_SIZE,
+  };
+
+  const SortState = sortByToState(filters.sortBy);
 
   const table = useReactTable({
     data,
     columns,
+    rowCount: rowCount,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: (pagination) => {
+      setFilters(
+        typeof pagination === 'function'
+          ? pagination(PaginationState)
+          : pagination
+      );
+    },
     getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
-    state: {
-      sorting,
-      globalFilter,
+    onSortingChange: (sorter) => {
+      const newSortingState =
+        typeof sorter === 'function' ? sorter(SortState) : sorter;
+      return setFilters({ sortBy: stateToSortBy(newSortingState) });
     },
     getFilteredRowModel: getFilteredRowModel(),
-    onGlobalFilterChange: setGlobalFilter,
-    globalFilterFn: 'includesString',
+    manualPagination: true,
+    manualSorting: true,
+    manualFiltering: true,
+    state: {
+      sorting: SortState,
+      pagination: PaginationState,
+    },
   });
 
   return (
     <div>
       <div className='py-4'>
         <DataTableFilter
-          table={table}
-          globalFilterState={globalFilter}
           placeholder={searchInputPlaceholder}
+          onResetFilters={resetFilters}
         />
       </div>
       <div className='rounded-md border'>
@@ -69,12 +88,30 @@ export function DataTable<TData, TValue>({
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                      {header.isPlaceholder ? null : (
+                        <>
+                          <div
+                            className={`flex gap-2 items-center ${
+                              header.column.getCanSort()
+                                ? 'cursor-pointer select-none'
+                                : ''
+                            } `}
+                            onClick={header.column.getToggleSortingHandler()}
+                          >
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                            {header.column.getCanSort()
+                              ? {
+                                  asc: <ArrowUp className='w-4 h-4' />,
+                                  desc: <ArrowDown className='w-4 h-4' />,
+                                  false: <ArrowUpDown className='w-4 h-4' />,
+                                }[header.column.getIsSorted() as string]
+                              : null}
+                          </div>
+                        </>
+                      )}
                     </TableHead>
                   );
                 })}
@@ -104,7 +141,7 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className='h-24 text-center'
                 >
-                  No results.
+                  Brak wyników.
                 </TableCell>
               </TableRow>
             )}

@@ -38,13 +38,13 @@ export const customerServices = {
   },
   updateCustomerQuery: async (
     customerID: number,
-    customerToUpdate: Customer
+    newCustomerData: Partial<Customer>
   ) => {
     if (!customerID || customerID < 1)
       throw new Error('CustomerID must be provided and higher than 0.');
     const updatedCustomer = await db
       .update(customer)
-      .set(customerToUpdate)
+      .set(newCustomerData)
       .where(eq(customer.id, customerID))
       .returning();
 

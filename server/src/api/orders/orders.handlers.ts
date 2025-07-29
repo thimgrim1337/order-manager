@@ -10,13 +10,15 @@ import getCitiesIds from '../cities/helpers/getCitiesId';
 import { ParamsWithId } from '@/interfaces/ParamsWithId';
 import * as placesHandler from '@/api/places/places.handlers';
 import db from '@/db';
+import { truckServices } from '../trucks/trucks.services';
+import { driverServices } from '../drivers/drivers.services';
 
 export const getFilterdOrders: RequestHandler = async (req, res, next) => {
   try {
     const { pageIndex, pageSize, sortBy, ...filters } =
-      req.query as unknown as OrderFilters;
+      req.query as OrderFilters;
 
-    const orders = await orderServices.getOrdersQuery(
+    let orders = await orderServices.getOrdersQuery(
       pageIndex,
       pageSize,
       sortBy,
@@ -49,8 +51,14 @@ export const getOrderById: RequestHandler = async (req, res, next) => {
 
 export const createOrder: RequestHandler = async (req, res, next) => {
   try {
-    const { orderNr, customerID, loadingPlaces, unloadingPlaces } =
-      req.body as OrderWithPlaces;
+    const {
+      orderNr,
+      customerID,
+      loadingPlaces,
+      unloadingPlaces,
+      driverID,
+      truckID,
+    } = req.body as OrderWithPlaces;
 
     const existingOrder = await orderServices.getOrderByNrAndCustomerQuery(
       orderNr,
@@ -65,6 +73,8 @@ export const createOrder: RequestHandler = async (req, res, next) => {
       throw new AppError('Invalid places provided', 400);
 
     const createdOrder = await db.transaction(async (trx) => {
+      await driverServices.ensureDriverHasAssigedTruck(driverID, truckID, trx);
+
       const order = await orderServices.createOrderQuery(req.body, trx);
 
       await placesHandler.addPlaces(

@@ -37,13 +37,13 @@ export const OrderWithPlaces = Order.extend({
 });
 export type OrderWithPlaces = z.infer<typeof OrderWithPlaces>;
 
-export const OrderWithIdAndPlaces = OrderWithId.extend({
+export const OrderWithIdAndPlaces = Order.extend({
   loadingPlaces: Places,
   unloadingPlaces: Places,
-});
+}).required({ id: true });
 export type OrderWithIdAndPlaces = z.infer<typeof OrderWithIdAndPlaces>;
 
-export const OrderWithIdAndDetails = OrderWithId.extend({
+export const OrderWithIdAndDetails = Order.extend({
   status: z.string().min(1),
   truck: z.string().min(1),
   driver: z.string().min(1),
@@ -55,8 +55,12 @@ export const OrderWithIdAndDetails = OrderWithId.extend({
 });
 export type OrderWithIdAndDetails = z.infer<typeof OrderWithIdAndDetails>;
 
-const OrderSpecifedFilters = Order.partial();
-
-export const OrderFilters =
-  OrderSpecifedFilters.merge(PaginationParams).merge(SortParams);
-export type OrderFilters = Partial<z.infer<typeof OrderFilters>>;
+export const OrderFilters = z
+  .object({
+    ...Order.shape,
+    ...PaginationParams.shape,
+    ...SortParams.shape,
+    globalFilters: z.string(),
+  })
+  .partial();
+export type OrderFilters = z.infer<typeof OrderFilters>;

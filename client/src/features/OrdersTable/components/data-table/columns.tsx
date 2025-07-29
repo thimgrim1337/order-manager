@@ -1,6 +1,7 @@
 import { ColumnDef, RowData } from '@tanstack/react-table';
 import { OrderWithDetails } from '@/types/types';
 import OrderOptions from '../order-options';
+import { formatDate } from '@/helpers/dates';
 
 declare module '@tanstack/react-table' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -14,14 +15,15 @@ export const columns: ColumnDef<OrderWithDetails>[] = [
   {
     accessorKey: 'orderNr',
     header: 'Nr zlecenia',
-    meta: { filterKey: 'orderNr', filterVariant: 'text' },
   },
   {
     accessorKey: 'startDate',
+    accessorFn: (order) => formatDate(order.startDate, 'dd-MM-yyyy'),
     header: 'Data załadunku',
   },
   {
     accessorKey: 'endDate',
+    accessorFn: (order) => formatDate(order.endDate, 'dd-MM-yyyy'),
     header: 'Data rozładunku',
   },
   {
@@ -36,25 +38,21 @@ export const columns: ColumnDef<OrderWithDetails>[] = [
     accessorKey: 'statusID',
     accessorFn: (order) => order.status,
     header: 'Status',
-    meta: { filterKey: 'statusID', filterVariant: 'number' },
   },
   {
     accessorKey: 'truckID',
     accessorFn: (order) => order.truck,
     header: 'Pojazd',
-    meta: { filterKey: 'truckID', filterVariant: 'number' },
   },
   {
     accessorKey: 'driverID',
     accessorFn: (order) => order.driver,
     header: 'Kierowca',
-    meta: { filterKey: 'driverID', filterVariant: 'number' },
   },
   {
     accessorKey: 'customerID',
     accessorFn: (order) => order.customer,
     header: 'Klient',
-    meta: { filterKey: 'customerID', filterVariant: 'number' },
   },
   {
     accessorKey: 'priceCurrency',

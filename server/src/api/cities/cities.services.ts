@@ -71,16 +71,16 @@ export const citiesServices = {
     return result[0];
   },
 
-  updateCityQuery: async (cityID: number, cityToUpdate: Partial<City>) => {
+  updateCityQuery: async (cityID: number, newCityData: Partial<City>) => {
     if (!cityID || cityID < 1)
       throw new Error('CityID must be provided and higher than 0.');
 
-    if (!cityToUpdate.name?.trim() && cityToUpdate.name === undefined)
+    if (!newCityData.name?.trim() && newCityData.name === undefined)
       throw new Error('City name cannot be empty.');
 
     const updateData = {
-      ...cityToUpdate,
-      ...(cityToUpdate.name && { name: cityToUpdate.name.trim() }),
+      ...newCityData,
+      ...(newCityData.name && { name: newCityData.name.trim() }),
     };
 
     const result = await db

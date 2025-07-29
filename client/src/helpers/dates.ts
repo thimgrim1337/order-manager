@@ -20,7 +20,7 @@ export type Day = {
 };
 
 export const formatDate = (
-  date: Date | number | undefined,
+  date: Date | number | string | undefined,
   dateFormat: string = 'yyyy-MM-dd'
 ) => {
   if (!date) return '';

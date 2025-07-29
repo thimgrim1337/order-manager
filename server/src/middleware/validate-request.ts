@@ -5,13 +5,13 @@ export function validateRequest(validators: RequestValidators): RequestHandler {
   return async (req, res, next) => {
     try {
       if (validators.params) {
-        req.params = await validators.params.parseAsync(req.params);
+        (req as any).params = await validators.params.parseAsync(req.params);
       }
       if (validators.body) {
-        req.body = await validators.body.parseAsync(req.body);
+        (req as any).body = await validators.body.parseAsync(req.body);
       }
       if (validators.query) {
-        req.query = await validators.query.parseAsync(req.query);
+        (req as any).query = await validators.query.parseAsync(req.query);
       }
       next();
     } catch (error) {

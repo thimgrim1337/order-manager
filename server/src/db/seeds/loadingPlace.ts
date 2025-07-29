@@ -1,10 +1,10 @@
-import { loadingPlace } from '@/api/loadingPlaces/loading-places.model';
+import { OrderPlace } from '@/api/places/places.model';
 import type db from '../index';
 import { loadingPlaces } from '../schema/index';
 import { faker } from '@faker-js/faker';
 
 export default async function seed(db: db) {
-  const rels: loadingPlace[] = [];
+  const rels: OrderPlace[] = [];
   for (let i = 1; i < 1000; i++) {
     rels.push({
       orderID: i,

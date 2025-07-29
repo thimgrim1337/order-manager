@@ -8,11 +8,11 @@ import { OrderWithDetails } from '@/types/types';
 
 export async function fetchOrdersByTruckAndDates(
   truckId: number,
-  start: Date | undefined,
-  end: Date | undefined
+  start: Date,
+  end: Date
 ): Promise<OrderWithDetails[]> {
-  const startDate = start ? `&startDate=${formatDate(start)}` : '';
-  const endDate = end ? `&endDate=${formatDate(end)}` : '';
+  const startDate = `&startDate=${formatDate(start)}`;
+  const endDate = `&endDate=${formatDate(end)}`;
 
   const response = await fetch(
     `api/v1/orders?truckId=${truckId}${startDate}${endDate}`

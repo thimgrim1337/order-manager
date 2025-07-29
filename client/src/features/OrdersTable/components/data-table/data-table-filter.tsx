@@ -1,23 +1,27 @@
-import { Table } from '@tanstack/react-table';
-import { Input } from '@/components/ui/primitives/input';
+import { Button } from '@/components/ui/primitives/button';
+import DebouncedInput from '../debounced-input';
+import { useFilters } from '../../hooks/useFilters';
 
-type DataTableFilter<TData> = {
-  globalFilterState: string[];
-  table: Table<TData>;
+type DataTableFilter = {
   placeholder: string;
+  onResetFilters: () => Promise<void>;
 };
 
-export default function DataTableFilter<TData>({
-  globalFilterState,
-  table,
-  placeholder,
-}: DataTableFilter<TData>) {
+export default function DataTableFilter({ placeholder }: DataTableFilter) {
+  const { filters, setFilters, resetFilters } = useFilters('/_layout/orders');
   return (
-    <Input
-      placeholder={placeholder}
-      value={globalFilterState}
-      onChange={(event) => table.setGlobalFilter(String(event.target.value))}
-      className='max-w-sm'
-    />
+    <div className='flex gap-2'>
+      <DebouncedInput
+        className='max-w-sm'
+        onChange={(value) => {
+          setFilters({
+            globalFilters: typeof value === 'string' ? value : value.toString(),
+          });
+        }}
+        placeholder={placeholder}
+        value={filters.globalFilters ?? ''}
+      />
+      <Button onClick={resetFilters}>Reset</Button>
+    </div>
   );
 }

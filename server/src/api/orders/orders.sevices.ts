@@ -1,22 +1,65 @@
 import db, { dbTransaction } from '@/db/index';
-import { customer, driver, order, status, truck } from '@/db/schema/index';
+import { order } from '@/db/schema/index';
 import {
   and,
   asc,
+  between,
   count,
   desc,
   eq,
-  getTableColumns,
   gte,
+  ilike,
   lte,
   or,
   sql,
 } from 'drizzle-orm';
 import { Order, OrderFilters, OrderWithPlaces } from './orders.model';
-import { City } from '../cities/cities.model';
+import { ordersWithDetailsView } from '@/db/schema/order';
 
 const DEFAULT_PAGE_INDEX = 0;
 const DEFAULT_PAGE_SIZE = 10;
+
+const analyzeGlobalFiltering = (value: string) => {
+  const trimmed = value.trim();
+
+  const numericValue = Number(trimmed);
+  const isNumeric = !isNaN(numericValue) && trimmed !== '';
+
+  // Sprawdź czy to data (formaty: YYYY-MM-DD, DD-MM-YYYY, DD/MM/YYYY, DD.MM.YYYY)
+  const datePatterns = [
+    /^\d{4}-\d{2}-\d{2}$/, // YYYY-MM-DD
+    /^\d{2}-\d{2}-\d{4}$/, // DD-MM-YYYY
+    /^\d{2}\/\d{2}\/\d{4}$/, // DD/MM/YYYY
+    /^\d{2}\.\d{2}\.\d{4}$/, // DD.MM.YYYY
+  ];
+
+  const isDate = datePatterns.some((pattern) => pattern.test(trimmed));
+
+  // Konwersja daty do formatu YYYY-MM-DD
+  let normalizedDate = '';
+  if (isDate) {
+    if (trimmed.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      normalizedDate = trimmed;
+    } else if (trimmed.match(/^\d{2}-\d{2}-\d{4}$/)) {
+      const [day, month, year] = trimmed.split('-');
+      normalizedDate = `${year}-${month}-${day}`;
+    } else if (trimmed.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+      const [day, month, year] = trimmed.split('/');
+      normalizedDate = `${year}-${month}-${day}`;
+    } else if (trimmed.match(/^\d{2}\.\d{2}\.\d{4}$/)) {
+      const [day, month, year] = trimmed.split('.');
+      normalizedDate = `${year}-${month}-${day}`;
+    }
+  }
+
+  return {
+    isNumeric,
+    isDate,
+    numericValue,
+    normalizedDate,
+    searchTerm: `%${trimmed.toLowerCase()}%`,
+  };
+};
 
 export const orderServices = {
   getOrdersQuery: async (
@@ -28,262 +71,110 @@ export const orderServices = {
     const sortField = sortOptions?.field;
     const sortOrder = sortOptions?.order === 'desc' ? desc : asc;
 
-    // Subquery dla szczegółowych miejsc załadunku (JSON array)
-    const loadingPlacesQuery = sql<string>`(
-    SELECT COALESCE(
-      JSON_AGG(
-        JSON_BUILD_OBJECT(
-          'id', lc.id,
-          'name', lc.name,
-          'postal', lc.postal,
-          'countryID', lc.country_id
-        ) ORDER BY lc.name
-      ), 
-      '[]'::json
-    )
-    FROM order_loading_places lp 
-    JOIN city lc ON lp.place_id = lc.id 
-    WHERE lp.order_id = "order".id
-  )`;
+    const getSortColumn = (field?: string) => {
+      const sortMappings = {
+        customerID: ordersWithDetailsView.customerID,
+        driverID: ordersWithDetailsView.driverID,
+        truckID: ordersWithDetailsView.truckID,
+        statusID: ordersWithDetailsView.status,
+        loadingCity: ordersWithDetailsView.loadingCity,
+        unloadingCity: ordersWithDetailsView.unloadingCity,
+        orderNr: ordersWithDetailsView.orderNr,
+        startDate: ordersWithDetailsView.startDate,
+        endDate: ordersWithDetailsView.endDate,
+        pricePLN: ordersWithDetailsView.pricePLN,
+        priceCurrency: ordersWithDetailsView.priceCurrency,
+        currency: ordersWithDetailsView.currency,
+      };
 
-    // Subquery dla szczegółowych miejsc rozładunku (JSON array)
-    const unloadingPlacesQuery = sql<string>`(
-    SELECT COALESCE(
-      JSON_AGG(
-        JSON_BUILD_OBJECT(
-          'id', uc.id,
-          'name', uc.name,
-          'postal', uc.postal,
-          'countryID', uc.country_id
-        ) ORDER BY uc.name
-      ), 
-      '[]'::json
-    )
-    FROM order_unloading_places up 
-    JOIN city uc ON up.place_id = uc.id 
-    WHERE up.order_id = "order".id
-  )`;
-
-    const firstLoadingCityQuery = sql<string>`(
-      SELECT lc.name
-      FROM order_loading_places lp
-      JOIN city lc ON lp.place_id = lc.id
-      WHERE lp.order_id = "order".id
-      LIMIT 1
-    )`;
-
-    const firstUnloadingCityQuery = sql<string>`(
-      SELECT uc.name
-      FROM order_unloading_places up
-      JOIN city uc ON up.place_id = uc.id
-      WHERE up.order_id = "order".id
-      LIMIT 1
-    )`;
-
-    const getOrderByClause = () => {
-      switch (sortField) {
-        case 'loadingCity':
-          return sortOrder(firstLoadingCityQuery);
-        case 'unloadingCity':
-          return sortOrder(firstUnloadingCityQuery);
-        default:
-          return sortField && sortField in order
-            ? sortOrder(order[sortField as keyof Order])
-            : sortOrder(order.id);
-      }
+      return (
+        sortMappings[field as keyof typeof sortMappings] ||
+        ordersWithDetailsView.id
+      );
     };
 
-    const query = db
-      .select({
-        ...getTableColumns(order),
-        customer: customer.name,
-        driver:
-          sql<string>`CONCAT(${driver.firstName}, ' ', ${driver.lastName})`.as(
-            'driver'
-          ),
-        truck: truck.plate,
-        status: status.name,
-        loadingPlaces: loadingPlacesQuery.as('loadingPlacesRaw'),
-        unloadingPlaces: unloadingPlacesQuery.as('unloadingPlacesRaw'),
-        loadingCity: firstLoadingCityQuery.as('loadingCity'),
-        unloadingCity: firstUnloadingCityQuery.as('unloadingCity'),
-      })
-      .from(order)
-      .leftJoin(customer, eq(order.customerID, customer.id))
-      .leftJoin(driver, eq(order.driverID, driver.id))
-      .leftJoin(truck, eq(order.truckID, truck.id))
-      .leftJoin(status, eq(order.statusID, status.id));
+    let query = db.select().from(ordersWithDetailsView);
 
-    const rawResults = await query
-      .orderBy(getOrderByClause())
+    const whereConditions: any[] = [];
+
+    if (filters?.truckID) {
+      whereConditions.push(eq(ordersWithDetailsView.truckID, filters.truckID));
+    }
+
+    if (filters?.startDate) {
+      whereConditions.push(
+        gte(ordersWithDetailsView.startDate, filters.startDate)
+      );
+    }
+
+    if (filters?.endDate) {
+      whereConditions.push(lte(ordersWithDetailsView.endDate, filters.endDate));
+    }
+
+    if (filters?.globalFilters) {
+      const { searchTerm, isNumeric, numericValue, isDate, normalizedDate } =
+        analyzeGlobalFiltering(filters.globalFilters);
+
+      const searchConditions = [
+        ilike(ordersWithDetailsView.orderNr, searchTerm),
+        ilike(ordersWithDetailsView.customer, searchTerm),
+        ilike(ordersWithDetailsView.driver, searchTerm),
+        ilike(ordersWithDetailsView.truck, searchTerm),
+        ilike(ordersWithDetailsView.status, searchTerm),
+        ilike(ordersWithDetailsView.currency, searchTerm),
+        ilike(ordersWithDetailsView.loadingCity, searchTerm),
+        ilike(ordersWithDetailsView.unloadingCity, searchTerm),
+      ];
+
+      if (isNumeric) {
+        searchConditions.push(
+          sql`${ordersWithDetailsView.pricePLN}::numeric BETWEEN ${
+            numericValue - 1
+          } AND ${numericValue + 1}`,
+          sql`${ordersWithDetailsView.priceCurrency}::numeric BETWEEN ${
+            numericValue - 1
+          } AND ${numericValue + 1}`
+        );
+      }
+
+      if (isDate) {
+        searchConditions.push(
+          eq(sql`DATE(${ordersWithDetailsView.startDate})`, normalizedDate),
+          eq(sql`DATE(${ordersWithDetailsView.endDate})`, normalizedDate)
+        );
+      }
+
+      whereConditions.push(or(...searchConditions));
+    }
+
+    if (whereConditions.length > 0) {
+      query.where(and(...whereConditions));
+    }
+
+    return query
+      .orderBy(sortOrder(getSortColumn(sortField)))
       .limit(pageSize)
       .offset(pageIndex * pageSize);
-
-    return rawResults.map((row) => {
-      const {
-        loadingPlaces,
-        unloadingPlaces,
-        loadingCity,
-        unloadingCity,
-        ...orderData
-      } = row;
-
-      return {
-        ...orderData,
-        loadingCity: loadingCity || '',
-        unloadingCity: unloadingCity || '',
-        loadingPlaces: loadingPlaces as unknown as City[],
-        unloadingPlaces: unloadingPlaces as unknown as City[],
-      };
-    });
   },
 
   getOrderByIdQuery: async (orderID: number) => {
-    const order = await db.query.order.findFirst({
-      where: (order, { eq }) => eq(order.id, orderID),
-      with: {
-        status: true,
-        truck: true,
-        customer: true,
-        driver: true,
-        loadingPlaces: {
-          with: {
-            place: true,
-          },
-        },
-        unloadingPlaces: {
-          with: {
-            place: true,
-          },
-        },
-      },
-    });
+    const order = await db
+      .select()
+      .from(ordersWithDetailsView)
+      .where(eq(ordersWithDetailsView.id, orderID));
 
-    if (!order) return null;
-
-    const loadingPlaces = order?.loadingPlaces.map((p) => p.place) || [];
-    const unloadingPlaces = order?.unloadingPlaces.map((p) => p.place) || [];
-    const driverFullName = order.driver
-      ? `${order.driver.firstName || ''} ${order.driver.lastName || ''}`.trim()
-      : 'N/A';
-
-    return {
-      ...order,
-      driver: driverFullName,
-      customer: order.customer?.name || 'N/A',
-      truck: order.truck?.plate || 'N/A',
-      status: order.status?.name || 'N/A',
-      loadingPlaces,
-      unloadingPlaces,
-      loadingCity: loadingPlaces[0]?.name || 'N/A',
-      unloadingCity: unloadingPlaces[0]?.name || 'N/A',
-    };
+    return order[0];
   },
 
   getOrderByNrAndCustomerQuery: async (orderNr: string, customerID: number) => {
     if (!orderNr.trim() || !customerID || customerID < 1 || isNaN(customerID))
       throw new Error(
-        'OrderNr and customerID must be provided and higher than 0.'
+        'OrderNr and customerID must be provided and CustomerID must be higher than 0.'
       );
 
-    const order = await db.query.order.findFirst({
+    return db.query.order.findFirst({
       where: (order) =>
         and(eq(order.orderNr, orderNr), eq(order.customerID, customerID)),
-      with: {
-        status: true,
-        truck: true,
-        customer: true,
-        driver: true,
-        loadingPlaces: {
-          with: {
-            place: true,
-          },
-        },
-        unloadingPlaces: {
-          with: {
-            place: true,
-          },
-        },
-      },
-    });
-
-    if (!order) return null;
-
-    const loadingPlaces = order?.loadingPlaces.map((p) => p.place) || [];
-    const unloadingPlaces = order?.unloadingPlaces.map((p) => p.place) || [];
-
-    return {
-      ...order,
-      driver: order.driver
-        ? `${order.driver.firstName || ''} ${
-            order.driver.lastName || ''
-          }`.trim()
-        : 'N/A',
-      customer: order.customer?.name || 'N/A',
-      truck: order.truck?.plate || 'N/A',
-      status: order.status?.name || 'N/A',
-      loadingPlaces,
-      unloadingPlaces,
-      loadingCity: loadingPlaces[0]?.name || 'N/A',
-      unloadingCity: unloadingPlaces[0]?.name || 'N/A',
-    };
-  },
-
-  getOrderByTruckIdAndDatesQuery: (
-    truckID: number,
-    startDate: string | undefined,
-    endDate: string | undefined
-  ) => {
-    return db.query.order.findMany({
-      where: (order) =>
-        and(
-          eq(order.truckID, truckID),
-          startDate ? gte(order.startDate, startDate) : undefined,
-          endDate ? lte(order.endDate, endDate) : undefined
-        ),
-      with: {
-        loadingPlaces: {
-          columns: {
-            id: false,
-            orderID: false,
-            placeID: false,
-          },
-          with: {
-            place: true,
-          },
-        },
-        unloadingPlaces: {
-          columns: {
-            id: false,
-            orderID: false,
-            placeID: false,
-          },
-          with: {
-            place: true,
-          },
-        },
-        status: {
-          columns: {
-            name: true,
-          },
-        },
-        truck: {
-          columns: {
-            plate: true,
-          },
-        },
-        driver: {
-          columns: {
-            firstName: true,
-            lastName: true,
-          },
-        },
-        customer: {
-          columns: {
-            name: true,
-          },
-        },
-      },
     });
   },
 

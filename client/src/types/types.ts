@@ -66,6 +66,7 @@ export const Order = z
     path: ['startDate'],
   });
 export type Order = z.infer<typeof Order>;
+
 export const OrderWithId = Order.extend({ id: z.number() });
 export type OrderWithId = z.infer<typeof OrderWithId>;
 
@@ -102,13 +103,26 @@ export type Customer = z.infer<typeof Customer>;
 export type CustomerWithId = WithId<Customer>;
 
 export const OrderDetails = z.object({
-  status: OrderStatus,
-  truck: Truck,
-  driver: Driver,
-  customer: Customer,
+  status: z.string().min(1),
+  truck: z.string().min(1),
+  driver: z.string().min(1),
+  customer: z.string().min(1),
+  loadingCity: z.string().min(1),
+  unloadingCity: z.string().min(1),
+  loadingPlaces: City.array(),
+  unloadingPlaces: City.array(),
 });
 export type OrderDetails = z.infer<typeof OrderDetails>;
-export type OrderWithDetails = OrderWithId & OrderDetails;
+export const OrderWithDetails = z.object({
+  ...OrderWithId.shape,
+  ...OrderDetails.shape,
+});
+export type OrderWithDetails = z.infer<typeof OrderWithDetails>;
+
+export type WithRowCount<T> = {
+  data: T[];
+  rowCount: number;
+};
 
 export type CurrencyRate = {
   table: string;
@@ -142,3 +156,38 @@ export type ApiError = {
   message: string;
   statusCode: number | string;
 };
+
+const PaginationParams = z.object({
+  pageIndex: z.number().min(0).default(0),
+  pageSize: z.number().min(10).max(100).default(10),
+});
+
+const SortParams = z.object({
+  sortBy: z.templateLiteral([
+    z.string(),
+    z.literal('.'),
+    z.enum(['asc', 'desc']),
+  ]),
+});
+export type SortParams = z.infer<typeof SortParams>;
+
+const makeFilters = <T extends z.ZodRawShape>(base: z.ZodObject<T>) =>
+  z
+    .object({
+      ...PaginationParams.shape,
+      ...SortParams.shape,
+      ...base.shape,
+    })
+    .partial();
+
+export const OrderFilters = makeFilters(
+  z.object({
+    ...OrderWithId.omit({
+      loadingPlaces: true,
+      unloadingPlaces: true,
+    }).shape,
+    ...OrderDetails.pick({ loadingCity: true, unloadingCity: true }).shape,
+    globalFilters: z.string(),
+  })
+);
+export type OrderFilters = z.infer<typeof OrderFilters>;
