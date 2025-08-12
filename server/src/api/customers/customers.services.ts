@@ -1,10 +1,28 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, ilike, or } from 'drizzle-orm';
 import db from '@/db/index';
 import { customer } from '@/db/schema/index';
 import { Customer } from './customers.model';
 
 export const customerServices = {
-  getCustomersQuery: () => db.query.customer.findMany(),
+  getCustomersQuery: (searchQuery?: string) => {
+    const searchTerm = `%${searchQuery?.trim().toLowerCase()}%`;
+    const whereConditions: any[] = [];
+
+    let query = db.select().from(customer);
+
+    if (searchQuery) {
+      const searchConditions = [
+        ilike(customer.name, searchTerm.toLowerCase()),
+        ilike(customer.tax, searchTerm.toLowerCase()),
+      ];
+
+      whereConditions.push(or(...searchConditions));
+    }
+
+    if (whereConditions.length > 0) query.where(and(...whereConditions));
+
+    return query.orderBy(customer.name).limit(10);
+  },
 
   getCustomerByIdQuery: (customerID: number) => {
     if (!customerID || customerID < 1)

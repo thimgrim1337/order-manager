@@ -10,3 +10,10 @@ export type Customer = z.infer<typeof Customer>;
 
 export const CustomerWithId = createSelectSchema(customer);
 export type CustomerWithId = z.infer<typeof CustomerWithId>;
+
+export const CustomerFilters = z
+  .object({
+    searchQuery: z.string(),
+  })
+  .partial();
+export type CustomerFilters = z.infer<typeof CustomerFilters>;

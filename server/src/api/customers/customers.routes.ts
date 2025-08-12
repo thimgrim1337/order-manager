@@ -2,11 +2,15 @@ import { Router } from 'express';
 import * as handlers from './customers.handlers';
 import { validateRequest } from '@/middleware/validate-request';
 import { ParamsWithId } from '@/interfaces/ParamsWithId';
-import { Customer, CustomerWithId } from './customers.model';
+import { Customer, CustomerFilters } from './customers.model';
 
 const router = Router();
 
-router.get('/', handlers.getAllCustomers);
+router.get(
+  '/',
+  validateRequest({ query: CustomerFilters }),
+  handlers.getAllCustomers
+);
 
 router.get(
   '/:id',

@@ -1,12 +1,13 @@
 import { RequestHandler } from 'express';
 import { AppError } from '@/lib/app-error';
 import { customerServices } from './customers.services';
-import { Customer, CustomerWithId } from './customers.model';
+import { Customer, CustomerFilters } from './customers.model';
 import { ParamsWithId } from '@/interfaces/ParamsWithId';
 
 export const getAllCustomers: RequestHandler = async (req, res, next) => {
   try {
-    const customers = await customerServices.getCustomersQuery();
+    const { searchQuery } = req.query as CustomerFilters;
+    const customers = await customerServices.getCustomersQuery(searchQuery);
     res.status(200).send(customers);
   } catch (error) {
     next(new AppError('Failed to fetch customers: ' + error, 500));

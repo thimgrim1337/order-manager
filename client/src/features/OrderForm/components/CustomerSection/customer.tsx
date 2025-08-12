@@ -23,20 +23,28 @@ import { createCustomer } from '../../mutations/customerMutation';
 import { useOptimisticMutation } from '../../hooks/useOptimisticMutation';
 import { useState } from 'react';
 import { Customer } from '@/types/types';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import customersQueryOptions from '../../queries/customersQuery';
+import { useQuery } from '@tanstack/react-query';
+import getCustomersQueryOptions from '../../queries/customersQuery';
+import useDebounce from '../../hooks/useDebounce';
 
 export default function CustomerSection() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
   const { control } = useFormContext();
+  const debouncedSearchQuery = useDebounce(searchQuery, 200);
 
-  const { data: customers } = useSuspenseQuery(customersQueryOptions);
+  const { data: customers } = useQuery(
+    getCustomersQueryOptions({ searchQuery: debouncedSearchQuery })
+  );
 
-  const createMutation = useOptimisticMutation<Customer>({
-    mutationFn: createCustomer,
-    queryKey: ['customers'],
-    successMessage: 'Udało się stworzyć nowego kontrahenta.',
-  });
+  const { mutate: createMutation, isPending } = useOptimisticMutation<Customer>(
+    {
+      mutationFn: createCustomer,
+      queryKey: ['customers'],
+      successMessage: 'Udało się stworzyć nowego kontrahenta.',
+    }
+  );
 
   return (
     <div className='flex justify-between gap-5'>
@@ -51,14 +59,15 @@ export default function CustomerSection() {
                 <FormCombobox
                   {...field}
                   placeholder='Wybierz zleceniodawcę'
-                  data={customers}
+                  data={customers || []}
+                  onFiltersChange={setSearchQuery}
                 />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
+
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button>
@@ -74,7 +83,7 @@ export default function CustomerSection() {
             </DialogHeader>
             <CustomerForm
               mutation={createMutation}
-              isPending={createMutation.isPending}
+              isPending={isPending}
               onOpenChange={setIsOpen}
             />
           </DialogContent>

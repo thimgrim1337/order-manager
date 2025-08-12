@@ -23,7 +23,9 @@ export function useFilters<T extends RouteIds<RegisteredRouter['routeTree']>>(
   return { filters, setFilters, resetFilters };
 }
 
-const cleanEmptyParams = <T extends Record<string, unknown>>(search: T) => {
+export const cleanEmptyParams = <T extends Record<string, unknown>>(
+  search: T
+) => {
   const newSearch = { ...search };
   Object.keys(newSearch).forEach((key) => {
     const value = newSearch[key];

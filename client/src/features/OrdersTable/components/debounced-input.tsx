@@ -1,16 +1,18 @@
 import { Input } from '@/components/ui/primitives/input';
-import { InputHTMLAttributes, useEffect, useState } from 'react';
+import { InputHTMLAttributes, ReactNode, useEffect, useState } from 'react';
 
 type DebouncedInputProps = {
   value: string;
   onChange: (value: string | number) => void;
   debounce?: number;
+  children?: ReactNode;
 };
 
 export default function DebouncedInput({
   value: initialValue,
   onChange,
   debounce = 200,
+  children,
   ...props
 }: DebouncedInputProps &
   Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'>) {
@@ -30,17 +32,20 @@ export default function DebouncedInput({
   }, [value]);
 
   return (
-    <Input
-      {...props}
-      value={value ?? ''}
-      onChange={(e) => {
-        if (e.target.value === '') return setValue('');
-        if (props.type === 'number') {
-          setValue(e.target.valueAsNumber);
-        } else {
-          setValue(e.target.value);
-        }
-      }}
-    />
+    <>
+      <Input
+        {...props}
+        value={value ?? ''}
+        onChange={(e) => {
+          if (e.target.value === '') return setValue('');
+          if (props.type === 'number') {
+            setValue(e.target.valueAsNumber);
+          } else {
+            setValue(e.target.value);
+          }
+        }}
+      />
+      {children}
+    </>
   );
 }

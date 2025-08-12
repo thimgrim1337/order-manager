@@ -21,7 +21,7 @@ const initialValues: Customer = {
 };
 
 type CustomerFormProps = {
-  mutation: UseMutationResult<unknown, Error, Customer, unknown>;
+  mutation: UseMutationResult<unknown, Error, Customer, unknown>['mutate'];
   isPending: UseMutationResult<unknown, Error, Customer, unknown>['isPending'];
   onOpenChange: Dispatch<SetStateAction<boolean>>;
 };
@@ -37,7 +37,7 @@ export default function CustomerForm({
   });
 
   async function handleSubmitForm(formData: Customer) {
-    mutation.mutate(formData, {
+    mutation(formData, {
       onSuccess: () => onOpenChange(false),
     });
   }
