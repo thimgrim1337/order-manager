@@ -1,3 +1,4 @@
+import { initialDate } from '@/helpers/dates';
 import { isAfter } from 'date-fns';
 import { z } from 'zod/v4';
 
@@ -78,8 +79,9 @@ export type OrderStatusWithId = WithId<OrderStatus>;
 
 export const Truck = z.object({
   plate: z.string().min(4).max(8),
-  insuranceEndAt: z.string().date(),
-  serviceEndAt: z.string().date(),
+  insuranceEndAt: z.date(),
+  serviceEndAt: z.date(),
+  driverID: z.number().optional(),
 });
 export type Truck = z.infer<typeof Truck>;
 export type TruckWithId = WithId<Truck>;
@@ -87,6 +89,7 @@ export type TruckWithId = WithId<Truck>;
 export const Driver = z.object({
   firstName: z.string().max(20).min(2),
   lastName: z.string().max(20).min(2),
+  truckID: z.number().optional(),
 });
 export type Driver = z.infer<typeof Driver>;
 export type DriverWithId = WithId<Driver>;
@@ -171,23 +174,30 @@ const SortParams = z.object({
 });
 export type SortParams = z.infer<typeof SortParams>;
 
-const makeFilters = <T extends z.ZodRawShape>(base: z.ZodObject<T>) =>
-  z
-    .object({
-      ...PaginationParams.shape,
-      ...SortParams.shape,
-      ...base.shape,
-    })
-    .partial();
-
-export const OrderFilters = makeFilters(
-  z.object({
+export const OrderFilters = z
+  .object({
     ...OrderWithId.omit({
       loadingPlaces: true,
       unloadingPlaces: true,
     }).shape,
     ...OrderDetails.pick({ loadingCity: true, unloadingCity: true }).shape,
     globalFilters: z.string(),
+    ...PaginationParams.shape,
+    ...SortParams.shape,
   })
-);
+  .partial();
 export type OrderFilters = z.infer<typeof OrderFilters>;
+
+export const TimetableFilters = z.object({
+  truckID: z.number().default(1),
+  startDate: z.string().default(initialDate),
+  endDate: z.string().optional(),
+});
+
+export type TimetableFilters = z.infer<typeof TimetableFilters>;
+export const CustomerFilters = z
+  .object({
+    searchQuery: z.string(),
+  })
+  .partial();
+export type CustomerFilters = z.infer<typeof CustomerFilters>;

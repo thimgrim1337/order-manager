@@ -11,10 +11,18 @@ import driversQueryOptions from '../../queries/driversQuery';
 import trucksQueryOptions from '../../queries/trucksQuery';
 
 export default function TruckSection() {
-  const { control } = useFormContext();
+  const { control, setValue } = useFormContext();
   const [drivers, trucks] = useSuspenseQueries({
     queries: [driversQueryOptions, trucksQueryOptions],
   });
+
+  const handleDriverChange = (id: string | number) => {
+    const driver = drivers.data.find((driver) => driver.id === id);
+
+    if (driver?.truckID) setValue('truckID', driver.truckID);
+
+    setValue('driverID', id);
+  };
 
   return (
     <div className='flex justify-between  gap-5'>
@@ -26,6 +34,7 @@ export default function TruckSection() {
             <FormLabel>Kierowca</FormLabel>
             <FormCombobox
               {...field}
+              onChange={handleDriverChange}
               data={drivers.data.map((driver) => {
                 return {
                   id: driver.id,

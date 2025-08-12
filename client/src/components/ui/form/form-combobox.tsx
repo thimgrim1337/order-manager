@@ -10,12 +10,7 @@ import {
   CommandList,
 } from '../primitives/command';
 import { cn } from '@/lib/utils';
-import {
-  FieldPath,
-  FieldValues,
-  PathValue,
-  useFormContext,
-} from 'react-hook-form';
+import { FieldPath, FieldValues, useFormContext } from 'react-hook-form';
 
 type ComboboxOption = {
   id: string | number;
@@ -26,14 +21,18 @@ type FormComboboxProps<TFieldValues extends FieldValues> = {
   name: FieldPath<TFieldValues>;
   placeholder: string;
   data: ComboboxOption[];
+  onChange: (id: string | number) => void;
+  onFiltersChange?: (filter: string) => void;
 };
 
 export default function FormCombobox<T extends FieldValues>({
   name,
   placeholder,
   data,
+  onChange,
+  onFiltersChange,
 }: FormComboboxProps<T>) {
-  const { setValue, watch } = useFormContext<T>();
+  const { watch } = useFormContext<T>();
   const selectedValue = watch(name);
 
   return (
@@ -58,7 +57,11 @@ export default function FormCombobox<T extends FieldValues>({
         </PopoverTrigger>
         <PopoverContent className='w-full p-0'>
           <Command>
-            <CommandInput placeholder='Szukaj...' className='h-9' />
+            <CommandInput
+              placeholder='Szukaj...'
+              className='h-9'
+              onValueChange={onFiltersChange}
+            />
             <CommandList id='combobox-list'>
               <CommandEmpty>Nic nie znaleziono.</CommandEmpty>
               <CommandGroup>
@@ -67,16 +70,8 @@ export default function FormCombobox<T extends FieldValues>({
                     aria-selected={d.id === selectedValue}
                     value={d.name}
                     key={d.id}
-                    onSelect={() => {
-                      setValue(name, d.id as PathValue<T, typeof name>, {
-                        shouldDirty: true,
-                      });
-                    }}
-                    onBlur={() => {
-                      setValue(name, d.id as PathValue<T, typeof name>, {
-                        shouldDirty: true,
-                      });
-                    }}
+                    onSelect={() => onChange(d.id)}
+                    onBlur={() => onChange(d.id)}
                   >
                     {d.name}
                     <Check

@@ -36,8 +36,8 @@ export const createTruck: RequestHandler = async (req, res, next) => {
       throw new AppError('Truck already exist.', 409);
     }
 
-    const addedTruck = await truckServices.createTruckQuery(req.body);
-    res.status(201).json(addedTruck);
+    const createdTruck = await truckServices.createTruckQuery(req.body);
+    res.status(201).json(createdTruck);
   } catch (error) {
     next(error);
   }
