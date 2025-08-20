@@ -13,3 +13,4 @@ export {
   default as unloadingPlaces,
   unloadingPlacesRelations as unloadingPlacesRelations,
 } from './unloadingPlaces';
+export { default as user } from './user';

@@ -69,3 +69,6 @@ export const isValidDate = (date: Date | undefined) => {
 
   return !isNaN(date.getTime());
 };
+
+const today = getToday();
+export const initialDate = formatDate(getFirstDayOfWeek(today));

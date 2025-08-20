@@ -6,7 +6,7 @@ import {
 import { ChevronsUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/primitives/button';
 
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { City, CountryWithId } from '@/types/types';
 import PlacesListItem from './places-list-item';
 
@@ -17,7 +17,7 @@ type SelectedPlacesListProps = {
   selectedPlaces: City[];
 };
 
-export function PlacesList({
+function PlacesList({
   name,
   countries,
   selectedPlaces,
@@ -73,3 +73,5 @@ export function PlacesList({
     </Collapsible>
   );
 }
+
+export default memo(PlacesList);

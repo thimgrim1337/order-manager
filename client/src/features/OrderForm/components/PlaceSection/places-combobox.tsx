@@ -37,7 +37,7 @@ export default function PlacesCombobox({
           aria-label='Wybierz miejsca'
           variant='outline'
           role='combobox'
-          className={cn('w-full justify-between')}
+          className={cn('w-full justify-between text-muted-foreground')}
         >
           Wybierz miejsca
           <ChevronsUpDown className='opacity-50' />

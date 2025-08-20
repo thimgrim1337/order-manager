@@ -3,7 +3,6 @@ import * as handlers from './orders.handlers';
 import { validateRequest } from '@/middleware/validate-request';
 import { ParamsWithId } from '@/interfaces/ParamsWithId';
 import {
-  Order,
   OrderFilters,
   OrderWithIdAndPlaces,
   OrderWithPlaces,

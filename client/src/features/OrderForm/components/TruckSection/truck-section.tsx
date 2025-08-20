@@ -47,6 +47,7 @@ export default function TruckSection() {
           </FormItem>
         )}
       />
+
       <FormField
         control={control}
         name='truckID'

@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from '@/components/ui/primitives/dialog';
 import { Button } from '@/components/ui/primitives/button';
-import { OrderWithDetails, OrderWithId } from '@/types/types';
+import { Order, OrderWithDetails } from '@/types/types';
 import { UseMutationResult } from '@tanstack/react-query';
 import { Dispatch, SetStateAction } from 'react';
 
@@ -19,7 +19,7 @@ const statusOptions = [
 type StatusDialogProps = {
   isOpen: boolean;
   onOpenChange: Dispatch<SetStateAction<boolean>>;
-  mutation: UseMutationResult<unknown, Error, OrderWithId, unknown>;
+  mutation: UseMutationResult<unknown, Error, Order, unknown>['mutate'];
   order: OrderWithDetails;
 };
 
@@ -36,7 +36,7 @@ export default function StatusDialog({
           <DialogTitle>Zmień status zlecenia nr ${order.orderNr}</DialogTitle>
           <DialogDescription className='text-primary '>
             Aktualny status:
-            <span className='font-semibold'> {order.status.name}</span>
+            <span className='font-semibold'> {order.status}</span>
           </DialogDescription>
         </DialogHeader>
         <div className='flex flex-col gap-2 '>
@@ -46,7 +46,7 @@ export default function StatusDialog({
               key={status.id}
               variant={status.id === 3 ? 'default' : 'secondary'}
               onClick={() =>
-                mutation.mutate(
+                mutation(
                   { ...order, statusID: status.id },
                   { onSettled: () => onOpenChange(false) }
                 )

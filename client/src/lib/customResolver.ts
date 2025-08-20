@@ -10,7 +10,6 @@ const zodToHookFormErrors = <T extends FieldValues>(
   zodError: ZodError
 ): FieldErrors<T> => {
   const errors: FieldErrors = {};
-
   for (const issue of zodError.issues) {
     const path = issue.path.join('.') || 'root';
     errors[path] = {
@@ -18,21 +17,22 @@ const zodToHookFormErrors = <T extends FieldValues>(
       message: issue.message,
     } as FieldError;
   }
-
   return errors as FieldErrors<T>;
 };
 
+// ZMIANA: Użyj synchronicznej walidacji
 export function customResolver<T extends FieldValues>(
   schema: ZodType
 ): Resolver<T> {
-  return async (
+  return (
     values: T
-  ): Promise<{
+  ): {
     values: FieldValues;
     errors: FieldErrors<T>;
-  }> => {
+  } => {
     try {
-      const result = await schema.safeParseAsync(values);
+      // KLUCZOWA ZMIANA: safeParse zamiast safeParseAsync
+      const result = schema.safeParse(values);
 
       if (result.success) {
         return {
@@ -52,7 +52,7 @@ export function customResolver<T extends FieldValues>(
         errors: {
           root: {
             type: 'unknown',
-            message: 'An unknown error occured during validation.',
+            message: 'An unknown error occurred during validation.',
           } as FieldError,
         } as FieldErrors<T>,
       };

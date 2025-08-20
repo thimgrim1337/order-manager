@@ -21,7 +21,7 @@ export const getCustomerById: RequestHandler = async (req, res, next) => {
 
     if (!customer) throw new AppError('Customer does not exist', 404);
 
-    res.status(200).json(customer);
+    res.status(200).json([customer]);
   } catch (error) {
     next(error);
   }

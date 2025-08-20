@@ -71,6 +71,13 @@ CREATE TABLE "order_unloading_places" (
 	CONSTRAINT "order_unloading_places_order_id_place_id_pk" PRIMARY KEY("order_id","place_id")
 );
 --> statement-breakpoint
+CREATE TABLE "users" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"username" text NOT NULL,
+	"password" text NOT NULL,
+	CONSTRAINT "users_username_unique" UNIQUE("username")
+);
+--> statement-breakpoint
 ALTER TABLE "cities" ADD CONSTRAINT "cities_country_id_countries_id_fk" FOREIGN KEY ("country_id") REFERENCES "public"."countries"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "drivers" ADD CONSTRAINT "drivers_truck_id_drivers_id_fk" FOREIGN KEY ("truck_id") REFERENCES "public"."drivers"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "order_loading_places" ADD CONSTRAINT "order_loading_places_order_id_orders_id_fk" FOREIGN KEY ("order_id") REFERENCES "public"."orders"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

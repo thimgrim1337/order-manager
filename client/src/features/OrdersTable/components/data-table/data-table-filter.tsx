@@ -9,6 +9,7 @@ type DataTableFilter = {
 
 export default function DataTableFilter({ placeholder }: DataTableFilter) {
   const { filters, setFilters, resetFilters } = useFilters('/_layout/orders');
+
   return (
     <div className='flex gap-2'>
       <DebouncedInput

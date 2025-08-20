@@ -34,13 +34,14 @@ export type CountryWithId = WithId<Country>;
 
 export const Order = z
   .object({
+    id: z.number().optional(),
     orderNr: z
       .string()
       .min(1, { message: 'Nr zlecenia jest zbyt krótki.' })
       .max(30, { message: 'Nr zlecenia jest zbyt długi.' }),
     startDate: z.string(),
     endDate: z.string(),
-    statusID: z.number().min(1).max(3).default(1),
+    statusID: z.number().min(1).max(3),
     priceCurrency: z
       .string()
       .transform((val) => Number(val))
@@ -52,9 +53,9 @@ export const Order = z
     pricePLN: z.string(),
     currency: z.enum(['PLN', 'EUR'], { message: 'Wybierz walutę.' }),
     currencyRate: z.string(),
-    truckID: z.number({ message: 'Wybierz pojazd.' }).min(1),
-    driverID: z.number({ message: 'Wybierz kierowcę.' }).min(1),
-    customerID: z.number({ message: 'Wybierz zleceniodawcę.' }).min(1),
+    truckID: z.number().min(1, { message: 'Wybierz pojazd.' }),
+    driverID: z.number().min(1, { message: 'Wybierz kierowcę.' }),
+    customerID: z.number().min(1, { message: 'Wybierz zleceniodawcę.' }),
     loadingPlaces: City.array().min(1, {
       message: 'Wybierz co najmniej jedno miejsce załadunku.',
     }),
@@ -67,9 +68,6 @@ export const Order = z
     path: ['startDate'],
   });
 export type Order = z.infer<typeof Order>;
-
-export const OrderWithId = Order.extend({ id: z.number() });
-export type OrderWithId = z.infer<typeof OrderWithId>;
 
 export const OrderStatus = z.object({
   name: z.enum(['W trakcie', 'Anulowane', 'Zakończone']),
@@ -117,7 +115,7 @@ export const OrderDetails = z.object({
 });
 export type OrderDetails = z.infer<typeof OrderDetails>;
 export const OrderWithDetails = z.object({
-  ...OrderWithId.shape,
+  ...Order.shape,
   ...OrderDetails.shape,
 });
 export type OrderWithDetails = z.infer<typeof OrderWithDetails>;
@@ -176,7 +174,7 @@ export type SortParams = z.infer<typeof SortParams>;
 
 export const OrderFilters = z
   .object({
-    ...OrderWithId.omit({
+    ...Order.omit({
       loadingPlaces: true,
       unloadingPlaces: true,
     }).shape,

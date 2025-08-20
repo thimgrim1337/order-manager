@@ -14,6 +14,7 @@ const Places = z
   .min(1);
 
 export const Order = createInsertSchema(order, {
+  createdAt: z.coerce.date(),
   orderNr: z.string().min(1),
   startDate: z.string().date(),
   endDate: z.string().date(),

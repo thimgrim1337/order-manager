@@ -1,6 +1,6 @@
 {
-  "id": "35a0fcbe-2503-4b91-977f-034ecafa50c5",
-  "prevId": "0f23e042-d425-4a0a-8992-8bacab5ac16a",
+  "id": "ea62dd90-2c35-4963-a463-95fdb9056769",
+  "prevId": "45af602d-e44b-4116-a30d-48fd59c41d40",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -694,6 +694,45 @@
         }
       },
       "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "username": {
+          "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_username_unique": {
+          "name": "users_username_unique",
+          "columns": [
+            "username"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

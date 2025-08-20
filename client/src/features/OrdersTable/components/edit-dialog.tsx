@@ -6,21 +6,16 @@ import {
   DialogTitle,
 } from '@/components/ui/primitives/dialog';
 import OrderForm from '@/features/OrderForm/components/order-form';
-import { OrderWithId } from '@/types/types';
+import { Order } from '@/types/types';
 import { UseMutationResult } from '@tanstack/react-query';
 import { Dispatch, SetStateAction } from 'react';
 
 type EditDialogProps = {
   onOpenChange: Dispatch<SetStateAction<boolean>>;
   isOpen: boolean;
-  isPending: UseMutationResult<
-    unknown,
-    Error,
-    OrderWithId,
-    unknown
-  >['isPending'];
-  mutation: UseMutationResult<unknown, Error, OrderWithId, unknown>;
-  order: OrderWithId;
+  isPending: UseMutationResult<unknown, Error, Order, unknown>['isPending'];
+  mutation: UseMutationResult<unknown, Error, Order, unknown>['mutate'];
+  order: Order;
 };
 
 export default function EditDialog({
@@ -39,7 +34,7 @@ export default function EditDialog({
             W tym oknie możesz edytować swoje zlecenie.
           </DialogDescription>
         </DialogHeader>
-        <OrderForm<OrderWithId>
+        <OrderForm
           values={order}
           mutation={mutation}
           isPending={isPending}

@@ -71,8 +71,8 @@ const order = pgTable(
 
 export const ordersWithDetailsView = pgView('orders_with_details', {
   id: serial().primaryKey(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  orderNr: text('order_nr').notNull(),
+  createdAt: timestamp('created_at', { mode: 'string' }).notNull().defaultNow(),
+  orderNr: text('order_nr'),
   startDate: date('start_date', { mode: 'string' }).notNull().defaultNow(),
   endDate: date('end_date', { mode: 'string' }).notNull().defaultNow(),
   statusID: integer('status_id')

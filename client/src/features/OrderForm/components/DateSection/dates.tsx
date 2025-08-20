@@ -8,37 +8,33 @@ import {
 import { useFormContext } from 'react-hook-form';
 import { Calendar } from './calendar';
 
-export default function DatesSection() {
+function DateFormField({ name }: { name: 'startDate' | 'endDate' }) {
   const { control } = useFormContext();
+
+  const label = name === 'startDate' ? 'Data załadunku' : 'Data rozładunku';
+
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem className='w-full'>
+          <FormLabel>{label}</FormLabel>
+          <FormControl>
+            <Calendar {...field} />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+}
+
+export default function DatesSection() {
   return (
     <div className='flex justify-between  gap-5'>
-      <FormField
-        control={control}
-        name='startDate'
-        render={({ field }) => (
-          <FormItem className='w-full'>
-            <FormLabel>Data załadunku</FormLabel>
-            <FormControl>
-              <Calendar {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={control}
-        name='endDate'
-        render={({ field }) => (
-          <FormItem className='w-full'>
-            <FormLabel>Data rozładunku</FormLabel>
-            <FormControl>
-              <Calendar {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <DateFormField name='startDate' />
+      <DateFormField name='endDate' />
     </div>
   );
 }

@@ -27,16 +27,65 @@ import { useQuery } from '@tanstack/react-query';
 import getCustomersQueryOptions from '../../queries/customersQuery';
 import useDebounce from '../../hooks/useDebounce';
 
-export default function CustomerSection() {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-
+function CustomerNameFormField({ customerID }: { customerID?: number }) {
   const { control } = useFormContext();
-  const debouncedSearchQuery = useDebounce(searchQuery, 200);
 
-  const { data: customers } = useQuery(
-    getCustomersQueryOptions({ searchQuery: debouncedSearchQuery })
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const debouncedSearchQuery = useDebounce(searchQuery);
+
+  const { data, isFetching } = useQuery(
+    getCustomersQueryOptions(customerID, { searchQuery: debouncedSearchQuery })
   );
+
+  return (
+    <FormField
+      name='customerID'
+      control={control}
+      render={({ field }) => (
+        <FormItem className='w-full pb-2'>
+          <FormLabel>Zleceniodawca</FormLabel>
+          <FormControl>
+            <FormCombobox
+              {...field}
+              placeholder='Wybierz zleceniodawcę'
+              data={data || []}
+              onFiltersChange={setSearchQuery}
+              isFetching={isFetching}
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+}
+
+function CustomerOrderNumberFormField() {
+  const { control } = useFormContext();
+
+  return (
+    <FormField
+      control={control}
+      name='orderNr'
+      render={({ field }) => (
+        <FormItem className='w-full'>
+          <FormLabel>Nr zlecenia</FormLabel>
+          <FormControl>
+            <Input placeholder='000/000/000' {...field} />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+}
+
+export default function CustomerSection({
+  customerID,
+}: {
+  customerID?: number;
+}) {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const { mutate: createMutation, isPending } = useOptimisticMutation<Customer>(
     {
@@ -48,26 +97,8 @@ export default function CustomerSection() {
 
   return (
     <div className='flex justify-between gap-5'>
-      <div className='w-full'>
-        <FormField
-          name='customerID'
-          control={control}
-          render={({ field }) => (
-            <FormItem className='w-full pb-2'>
-              <FormLabel>Zleceniodawca</FormLabel>
-              <FormControl>
-                <FormCombobox
-                  {...field}
-                  placeholder='Wybierz zleceniodawcę'
-                  data={customers || []}
-                  onFiltersChange={setSearchQuery}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
+      <div className='w-full max-w-[50%]'>
+        <CustomerNameFormField customerID={customerID} />
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button>
@@ -89,20 +120,7 @@ export default function CustomerSection() {
           </DialogContent>
         </Dialog>
       </div>
-
-      <FormField
-        control={control}
-        name='orderNr'
-        render={({ field }) => (
-          <FormItem className='w-full'>
-            <FormLabel>Nr zlecenia</FormLabel>
-            <FormControl>
-              <Input placeholder='000/000/000' {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <CustomerOrderNumberFormField />
     </div>
   );
 }

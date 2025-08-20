@@ -1,13 +1,7 @@
-import { useState } from 'react';
-import { useSuspenseQueries } from '@tanstack/react-query';
-import {
-  FieldPath,
-  FieldValues,
-  PathValue,
-  useFormContext,
-} from 'react-hook-form';
+import { memo, useState } from 'react';
+import { useQueries } from '@tanstack/react-query';
 import PlacesCombobox from './places-combobox';
-import { PlacesList } from './places-list';
+
 import {
   Dialog,
   DialogContent,
@@ -22,43 +16,41 @@ import { Plus } from 'lucide-react';
 import countriesQueryOptions from '../../queries/countriesQuery';
 import citiesQueryOptions from '../../queries/citiesQuery';
 import { City } from '@/types/types';
+import PlacesList from './places-list';
 
-type PlaceControlProps<TFieldValues extends FieldValues> = {
-  name: FieldPath<TFieldValues>;
+type PlaceControlProps = {
+  onChange: (value: City[]) => void;
+  name: string;
+  value: City[];
 };
 
-export default function PlaceSelector<T extends FieldValues>({
-  name,
-}: PlaceControlProps<T>) {
+function PlaceSelector({ name, value, onChange }: PlaceControlProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const [{ data: countries }, { data: cities }] = useSuspenseQueries({
+  const [{ data: countries }, { data: cities }] = useQueries({
     queries: [countriesQueryOptions, citiesQueryOptions],
   });
 
-  const { setValue, watch } = useFormContext<T>();
-  const selectedPlaces: City[] = watch(name) || [];
-
   function togglePlace(city: City) {
-    const isSelected = selectedPlaces.some((place) => place.name === city.name);
+    const isSelected = value?.some((place) => place.name === city.name);
     const updated = isSelected
-      ? selectedPlaces.filter((place) => place.name !== city.name)
-      : [...selectedPlaces, city];
+      ? value.filter((place) => place.name !== city.name)
+      : [...(value || []), city];
 
-    setValue(name, updated as PathValue<T, typeof name>, { shouldDirty: true });
+    onChange(updated);
   }
 
   return (
     <>
       <PlacesList
         name={name}
-        countries={countries}
-        selectedPlaces={selectedPlaces}
+        countries={countries || []}
+        selectedPlaces={value || []}
         onRemove={togglePlace}
       />
       <PlacesCombobox
-        cities={cities}
-        selectedPlaces={selectedPlaces}
+        cities={cities || []}
+        selectedPlaces={value || []}
         onSelect={togglePlace}
       />
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -80,3 +72,5 @@ export default function PlaceSelector<T extends FieldValues>({
     </>
   );
 }
+
+export default memo(PlaceSelector);

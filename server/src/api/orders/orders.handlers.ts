@@ -10,7 +10,6 @@ import getCitiesIds from '../cities/helpers/getCitiesId';
 import { ParamsWithId } from '@/interfaces/ParamsWithId';
 import * as placesHandler from '@/api/places/places.handlers';
 import db from '@/db';
-import { truckServices } from '../trucks/trucks.services';
 import { driverServices } from '../drivers/drivers.services';
 
 export const getFilterdOrders: RequestHandler = async (req, res, next) => {

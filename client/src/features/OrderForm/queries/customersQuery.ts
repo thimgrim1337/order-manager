@@ -3,26 +3,36 @@ import { CustomerFilters, CustomerWithId } from '@/types/types';
 import { queryOptions } from '@tanstack/react-query';
 
 async function fetchCustomers(
+  id?: number,
   searchQuery?: CustomerFilters
 ): Promise<CustomerWithId[]> {
-  console.log(searchQuery);
-  const queryString = searchQuery
-    ? `?searchQuery=${searchQuery?.searchQuery}`
-    : undefined;
+  const queryString = searchQuery?.searchQuery
+    ? `?searchQuery=${searchQuery.searchQuery} `
+    : '';
 
-  const response = await fetch(`api/v1/customers${queryString}`);
+  let response;
+  if (queryString) {
+    response = await fetch(`api/v1/customers${queryString}`);
+  } else if (id) {
+    response = await fetch(`api/v1/customers/${id}`);
+  } else {
+    response = await fetch(`api/v1/customers`);
+  }
 
   if (!response.ok) throw new Error("Can't fetch customer from API.");
 
   return (await response.json()) satisfies CustomerWithId;
 }
 
-export const getCustomersQueryOptions = (searchQuery?: CustomerFilters) => {
+export const getCustomersQueryOptions = (
+  id?: number,
+  searchQuery?: CustomerFilters
+) => {
   const searchKey = searchQuery && cleanEmptyParams(searchQuery);
 
   return queryOptions({
-    queryKey: ['customers', searchKey],
-    queryFn: () => fetchCustomers(searchQuery),
+    queryKey: ['customers', searchKey, id],
+    queryFn: () => fetchCustomers(id, searchQuery),
   });
 };
 
