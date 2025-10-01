@@ -2,16 +2,18 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/primitives/form';
 import { useFormContext } from 'react-hook-form';
 import { Calendar } from './calendar';
+import { CalendarArrowDown, CalendarArrowUp } from 'lucide-react';
+import FormLabel from '@/components/ui/form/form-label';
 
 function DateFormField({ name }: { name: 'startDate' | 'endDate' }) {
   const { control } = useFormContext();
 
   const label = name === 'startDate' ? 'Data załadunku' : 'Data rozładunku';
+  const icon = name === 'startDate' ? CalendarArrowDown : CalendarArrowUp;
 
   return (
     <FormField
@@ -19,7 +21,7 @@ function DateFormField({ name }: { name: 'startDate' | 'endDate' }) {
       name={name}
       render={({ field }) => (
         <FormItem className='w-full'>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel Icon={icon}>{label}</FormLabel>
           <FormControl>
             <Calendar {...field} />
           </FormControl>

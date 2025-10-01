@@ -2,7 +2,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/primitives/form';
 import {
@@ -17,8 +16,7 @@ import FormCombobox from '@/components/ui/form/form-combobox';
 import { useFormContext } from 'react-hook-form';
 import { Input } from '@/components/ui/primitives/input';
 import CustomerForm from './customer-form';
-import { Button } from '@/components/ui/primitives/button';
-import { PlusIcon } from 'lucide-react';
+import { Briefcase, Hash } from 'lucide-react';
 import { createCustomer } from '../../mutations/customerMutation';
 import { useOptimisticMutation } from '../../hooks/useOptimisticMutation';
 import { useState } from 'react';
@@ -26,6 +24,8 @@ import { Customer } from '@/types/types';
 import { useQuery } from '@tanstack/react-query';
 import getCustomersQueryOptions from '../../queries/customersQuery';
 import useDebounce from '../../hooks/useDebounce';
+import PlusButton from '@/components/ui/buttons/plus-button';
+import FormLabel from '@/components/ui/form/form-label';
 
 function CustomerNameFormField({ customerID }: { customerID?: number }) {
   const { control } = useFormContext();
@@ -42,8 +42,8 @@ function CustomerNameFormField({ customerID }: { customerID?: number }) {
       name='customerID'
       control={control}
       render={({ field }) => (
-        <FormItem className='w-full pb-2'>
-          <FormLabel>Zleceniodawca</FormLabel>
+        <FormItem className='w-full'>
+          <FormLabel Icon={Briefcase}>Zleceniodawca</FormLabel>
           <FormControl>
             <FormCombobox
               {...field}
@@ -69,7 +69,7 @@ function CustomerOrderNumberFormField() {
       name='orderNr'
       render={({ field }) => (
         <FormItem className='w-full'>
-          <FormLabel>Nr zlecenia</FormLabel>
+          <FormLabel Icon={Hash}>Numer zlecenia</FormLabel>
           <FormControl>
             <Input placeholder='000/000/000' {...field} />
           </FormControl>
@@ -97,13 +97,11 @@ export default function CustomerSection({
 
   return (
     <div className='flex justify-between gap-5'>
-      <div className='w-full max-w-[50%]'>
+      <div className='w-full max-w-[50%] flex items-end gap-2'>
         <CustomerNameFormField customerID={customerID} />
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button>
-              <PlusIcon />
-            </Button>
+            <PlusButton variant={'link'} />
           </DialogTrigger>
           <DialogContent className='max-w-screen-sm'>
             <DialogHeader>

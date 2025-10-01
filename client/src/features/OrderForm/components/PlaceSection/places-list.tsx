@@ -11,14 +11,12 @@ import { City, CountryWithId } from '@/types/types';
 import PlacesListItem from './places-list-item';
 
 type SelectedPlacesListProps = {
-  name: string;
   countries: CountryWithId[];
   onRemove: (city: City) => void;
   selectedPlaces: City[];
 };
 
 function PlacesList({
-  name,
   countries,
   selectedPlaces,
   onRemove,
@@ -32,20 +30,24 @@ function PlacesList({
     countries.find((c) => c.id === countryID)?.code || '??';
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className=' space-y-2'>
-      <div className='flex items-center justify-between space-x-4'>
-        <h4 className='text-sm font-medium`'>
-          Wybierz miejsce
-          {name === 'loadingPlaces' ? ' załadunku' : ' rozładunku'}
-        </h4>
+    <Collapsible
+      open={isOpen}
+      onOpenChange={setIsOpen}
+      className='space-y-2 bg-zinc-200 px-2 py-2 rounded'
+    >
+      <div className='flex items-center justify-end '>
         <CollapsibleTrigger asChild>
-          <Button variant='ghost' size='sm' className='text-primary'>
+          <Button
+            variant='ghost'
+            size='sm'
+            className='text-primary absolute top-0'
+          >
             <ChevronsUpDown className='h-4 w-4' />
             <span className='sr-only'>Toggle</span>
           </Button>
         </CollapsibleTrigger>
       </div>
-      <div>
+      <div className=''>
         {firstPlace ? (
           <PlacesListItem
             place={firstPlace}
@@ -53,7 +55,7 @@ function PlacesList({
             country={getCountryCode(firstPlace.countryID)}
           />
         ) : (
-          <span className='text-muted-foreground'>
+          <span className='text-muted-foreground text-xs pl-2'>
             Nie wybrano żadnego miejsca
           </span>
         )}

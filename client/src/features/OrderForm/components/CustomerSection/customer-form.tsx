@@ -4,16 +4,16 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/primitives/form';
 import { Input } from '@/components/ui/primitives/input';
 import { Customer } from '@/types/types';
-import { BriefcaseBusinessIcon } from 'lucide-react';
+import { Building } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { UseMutationResult } from '@tanstack/react-query';
 import { Dispatch, SetStateAction } from 'react';
 import { customResolver } from '@/lib/customResolver';
+import FormLabel from '@/components/ui/form/form-label';
 
 const initialValues: Customer = {
   name: '',
@@ -45,10 +45,7 @@ export default function CustomerForm({
   return (
     <Form {...form}>
       <form className='grid grid-cols-3 grid-rows-2 gap-2'>
-        <BriefcaseBusinessIcon
-          size={'64px'}
-          className='row-span-2 place-self-center'
-        />
+        <Building size={'64px'} className='row-span-2 place-self-center' />
 
         <FormField
           control={form.control}

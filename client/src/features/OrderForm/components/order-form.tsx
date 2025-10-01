@@ -35,7 +35,7 @@ const initialValues: Order = {
 };
 
 type OrderFormProps = {
-  values: Order;
+  values?: Order;
   mutation: UseMutationResult<unknown, Error, Order, unknown>['mutate'];
   isPending: boolean;
   onOpenChange?: Dispatch<SetStateAction<boolean>>;
@@ -95,7 +95,7 @@ export default function OrderForm({
           <PriceSection />
           <TruckSection />
         </Suspense>
-        <Button type='submit' aria-label={label}>
+        <Button type='submit' aria-label={label} disabled={isPending}>
           {label}
           {isPending && <LoaderCircle className='animate-spin' />}
         </Button>

@@ -38,7 +38,7 @@ export default function FormCombobox<T extends FieldValues>({
 
   return (
     <>
-      <Popover>
+      <Popover modal>
         <PopoverTrigger asChild>
           <Button
             variant='outline'
