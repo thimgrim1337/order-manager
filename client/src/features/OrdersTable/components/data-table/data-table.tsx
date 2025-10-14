@@ -25,7 +25,6 @@ import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  searchInputPlaceholder: string;
   rowCount: number;
 }
 
@@ -33,9 +32,8 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   rowCount,
-  searchInputPlaceholder,
 }: DataTableProps<TData, TValue>) {
-  const { filters, setFilters, resetFilters } = useFilters('/_layout/orders');
+  const { filters, setFilters } = useFilters('/_layout/orders');
 
   const PaginationState = {
     pageIndex: filters.pageIndex ?? DEFAULT_PAGE_INDEX,
@@ -73,82 +71,79 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div>
+    <>
       <div className='py-4'>
-        <DataTableFilter
-          placeholder={searchInputPlaceholder}
-          onResetFilters={resetFilters}
-        />
+        <DataTableFilter />
       </div>
-      <div className='rounded-md border'>
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder ? null : (
-                        <>
-                          <div
-                            className={`flex gap-2 items-center ${
-                              header.column.getCanSort()
-                                ? 'cursor-pointer select-none'
-                                : ''
-                            } `}
-                            onClick={header.column.getToggleSortingHandler()}
-                          >
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                            {header.column.getCanSort()
-                              ? {
-                                  asc: <ArrowUp className='w-4 h-4' />,
-                                  desc: <ArrowDown className='w-4 h-4' />,
-                                  false: <ArrowUpDown className='w-4 h-4' />,
-                                }[header.column.getIsSorted() as string]
-                              : null}
-                          </div>
-                        </>
-                      )}
-                    </TableHead>
-                  );
-                })}
+
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder ? null : (
+                      <>
+                        <div
+                          className={`flex gap-2 items-center justify-start ${
+                            header.column.getCanSort()
+                              ? 'cursor-pointer select-none group'
+                              : ''
+                          } `}
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                          {header.column.getCanSort()
+                            ? {
+                                asc: (
+                                  <ArrowUp className='max-w-4 opacity-0 group-hover:opacity-100' />
+                                ),
+                                desc: (
+                                  <ArrowDown className='max-w-4 opacity-0 group-hover:opacity-100' />
+                                ),
+                                false: (
+                                  <ArrowUpDown className='max-w-4 opacity-0 group-hover:opacity-100' />
+                                ),
+                              }[header.column.getIsSorted() as string]
+                            : null}
+                        </div>
+                      </>
+                    )}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && 'selected'}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
               </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className='h-24 text-center'
-                >
-                  Brak wyników.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className='h-24 text-center'>
+                Brak wyników.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+
       <DataTablePagination table={table} />
-    </div>
+    </>
   );
 }

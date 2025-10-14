@@ -1,28 +1,27 @@
 import { Button } from '@/components/ui/primitives/button';
 import DebouncedInput from '../debounced-input';
 import { useFilters } from '../../hooks/useFilters';
+import { Search } from 'lucide-react';
 
-type DataTableFilter = {
-  placeholder: string;
-  onResetFilters: () => Promise<void>;
-};
-
-export default function DataTableFilter({ placeholder }: DataTableFilter) {
+export default function DataTableFilter() {
   const { filters, setFilters, resetFilters } = useFilters('/_layout/orders');
 
   return (
-    <div className='flex gap-2'>
+    <div className='flex gap-2 items-center'>
+      <Search className='text-muted-foreground' />
       <DebouncedInput
-        className='max-w-sm'
+        className='max-w-sm border-none'
         onChange={(value) => {
           setFilters({
             globalFilters: typeof value === 'string' ? value : value.toString(),
           });
         }}
-        placeholder={placeholder}
+        placeholder={`Szukaj zleceń....`}
         value={filters.globalFilters ?? ''}
       />
-      <Button onClick={resetFilters}>Reset</Button>
+      <Button onClick={resetFilters} variant={'outline'}>
+        Reset
+      </Button>
     </div>
   );
 }

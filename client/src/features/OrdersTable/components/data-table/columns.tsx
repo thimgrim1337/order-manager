@@ -1,15 +1,8 @@
-import { ColumnDef, RowData } from '@tanstack/react-table';
+import { ColumnDef } from '@tanstack/react-table';
 import { OrderWithDetails } from '@/types/types';
 import OrderOptions from '../order-options';
 import { formatDate } from '@/helpers/dates';
-
-declare module '@tanstack/react-table' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface ColumnMeta<TData extends RowData, TValue> {
-    filterKey?: keyof TData;
-    filterVariant?: 'text' | 'number';
-  }
-}
+import StatusBadge from '@/components/status-badge';
 
 export const columns: ColumnDef<OrderWithDetails>[] = [
   {
@@ -28,15 +21,21 @@ export const columns: ColumnDef<OrderWithDetails>[] = [
   },
   {
     accessorKey: 'loadingCity',
-    header: 'Miejsca załadunku',
+    header: ' Miejsce załadunku',
   },
   {
     accessorKey: 'unloadingCity',
-    header: 'Miejsca rozładunku',
+    header: 'Miejsce rozładunku',
   },
   {
     accessorKey: 'statusID',
-    accessorFn: (order) => order.status,
+    cell: ({ row }) => {
+      const statusID = row.getValue('statusID') as number;
+
+      return (
+        <StatusBadge statusID={statusID}> {row.original.status}</StatusBadge>
+      );
+    },
     header: 'Status',
   },
   {
@@ -73,7 +72,7 @@ export const columns: ColumnDef<OrderWithDetails>[] = [
   },
   {
     accessorKey: 'pricePLN',
-    header: 'Cena w PLN',
+    header: 'Cena (PLN)',
     cell: ({ row }) => {
       const price = parseFloat(row.getValue('pricePLN'));
 
