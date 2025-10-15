@@ -16,7 +16,8 @@ import { pl } from 'date-fns/locale';
 
 export type Day = {
   name: string;
-  date: string;
+  longDate: string;
+  shortDate: string;
 };
 
 export const formatDate = (
@@ -45,19 +46,20 @@ export const subWeek = (date: Date | string, count: number) =>
 export const addWeek = (date: Date | string, count: number) =>
   addWeeks(date, count);
 
-export const getFirstDayOfWeek = (date: Date | string) =>
+export const getFirstDay = (date: Date | string) =>
   startOfWeek(date, { weekStartsOn: 1 });
 
-export const getLastDayOfWeek = (date: Date | string) =>
-  endOfWeek(date, { weekStartsOn: 1 });
+export const getLastDay = (date: Date | string) =>
+  endOfWeek(addWeek(date, 1), { weekStartsOn: 1 });
 
-export const getDaysOfWeek = (startDate: Date, endDate: Date): Day[] =>
+export const getTwoWeekDays = (startDate: Date, endDate: Date): Day[] =>
   eachDayOfInterval({
     start: startDate,
     end: endDate,
   }).map((day) => ({
-    name: formatDate(day, 'eeee'),
-    date: formatDate(day),
+    name: formatDate(day, 'eee'),
+    longDate: formatDate(day),
+    shortDate: formatDate(day, 'dd.MM'),
   }));
 
 export const getPreviousFriday = (date: Date | string) => previousFriday(date);
@@ -71,4 +73,4 @@ export const isValidDate = (date: Date | undefined) => {
 };
 
 const today = getToday();
-export const initialDate = formatDate(getFirstDayOfWeek(today));
+export const initialDate = formatDate(getFirstDay(today));

@@ -69,9 +69,7 @@ export const Order = z
   });
 export type Order = z.infer<typeof Order>;
 
-export const OrderStatus = z.object({
-  name: z.enum(['W trakcie', 'Anulowane', 'Zakończone']),
-});
+export const OrderStatus = z.enum(['w trakcie', 'anulowane', 'zakończone']);
 export type OrderStatus = z.infer<typeof OrderStatus>;
 export type OrderStatusWithId = WithId<OrderStatus>;
 
@@ -187,7 +185,7 @@ export const OrderFilters = z
 export type OrderFilters = z.infer<typeof OrderFilters>;
 
 export const TimetableFilters = z.object({
-  truckID: z.number().default(1),
+  truckID: z.number().optional().default(0),
   startDate: z.string().default(initialDate),
   endDate: z.string().optional(),
 });

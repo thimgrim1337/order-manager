@@ -15,14 +15,15 @@ import { useState } from 'react';
 import { getOrderQueryOptions } from '@/features/OrderForm/queries/ordersQuery';
 import { createOrder } from '@/features/OrderForm/mutations/orderMutation';
 import { useOptimisticMutation } from '@/features/OrderForm/hooks/useOptimisticMutation';
-import customersQueryOptions from '@/features/OrderForm/queries/customersQuery';
+import getCustomersQueryOptions from '@/features/OrderForm/queries/customersQuery';
 import countriesQueryOptions from '@/features/OrderForm/queries/countriesQuery';
 import trucksQueryOptions from '@/features/OrderForm/queries/trucksQuery';
 import driversQueryOptions from '@/features/OrderForm/queries/driversQuery';
 import { Order, OrderFilters } from '@/types/types';
 import { Button } from '@/components/ui/primitives/button';
-import { LoaderCircleIcon } from 'lucide-react';
+import { LoaderCircleIcon, Plus } from 'lucide-react';
 import { useFilters } from '@/features/OrdersTable/hooks/useFilters';
+import PageHeader from '@/components/ui/typography/page-header';
 
 export const DEFAULT_PAGE_INDEX = 0;
 export const DEFAULT_PAGE_SIZE = 10;
@@ -36,11 +37,11 @@ export const Route = createFileRoute('/_layout/orders')({
     context: { queryClient },
     deps: { pageSize, pageIndex },
   }) => {
-    Promise.allSettled([
+    await Promise.allSettled([
       queryClient.ensureQueryData(
         getOrderQueryOptions({ pageSize: 10, pageIndex: 0 })
       ),
-      queryClient.ensureQueryData(customersQueryOptions),
+      queryClient.ensureQueryData(getCustomersQueryOptions()),
       queryClient.ensureQueryData(countriesQueryOptions),
       queryClient.ensureQueryData(trucksQueryOptions),
       queryClient.ensureQueryData(driversQueryOptions),
@@ -57,7 +58,7 @@ function OrdersPage() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { data: orders, isFetching } = useQuery(getOrderQueryOptions(filters));
 
-  const createMutation = useOptimisticMutation<Order>({
+  const { mutate: createMutation, isPending } = useOptimisticMutation<Order>({
     mutationFn: createOrder,
     queryKey: ['orders'],
     successMessage: 'Dodano nowe zlecenie.',
@@ -65,11 +66,18 @@ function OrdersPage() {
   });
 
   return (
-    <div className='container mx-auto py-10'>
-      <div className='flex justify-end mb-4'>
+    <div className='container mx-auto p-10'>
+      <PageHeader
+        h2Text='Zlecenia transportowe'
+        subText='System zarządzania zleceniami transportowymi'
+      />
+
+      <div className='flex justify-end '>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button>Dodaj zlecenie</Button>
+            <Button className='group'>
+              <Plus className='transition-transform group-hover:rotate-45 group-hover:scale-125' />
+            </Button>
           </DialogTrigger>
 
           <DialogContent className='max-w-screen-lg'>
@@ -79,10 +87,10 @@ function OrdersPage() {
                 Wypełnij wszystkie pola aby dodać nowe zlecenie.
               </DialogDescription>
             </DialogHeader>
-            <OrderForm<Order>
+            <OrderForm
               onOpenChange={setIsOpen}
               mutation={createMutation}
-              isPending={createMutation.isPending}
+              isPending={isPending}
             />
           </DialogContent>
         </Dialog>
@@ -92,7 +100,6 @@ function OrdersPage() {
         columns={columns}
         data={(orders && orders.data) || []}
         rowCount={(orders && orders.rowCount) || 0}
-        searchInputPlaceholder='Filtruj zlecenia...'
       />
       {isFetching && <LoaderCircleIcon className='animate-spin' />}
     </div>

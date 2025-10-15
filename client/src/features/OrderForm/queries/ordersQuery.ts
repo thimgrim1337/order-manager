@@ -14,11 +14,12 @@ async function fetchOrders(
   return (await response.json()) as WithRowCount<OrderWithDetails>;
 }
 
-export const getOrderQueryOptions = (filters: OrderFilters) =>
-  queryOptions({
+export const getOrderQueryOptions = (filters: OrderFilters) => {
+  return queryOptions({
     queryKey: ['orders', filters],
     queryFn: () => fetchOrders(filters),
     placeholderData: keepPreviousData,
   });
+};
 
 export default getOrderQueryOptions;
