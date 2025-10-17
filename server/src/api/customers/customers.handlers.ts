@@ -1,115 +1,82 @@
 import { RequestHandler } from 'express';
 import { AppError } from '@/lib/app-error';
 import { customerServices } from './customers.services';
-import { CustomerWithId } from './customers.model';
+import { Customer, CustomerFilters } from './customers.model';
 import { ParamsWithId } from '@/interfaces/ParamsWithId';
-import * as addressHandlers from '../addresses/addresses.handlers';
 
-export const getAllCustomers: RequestHandler<{}, CustomerWithId[]> = async (
-  req,
-  res,
-  next
-) => {
+export const getAllCustomers: RequestHandler = async (req, res, next) => {
   try {
-    const customers = await customerServices.getCustomersQuery();
+    const { searchQuery } = req.query as CustomerFilters;
+    const customers = await customerServices.getCustomersQuery(searchQuery);
     res.status(200).send(customers);
   } catch (error) {
-    next(new AppError('Failed to fetch customers', 500));
+    next(new AppError('Failed to fetch customers: ' + error, 500));
   }
 };
 
-export const getCustomerById: RequestHandler<
-  ParamsWithId,
-  CustomerWithId | {}
-> = async (req, res, next) => {
+export const getCustomerById: RequestHandler = async (req, res, next) => {
   try {
-    const customer = await customerServices.getCustomerByIdQuery(
-      +req.params.id
-    );
+    const { id } = req.params as ParamsWithId;
+    const customer = await customerServices.getCustomerByIdQuery(+id);
 
-    if (!customer) res.status(404).send({});
+    if (!customer) throw new AppError('Customer does not exist', 404);
 
-    res.status(200).json(customer);
+    res.status(200).json([customer]);
   } catch (error) {
-    next(new AppError('Failed to fetch customer', 500));
+    next(error);
   }
 };
 
-export const addCustomer: RequestHandler<
-  {},
-  CustomerWithId,
-  CustomerWithId
-> = async (req, res, next) => {
+export const createCustomer: RequestHandler = async (req, res, next) => {
   try {
-    const { id, name, tax } = req.body;
+    const { tax } = req.body as Customer;
 
     const existingCustomer = await customerServices.getCustomerByTaxQuery(tax);
+
     if (existingCustomer) {
       throw new AppError('Customer already exist.', 409);
     }
 
-    const newCustomer = {
-      id,
-      name,
-      tax,
-    };
+    const createdCustomer = await customerServices.addCustomerQuery(req.body);
 
-    const createdCustomer = await customerServices.addCustomerQuery(
-      newCustomer
-    );
-
-    res.status(201).json(createdCustomer[0]);
+    res.status(201).json(createdCustomer);
   } catch (error) {
     next(error);
   }
 };
 
-export const updateCustomer: RequestHandler<
-  ParamsWithId,
-  CustomerWithId,
-  CustomerWithId
-> = async (req, res, next) => {
+export const updateCustomer: RequestHandler = async (req, res, next) => {
   try {
-    const customerID = +req.params.id;
-    const { tax, name } = req.body;
+    const { id } = req.params as ParamsWithId;
 
-    const existingCustomer = await customerServices.getCustomerByIdQuery(
-      customerID
-    );
+    const existingCustomer = await customerServices.getCustomerByIdQuery(+id);
+
     if (!existingCustomer) throw new AppError('Customer does not exist', 404);
 
-    const updatedCustomerObj = {
-      tax,
-      name,
-    };
-
     const updatedCustomer = await customerServices.updateCustomerQuery(
-      updatedCustomerObj,
-      customerID
+      existingCustomer.id,
+      req.body
     );
-    res.status(200).json(updatedCustomer[0]);
+
+    res.status(200).json(updatedCustomer);
   } catch (error) {
     next(error);
   }
 };
 
-export const deleteCustomer: RequestHandler<
-  ParamsWithId,
-  CustomerWithId
-> = async (req, res, next) => {
+export const deleteCustomer: RequestHandler = async (req, res, next) => {
   try {
-    const deletedCustomer = await customerServices.deleteCustomerQuery(
-      +req.params.id
-    );
+    const { id } = req.params as ParamsWithId;
 
-    if (!deletedCustomer.length) {
-      throw new AppError('Customer does not exist.', 404);
-    }
+    //TODO: Usuwanie kontrahenta narusza klucz podstawowy order_customer
 
-    if (!deletedCustomer[0])
-      throw new AppError('Something went wrong when deleting customer.', 404);
+    const existingCustomer = await customerServices.getCustomerByIdQuery(+id);
 
-    res.status(200).json(deletedCustomer[0]);
+    if (!existingCustomer) throw new AppError('Customer does not exist', 404);
+
+    const deletedCustomer = await customerServices.deleteCustomerQuery(+id);
+
+    res.status(200).json(deletedCustomer);
   } catch (error) {
     next(error);
   }

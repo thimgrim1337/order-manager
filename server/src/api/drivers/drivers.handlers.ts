@@ -1,92 +1,69 @@
 import { RequestHandler } from 'express';
 import { AppError } from '../../lib/app-error';
 import { driverServices } from './drivers.services';
-import { Driver, DriverWithId } from './drivers.model';
 import { ParamsWithId } from '../../interfaces/ParamsWithId';
 
-export const getAllDrivers: RequestHandler<{}, Driver[]> = async (
-  req,
-  res,
-  next
-) => {
+export const getAllDrivers: RequestHandler = async (req, res, next) => {
   try {
     const drivers = await driverServices.getDriversQuery();
     res.status(200).json(drivers);
   } catch (error) {
-    next(new AppError('Failed to fetch drivers', 500));
+    next(new AppError('Failed to fetch drivers: ' + error, 500));
   }
 };
 
-export const getDriverById: RequestHandler<ParamsWithId, DriverWithId> = async (
-  req,
-  res,
-  next
-) => {
+export const getDriverById: RequestHandler = async (req, res, next) => {
   try {
-    const driver = await driverServices.getDriverByIdQuery(+req.params.id);
+    const { id } = req.params as ParamsWithId;
+    const existingDriver = await driverServices.getDriverByIdQuery(+id);
 
-    if (!driver) res.status(404).json();
+    if (!existingDriver) throw new AppError('Driver does not exist.', 404);
 
-    res.status(200).json(driver);
+    res.status(200).json(existingDriver);
   } catch (error) {
-    next(new AppError('Failed to fetch driver', 500));
+    next(error);
   }
 };
 
-export const addDriver: RequestHandler<{}, Driver, DriverWithId> = async (
-  req,
-  res,
-  next
-) => {
+export const addDriver: RequestHandler = async (req, res, next) => {
   try {
-    const newDriver = req.body;
+    const existingDriver = await driverServices.getDriverByNameQuery(req.body);
 
-    const isExist = await driverServices.getDriverByNameQuery(newDriver);
-
-    if (isExist) {
+    if (existingDriver) {
       throw new AppError('Driver already exist.', 409);
     }
 
-    const addedDriver = await driverServices.createDriverQuery(newDriver);
-    res.status(201).json(addedDriver[0]);
+    const createdDriver = await driverServices.createDriverQuery(req.body);
+    res.status(201).json(createdDriver);
   } catch (error) {
     next(error);
   }
 };
 
-export const deleteDriver: RequestHandler<ParamsWithId, DriverWithId> = async (
-  req,
-  res,
-  next
-) => {
+export const deleteDriver: RequestHandler = async (req, res, next) => {
   try {
-    const deletedDriver = await driverServices.deleteDriverQuery(
-      +req.params.id
-    );
+    const { id } = req.params as ParamsWithId;
 
-    if (!deletedDriver.length) {
-      throw new AppError('Driver does not exist.', 404);
-    }
+    const deletedDriver = await driverServices.deleteDriverQuery(+id);
 
-    res.status(200).json(deletedDriver[0]);
+    if (!deletedDriver) throw new AppError('Driver does not exist.', 404);
+
+    res.status(200).json(deletedDriver);
   } catch (error) {
     next(error);
   }
 };
 
-export const updateDriver: RequestHandler<
-  ParamsWithId,
-  DriverWithId,
-  Driver
-> = async (req, res, next) => {
+export const updateDriver: RequestHandler = async (req, res, next) => {
   try {
-    const driverToUpdate = req.body;
+    const { id } = req.params as ParamsWithId;
+    const existingDriver = await driverServices.getDriverByIdQuery(+id);
 
-    const updatedDriver = await driverServices.updateDriverQuery(
-      driverToUpdate,
-      +req.params.id
-    );
-    res.status(200).json(updatedDriver[0]);
+    if (!existingDriver) throw new AppError('Driver does not exist.', 404);
+
+    const updatedDriver = await driverServices.updateDriverQuery(+id, req.body);
+
+    res.status(200).json(updatedDriver);
   } catch (error) {
     next(error);
   }

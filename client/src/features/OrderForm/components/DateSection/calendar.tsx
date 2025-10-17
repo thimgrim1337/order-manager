@@ -79,6 +79,7 @@ export function Calendar({ name }: CalendarProps) {
             mode='single'
             selected={date}
             captionLayout='dropdown'
+            weekStartsOn={1}
             month={date}
             onMonthChange={setDate}
             onSelect={(date) => handleSelectDate(date)}

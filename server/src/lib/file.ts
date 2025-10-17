@@ -1,4 +1,4 @@
-import { readFile, writeFile, mkdir, access } from 'fs/promises';
+import { readFile, writeFile, mkdir, access, appendFile } from 'fs/promises';
 
 export async function checkIfDirExist(path: string) {
   try {
@@ -24,5 +24,14 @@ export async function writeData(path: string, data: string) {
     await writeFile(path, JSON.stringify(data));
   } catch (error) {
     console.error('An error occured when trying save data to file.');
+  }
+}
+
+export async function appendData(path: string, data: string | object) {
+  try {
+    console.log(data);
+    await appendFile(path, JSON.stringify(data));
+  } catch (error) {
+    console.error('An error occured when trying save data to file.' + error);
   }
 }

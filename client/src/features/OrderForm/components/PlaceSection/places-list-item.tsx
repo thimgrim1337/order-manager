@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/primitives/button';
 import { City } from '@/types/types';
-import { Trash } from 'lucide-react';
+import { X } from 'lucide-react';
 
 type PlaceListItemProps = {
   place: City;
@@ -14,19 +14,20 @@ export default function PlacesListItem({
   onRemove,
 }: PlaceListItemProps) {
   return (
-    <li className='rounded-md border px-4 py-2 text-sm shadow-sm flex  items-center'>
+    <li className='border-2 shadow rounded px-4 py-1 text-sm flex items-center'>
       <span className='font-medium '>{place.name}</span>
-      <span className='text-muted-foreground flex-grow text-right mr-2'>
+      <span className='text-muted-foreground flex-grow text-right mr-2 text-xs'>
         {country} {place.postal}
       </span>
       <Button
         aria-label={`Usuń miejsce ${place.name}`}
         type='button'
         size={'icon'}
-        variant={'destructive'}
+        variant={'ghost'}
+        className='group'
         onClick={() => onRemove(place)}
       >
-        <Trash />
+        <X className='transition-transform group-hover:scale-110 group-hover:text-destructive' />
       </Button>
     </li>
   );

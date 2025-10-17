@@ -1,71 +1,69 @@
+import { PaginationParams, SortParams } from '@/interfaces/Filters';
 import { order } from '../../db/schema/index';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
+const Places = z
+  .object({
+    id: z.number().optional(),
+    name: z.string(),
+    postal: z.string(),
+    countryID: z.number(),
+  })
+  .array()
+  .min(1);
+
 export const Order = createInsertSchema(order, {
-  orderNr: z.string().min(1).max(30),
+  createdAt: z.coerce.date(),
+  orderNr: z.string().min(1),
   startDate: z.string().date(),
   endDate: z.string().date(),
-  statusID: z.number().min(1),
+  customerID: z.coerce.number().min(1),
+  truckID: z.coerce.number().min(1),
+  driverID: z.coerce.number().min(1),
+  statusID: z.coerce.number().min(1),
   priceCurrency: z.string(),
-  pricePLN: z.string(),
-  currency: z.string(),
-  currencyRate: z.string(),
-  truckID: z.number().min(1),
-  driverID: z.number().min(1),
-  customerID: z.number().min(1),
-}).extend({
-  loadingPlaces: z
-    .object({
-      id: z.number().optional(),
-      name: z.string(),
-      postal: z.string(),
-      countryID: z.number(),
-    })
-    .array(),
-  unloadingPlaces: z
-    .object({
-      id: z.number().optional(),
-      name: z.string(),
-      postal: z.string(),
-      countryID: z.number(),
-    })
-    .array(),
+  pricePLN: z.string().min(1),
+  currency: z.enum(['PLN', 'EUR']).default('PLN'),
+  currencyRate: z.string().min(1),
 });
 export type Order = z.infer<typeof Order>;
 
-export const OrderWithId = createSelectSchema(order);
+export const OrderWithPlaces = Order.extend({
+  loadingPlaces: Places,
+  unloadingPlaces: Places,
+});
+export type OrderWithPlaces = z.infer<typeof OrderWithPlaces>;
+
+export const OrderWithId = createSelectSchema(order, {
+  truckID: z.coerce.number(),
+});
 export type OrderWithId = z.infer<typeof OrderWithId>;
 
+export const OrderWithIdAndPlaces = Order.extend({
+  loadingPlaces: Places,
+  unloadingPlaces: Places,
+}).required({ id: true });
+export type OrderWithIdAndPlaces = z.infer<typeof OrderWithIdAndPlaces>;
+
 export const OrderWithIdAndDetails = OrderWithId.extend({
-  status: z.object({
-    name: z.string().min(1),
-  }),
-  truck: z.object({
-    plate: z.string().min(1),
-  }),
-  driver: z.object({
-    firstName: z.string().min(1),
-    lastName: z.string().min(1),
-  }),
-  customer: z.object({
-    name: z.string().min(1),
-  }),
-  loadingPlaces: z
-    .object({
-      id: z.number(),
-      name: z.string(),
-      postal: z.string(),
-      countryID: z.number(),
-    })
-    .array(),
-  unloadingPlaces: z
-    .object({
-      id: z.number(),
-      name: z.string(),
-      postal: z.string(),
-      countryID: z.number(),
-    })
-    .array(),
+  status: z.string().min(1),
+  truck: z.string().min(1),
+  driver: z.string().min(1),
+  customer: z.string().min(1),
+  loadingCity: z.string().min(1),
+  unloadingCity: z.string().min(1),
+  loadingPlaces: Places,
+  unloadingPlaces: Places,
 });
 export type OrderWithIdAndDetails = z.infer<typeof OrderWithIdAndDetails>;
+
+export const OrderFilters = z
+  .object({
+    ...OrderWithId.shape,
+    ...PaginationParams.shape,
+    ...SortParams.shape,
+    globalFilters: z.string(),
+  })
+  .partial();
+export type OrderFilters = z.infer<typeof OrderFilters>;

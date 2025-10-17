@@ -11,7 +11,7 @@ import {
   removeOrder,
   updateOrder,
 } from '@/features/OrderForm/mutations/orderMutation';
-import { OrderWithDetails, OrderWithId } from '@/types/types';
+import { OrderWithDetails, Order } from '@/types/types';
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 import StatusDialog from './status-dialog';
@@ -28,21 +28,21 @@ export default function OrderOptions({ order }: TableRowDropdownProps) {
   const [isStatusOpen, setIsStatusOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
 
-  const editMutation = useOptimisticMutation<OrderWithId>({
+  const { mutate: editMutation, isPending } = useOptimisticMutation<Order>({
     mutationFn: updateOrder,
     queryKey: ['orders'],
     successMessage: `Edytowanie zlecenia nr ${order.orderNr}.`,
     errorMessage: 'Nie udało się edytować zlecenia. Spróbuj ponownie.',
   });
 
-  const statusMutation = useOptimisticMutation<OrderWithId>({
+  const { mutate: statusMutation } = useOptimisticMutation<Order>({
     mutationFn: updateOrder,
     queryKey: ['orders'],
     successMessage: `Zmiana statusu zlecenia nr ${order.orderNr}.`,
     errorMessage: 'Nie udało się zmienić statusu zlecenia. Spróbuj ponownie.',
   });
 
-  const removeMutation = useOptimisticMutation<OrderWithId>({
+  const { mutate: removeMutation } = useOptimisticMutation<Order>({
     mutationFn: removeOrder,
     queryKey: ['orders'],
     successMessage: `Pomyślnie usuniętlo zlecenie nr ${order.orderNr}.`,
@@ -65,7 +65,7 @@ export default function OrderOptions({ order }: TableRowDropdownProps) {
           isOpen={isEditOpen}
           onOpenChange={setIsEditOpen}
           order={order}
-          isPending={editMutation.isPending}
+          isPending={isPending}
           mutation={editMutation}
         />
       )}

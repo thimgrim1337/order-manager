@@ -1,94 +1,106 @@
 import { createFileRoute, useLoaderData } from '@tanstack/react-router';
-import { lazy, useMemo } from 'react';
+import { useMemo } from 'react';
 import countriesQueryOptions from '@/features/OrderForm/queries/countriesQuery';
 import trucksQueryOptions from '@/features/OrderForm/queries/trucksQuery';
-import { getOrdersQueryOptions } from '@/features/TimeTable/queries/ordersQuery';
 import {
   formatDate,
-  getDaysOfWeek,
-  getFirstDayOfWeek,
-  getLastDayOfWeek,
-  getToday,
+  getTwoWeekDays,
+  getFirstDay,
+  getLastDay,
   getWeekNumber,
 } from '@/helpers/dates';
 
 import TimeTablePagination from '@/features/TimeTable/components/time-table-pagination';
-import { useTimeTableData } from '@/features/TimeTable/hooks/useTimeTableData';
-import { z } from 'zod';
-
-const TimeTable = lazy(
-  () => import('@/features/TimeTable/components/time-table')
-);
-const TimeTableHeader = lazy(
-  () => import('@/features/TimeTable/components/time-table-header')
-);
-
-const today = getToday();
-const initialDate = formatDate(getFirstDayOfWeek(today));
-
-const OrderFilterSchema = z.object({
-  truckId: z.coerce.number().min(1).default(1),
-  startDate: z.string().date().default(initialDate),
-});
+import { useQuery, useSuspenseQueries } from '@tanstack/react-query';
+import { TimetableFilters } from '@/types/types';
+import getOrderQueryOptions from '@/features/OrderForm/queries/ordersQuery';
+import PageHeader from '@/components/ui/typography/page-header';
+import driversQueryOptions from '@/features/OrderForm/queries/driversQuery';
+import TimeTableHeader from '@/features/TimeTable/components/time-table-header';
+import TimeTable from '@/features/TimeTable/components/time-table';
 
 export const Route = createFileRoute('/_layout/time-table')({
   loaderDeps: ({ search }) => ({
-    truckId: search.truckId,
+    truckID: search.truckID,
     startDate: search.startDate,
   }),
   loader: async ({
     context: { queryClient },
-    deps: { startDate, truckId },
+    deps: { truckID, startDate },
   }) => {
-    const weekNumber = getWeekNumber(startDate);
-    const firstDayOfWeek = getFirstDayOfWeek(startDate);
-    const lastDayOfWeek = getLastDayOfWeek(startDate);
+    const firstDay = getFirstDay(startDate);
+    const lastDay = getLastDay(startDate);
+    const weekNumber = getWeekNumber(firstDay);
 
     await Promise.allSettled([
       queryClient.ensureQueryData(trucksQueryOptions),
+      queryClient.ensureQueryData(driversQueryOptions),
       queryClient.ensureQueryData(countriesQueryOptions),
       queryClient.ensureQueryData(
-        getOrdersQueryOptions(truckId, firstDayOfWeek, lastDayOfWeek)
+        getOrderQueryOptions({
+          startDate: formatDate(firstDay),
+          endDate: formatDate(lastDay),
+        })
       ),
     ]);
 
     return {
+      truckID,
+      firstDay,
       weekNumber,
-      truckId,
-      firstDayOfWeek,
-      lastDayOfWeek,
+      lastDay,
     };
   },
-  validateSearch: (search: Record<string, unknown>) =>
-    OrderFilterSchema.parse(search),
+  validateSearch: (search: TimetableFilters) => TimetableFilters.parse(search),
   component: TimetablePage,
 });
 
 function TimetablePage() {
-  const { weekNumber, lastDayOfWeek, firstDayOfWeek, truckId } = useLoaderData({
+  const { truckID, firstDay, lastDay } = useLoaderData({
     from: '/_layout/time-table',
   });
 
-  const { orders, trucks, countries } = useTimeTableData(
-    truckId,
-    firstDayOfWeek,
-    lastDayOfWeek
+  const [{ data: trucks }, { data: countries }, { data: drivers }] =
+    useSuspenseQueries({
+      queries: [trucksQueryOptions, countriesQueryOptions, driversQueryOptions],
+    });
+
+  const { data: orders } = useQuery(
+    getOrderQueryOptions({
+      truckID,
+      startDate: formatDate(firstDay),
+      endDate: formatDate(lastDay),
+    })
   );
 
-  const daysOfWeek = useMemo(
-    () => getDaysOfWeek(firstDayOfWeek, lastDayOfWeek),
-    [firstDayOfWeek, lastDayOfWeek]
+  const days = useMemo(
+    () => getTwoWeekDays(firstDay, lastDay),
+    [firstDay, lastDay]
   );
+
+  const sortedOrders =
+    orders &&
+    [...orders.data]
+      .sort((a, b) => Date.parse(a.startDate) - Date.parse(b.startDate))
+      .sort((a, b) => a.driverID - b.driverID);
 
   return (
-    <div className='container mx-auto py-10'>
-      <TimeTableHeader trucks={trucks} />
-      <TimeTable
-        orders={orders}
-        countries={countries}
-        daysOfWeek={daysOfWeek}
-        weekNumber={weekNumber}
+    <div className='container mx-auto p-10'>
+      <PageHeader
+        h2Text='Harmonogram transportu'
+        subText='Tablica czasu operacji transportowych'
+        className='mb-10'
       />
+
+      <TimeTableHeader trucks={trucks} drivers={drivers} />
+
+      <TimeTable
+        orders={sortedOrders || []}
+        countries={countries}
+        daysOfWeek={days}
+      />
+      <TimeTablePagination />
+
       <TimeTablePagination />
     </div>
   );

@@ -1,21 +1,27 @@
 import { relations } from 'drizzle-orm';
-import { serial, pgTable, varchar, unique } from 'drizzle-orm/pg-core';
+import {
+  serial,
+  pgTable,
+  text,
+  integer,
+  AnyPgColumn,
+} from 'drizzle-orm/pg-core';
 import order from './order';
+import truck from './truck';
 
-const driver = pgTable(
-  'driver',
-  {
-    id: serial().primaryKey(),
-    firstName: varchar('first_name', { length: 20 }).notNull(),
-    lastName: varchar('last_name', { length: 20 }).notNull(),
-  },
-  (table) => ({
-    pk: unique('full_name').on(table.firstName, table.lastName),
-  })
-);
+export const driver = pgTable('drivers', {
+  id: serial('id').primaryKey(),
+  firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull(),
+  truckID: integer('truck_id').references((): AnyPgColumn => driver.id),
+});
 
-export const driverRelations = relations(driver, ({ many }) => ({
+export const driverRelations = relations(driver, ({ one, many }) => ({
   orders: many(order),
+  truck: one(truck, {
+    fields: [driver.truckID],
+    references: [truck.id],
+  }),
 }));
 
 export default driver;

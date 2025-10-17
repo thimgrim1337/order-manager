@@ -11,8 +11,8 @@ export default function ErrorComponent({
   const isDev = process.env.NODE_ENV !== 'production';
 
   return (
-    <div className='mt-8 flex items-center justify-center p-4'>
-      <div className='w-full max-w-md'>
+    <div className='container flex items-center justify-center p-10 mt-4'>
+      <div className='w-full max-w-xl'>
         <div>
           <h2>Oops! Something went wrong</h2>
           <p>We&apos;re sorry, but we encountered an unexpected error.</p>

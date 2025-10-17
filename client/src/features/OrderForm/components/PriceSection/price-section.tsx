@@ -2,7 +2,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/primitives/form';
 import { Input } from '@/components/ui/primitives/input';
@@ -15,8 +14,9 @@ import {
 } from '@/components/ui/primitives/select';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Currencies, Order } from '@/types/types';
-import { LoaderCircle } from 'lucide-react';
+import { BadgeEuro, Banknote, LoaderCircle } from 'lucide-react';
 import useCurrencyRate from '../../hooks/useCurrencyRate';
+import FormLabel from '@/components/ui/form/form-label';
 
 const currencies: Currencies[] = ['PLN', 'EUR'];
 
@@ -36,7 +36,7 @@ export default function PriceSection() {
         name='priceCurrency'
         render={({ field }) => (
           <FormItem className='w-full'>
-            <FormLabel>Cena w walucie</FormLabel>
+            <FormLabel Icon={Banknote}>Cena</FormLabel>
             <FormControl>
               <Input placeholder='5000' type='number' {...field} />
             </FormControl>
@@ -49,7 +49,7 @@ export default function PriceSection() {
         name='currency'
         render={({ field }) => (
           <FormItem className='w-full'>
-            <FormLabel>Waluta</FormLabel>
+            <FormLabel Icon={BadgeEuro}>Waluta</FormLabel>
 
             <Select onValueChange={field.onChange} value={field.value}>
               <FormControl>

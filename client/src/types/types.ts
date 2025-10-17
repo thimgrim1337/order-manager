@@ -1,3 +1,4 @@
+import { initialDate } from '@/helpers/dates';
 import { isAfter } from 'date-fns';
 import { z } from 'zod/v4';
 
@@ -33,13 +34,14 @@ export type CountryWithId = WithId<Country>;
 
 export const Order = z
   .object({
+    id: z.number().optional(),
     orderNr: z
       .string()
       .min(1, { message: 'Nr zlecenia jest zbyt krótki.' })
       .max(30, { message: 'Nr zlecenia jest zbyt długi.' }),
     startDate: z.string(),
     endDate: z.string(),
-    statusID: z.number().min(1).max(3).default(1),
+    statusID: z.number().min(1).max(3),
     priceCurrency: z
       .string()
       .transform((val) => Number(val))
@@ -51,9 +53,9 @@ export const Order = z
     pricePLN: z.string(),
     currency: z.enum(['PLN', 'EUR'], { message: 'Wybierz walutę.' }),
     currencyRate: z.string(),
-    truckID: z.number({ message: 'Wybierz pojazd.' }).min(1),
-    driverID: z.number({ message: 'Wybierz kierowcę.' }).min(1),
-    customerID: z.number({ message: 'Wybierz zleceniodawcę.' }).min(1),
+    truckID: z.number().min(1, { message: 'Wybierz pojazd.' }),
+    driverID: z.number().min(1, { message: 'Wybierz kierowcę.' }),
+    customerID: z.number().min(1, { message: 'Wybierz zleceniodawcę.' }),
     loadingPlaces: City.array().min(1, {
       message: 'Wybierz co najmniej jedno miejsce załadunku.',
     }),
@@ -66,19 +68,16 @@ export const Order = z
     path: ['startDate'],
   });
 export type Order = z.infer<typeof Order>;
-export const OrderWithId = Order.extend({ id: z.number() });
-export type OrderWithId = z.infer<typeof OrderWithId>;
 
-export const OrderStatus = z.object({
-  name: z.enum(['W trakcie', 'Anulowane', 'Zakończone']),
-});
+export const OrderStatus = z.enum(['w trakcie', 'anulowane', 'zakończone']);
 export type OrderStatus = z.infer<typeof OrderStatus>;
 export type OrderStatusWithId = WithId<OrderStatus>;
 
 export const Truck = z.object({
   plate: z.string().min(4).max(8),
-  insuranceEndAt: z.string().date(),
-  serviceEndAt: z.string().date(),
+  insuranceEndAt: z.date(),
+  serviceEndAt: z.date(),
+  driverID: z.number().optional(),
 });
 export type Truck = z.infer<typeof Truck>;
 export type TruckWithId = WithId<Truck>;
@@ -86,6 +85,7 @@ export type TruckWithId = WithId<Truck>;
 export const Driver = z.object({
   firstName: z.string().max(20).min(2),
   lastName: z.string().max(20).min(2),
+  truckID: z.number().optional(),
 });
 export type Driver = z.infer<typeof Driver>;
 export type DriverWithId = WithId<Driver>;
@@ -102,13 +102,26 @@ export type Customer = z.infer<typeof Customer>;
 export type CustomerWithId = WithId<Customer>;
 
 export const OrderDetails = z.object({
-  status: OrderStatus,
-  truck: Truck,
-  driver: Driver,
-  customer: Customer,
+  status: z.string().min(1),
+  truck: z.string().min(1),
+  driver: z.string().min(1),
+  customer: z.string().min(1),
+  loadingCity: z.string().min(1),
+  unloadingCity: z.string().min(1),
+  loadingPlaces: City.array(),
+  unloadingPlaces: City.array(),
 });
 export type OrderDetails = z.infer<typeof OrderDetails>;
-export type OrderWithDetails = OrderWithId & OrderDetails;
+export const OrderWithDetails = z.object({
+  ...Order.shape,
+  ...OrderDetails.shape,
+});
+export type OrderWithDetails = z.infer<typeof OrderWithDetails>;
+
+export type WithRowCount<T> = {
+  data: T[];
+  rowCount: number;
+};
 
 export type CurrencyRate = {
   table: string;
@@ -142,3 +155,45 @@ export type ApiError = {
   message: string;
   statusCode: number | string;
 };
+
+const PaginationParams = z.object({
+  pageIndex: z.number().min(0).default(0),
+  pageSize: z.number().min(10).max(100).default(10),
+});
+
+const SortParams = z.object({
+  sortBy: z.templateLiteral([
+    z.string(),
+    z.literal('.'),
+    z.enum(['asc', 'desc']),
+  ]),
+});
+export type SortParams = z.infer<typeof SortParams>;
+
+export const OrderFilters = z
+  .object({
+    ...Order.omit({
+      loadingPlaces: true,
+      unloadingPlaces: true,
+    }).shape,
+    ...OrderDetails.pick({ loadingCity: true, unloadingCity: true }).shape,
+    globalFilters: z.string(),
+    ...PaginationParams.shape,
+    ...SortParams.shape,
+  })
+  .partial();
+export type OrderFilters = z.infer<typeof OrderFilters>;
+
+export const TimetableFilters = z.object({
+  truckID: z.number().optional().default(0),
+  startDate: z.string().default(initialDate),
+  endDate: z.string().optional(),
+});
+
+export type TimetableFilters = z.infer<typeof TimetableFilters>;
+export const CustomerFilters = z
+  .object({
+    searchQuery: z.string(),
+  })
+  .partial();
+export type CustomerFilters = z.infer<typeof CustomerFilters>;

@@ -10,43 +10,66 @@
 
 import { createFileRoute } from '@tanstack/react-router'
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as LayoutRouteImport } from './routes/_layout'
+import { Route as LayoutTimeTableRouteImport } from './routes/_layout.time-table'
+import { Route as LayoutOrdersRouteImport } from './routes/_layout.orders'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as LayoutImport } from './routes/_layout'
-import { Route as LayoutTimeTableImport } from './routes/_layout.time-table'
-import { Route as LayoutOrdersImport } from './routes/_layout.orders'
+const LayoutIndexLazyRouteImport = createFileRoute('/_layout/')()
 
-// Create Virtual Routes
-
-const LayoutIndexLazyImport = createFileRoute('/_layout/')()
-
-// Create/Update Routes
-
-const LayoutRoute = LayoutImport.update({
+const LayoutRoute = LayoutRouteImport.update({
   id: '/_layout',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const LayoutIndexLazyRoute = LayoutIndexLazyImport.update({
+const LayoutIndexLazyRoute = LayoutIndexLazyRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => LayoutRoute,
 } as any).lazy(() => import('./routes/_layout.index.lazy').then((d) => d.Route))
-
-const LayoutTimeTableRoute = LayoutTimeTableImport.update({
+const LayoutTimeTableRoute = LayoutTimeTableRouteImport.update({
   id: '/time-table',
   path: '/time-table',
   getParentRoute: () => LayoutRoute,
 } as any)
-
-const LayoutOrdersRoute = LayoutOrdersImport.update({
+const LayoutOrdersRoute = LayoutOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
   getParentRoute: () => LayoutRoute,
 } as any)
 
-// Populate the FileRoutesByPath interface
+export interface FileRoutesByFullPath {
+  '/orders': typeof LayoutOrdersRoute
+  '/time-table': typeof LayoutTimeTableRoute
+  '/': typeof LayoutIndexLazyRoute
+}
+export interface FileRoutesByTo {
+  '/orders': typeof LayoutOrdersRoute
+  '/time-table': typeof LayoutTimeTableRoute
+  '/': typeof LayoutIndexLazyRoute
+}
+export interface FileRoutesById {
+  __root__: typeof rootRouteImport
+  '/_layout': typeof LayoutRouteWithChildren
+  '/_layout/orders': typeof LayoutOrdersRoute
+  '/_layout/time-table': typeof LayoutTimeTableRoute
+  '/_layout/': typeof LayoutIndexLazyRoute
+}
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/orders' | '/time-table' | '/'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/orders' | '/time-table' | '/'
+  id:
+    | '__root__'
+    | '/_layout'
+    | '/_layout/orders'
+    | '/_layout/time-table'
+    | '/_layout/'
+  fileRoutesById: FileRoutesById
+}
+export interface RootRouteChildren {
+  LayoutRoute: typeof LayoutRouteWithChildren
+}
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
@@ -54,34 +77,32 @@ declare module '@tanstack/react-router' {
       id: '/_layout'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof LayoutImport
-      parentRoute: typeof rootRoute
-    }
-    '/_layout/orders': {
-      id: '/_layout/orders'
-      path: '/orders'
-      fullPath: '/orders'
-      preLoaderRoute: typeof LayoutOrdersImport
-      parentRoute: typeof LayoutImport
-    }
-    '/_layout/time-table': {
-      id: '/_layout/time-table'
-      path: '/time-table'
-      fullPath: '/time-table'
-      preLoaderRoute: typeof LayoutTimeTableImport
-      parentRoute: typeof LayoutImport
+      preLoaderRoute: typeof LayoutRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_layout/': {
       id: '/_layout/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof LayoutIndexLazyImport
-      parentRoute: typeof LayoutImport
+      preLoaderRoute: typeof LayoutIndexLazyRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/time-table': {
+      id: '/_layout/time-table'
+      path: '/time-table'
+      fullPath: '/time-table'
+      preLoaderRoute: typeof LayoutTimeTableRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/orders': {
+      id: '/_layout/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof LayoutOrdersRouteImport
+      parentRoute: typeof LayoutRoute
     }
   }
 }
-
-// Create and export the route tree
 
 interface LayoutRouteChildren {
   LayoutOrdersRoute: typeof LayoutOrdersRoute
@@ -98,82 +119,9 @@ const LayoutRouteChildren: LayoutRouteChildren = {
 const LayoutRouteWithChildren =
   LayoutRoute._addFileChildren(LayoutRouteChildren)
 
-export interface FileRoutesByFullPath {
-  '': typeof LayoutRouteWithChildren
-  '/orders': typeof LayoutOrdersRoute
-  '/time-table': typeof LayoutTimeTableRoute
-  '/': typeof LayoutIndexLazyRoute
-}
-
-export interface FileRoutesByTo {
-  '/orders': typeof LayoutOrdersRoute
-  '/time-table': typeof LayoutTimeTableRoute
-  '/': typeof LayoutIndexLazyRoute
-}
-
-export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/_layout': typeof LayoutRouteWithChildren
-  '/_layout/orders': typeof LayoutOrdersRoute
-  '/_layout/time-table': typeof LayoutTimeTableRoute
-  '/_layout/': typeof LayoutIndexLazyRoute
-}
-
-export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/orders' | '/time-table' | '/'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/orders' | '/time-table' | '/'
-  id:
-    | '__root__'
-    | '/_layout'
-    | '/_layout/orders'
-    | '/_layout/time-table'
-    | '/_layout/'
-  fileRoutesById: FileRoutesById
-}
-
-export interface RootRouteChildren {
-  LayoutRoute: typeof LayoutRouteWithChildren
-}
-
 const rootRouteChildren: RootRouteChildren = {
   LayoutRoute: LayoutRouteWithChildren,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/_layout"
-      ]
-    },
-    "/_layout": {
-      "filePath": "_layout.tsx",
-      "children": [
-        "/_layout/orders",
-        "/_layout/time-table",
-        "/_layout/"
-      ]
-    },
-    "/_layout/orders": {
-      "filePath": "_layout.orders.tsx",
-      "parent": "/_layout"
-    },
-    "/_layout/time-table": {
-      "filePath": "_layout.time-table.tsx",
-      "parent": "/_layout"
-    },
-    "/_layout/": {
-      "filePath": "_layout.index.lazy.tsx",
-      "parent": "/_layout"
-    }
-  }
-}
-ROUTE_MANIFEST_END */

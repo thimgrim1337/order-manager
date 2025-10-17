@@ -19,6 +19,7 @@ beforeEach(() => {
     statusID: 3,
     pricePLN: '0',
     priceCurrency: '10000.00',
+    currencyRate: '1',
     truckID: 4,
     driverID: 5,
     customerID: 3,

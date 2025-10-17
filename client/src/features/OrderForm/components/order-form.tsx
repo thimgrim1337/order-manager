@@ -1,4 +1,4 @@
-import { DefaultValues, SubmitHandler, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Form } from '@/components/ui/primitives/form';
 import { Button } from '@/components/ui/primitives/button';
 import { LoaderCircle } from 'lucide-react';
@@ -11,51 +11,52 @@ import PriceSection from './PriceSection/price-section';
 import TruckSection from './TruckSection/truck-section';
 import PlacesSection from './PlaceSection/places';
 import { UseMutationResult } from '@tanstack/react-query';
-import { Order, OrderWithId } from '@/types/types';
-import { Dispatch, SetStateAction } from 'react';
-
+import { Order } from '@/types/types';
+import { Dispatch, SetStateAction, Suspense } from 'react';
 import { customResolver } from '@/lib/customResolver';
 
 const today = getToday();
 const tomorrow = getTomorrow(today);
 
-const initialValues = {
+const initialValues: Order = {
   orderNr: '',
   startDate: formatDate(today),
   endDate: formatDate(tomorrow),
-  statusId: 1,
+  statusID: 1,
   priceCurrency: '',
   pricePLN: '',
   currencyRate: '0',
   currency: 'PLN',
-  truckId: undefined,
-  driverId: undefined,
-  customerId: undefined,
+  truckID: 0,
+  driverID: 0,
+  customerID: 0,
   loadingPlaces: [],
   unloadingPlaces: [],
 };
 
-type OrderFormProps<T> = {
-  values?: T;
-  mutation: UseMutationResult<unknown, Error, T, unknown>;
+type OrderFormProps = {
+  values?: Order;
+  mutation: UseMutationResult<unknown, Error, Order, unknown>['mutate'];
   isPending: boolean;
   onOpenChange?: Dispatch<SetStateAction<boolean>>;
 };
 
-export default function OrderForm<T extends Order>({
+export default function OrderForm({
   mutation,
-  values,
   isPending,
   onOpenChange,
-}: OrderFormProps<T>) {
+  values,
+}: OrderFormProps) {
   const { showBoundary } = useErrorBoundary();
 
-  const form = useForm<T>({
-    resolver: customResolver<T>(values ? OrderWithId : Order),
-    defaultValues: (values || initialValues) as DefaultValues<T>,
+  const form = useForm({
+    resolver: customResolver(Order),
+    defaultValues: values || initialValues,
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
   });
 
-  const handleSubmit: SubmitHandler<T> = async (formValues) => {
+  const handleSubmit = async (formValues: Order) => {
     try {
       const order = { ...formValues };
 
@@ -66,8 +67,8 @@ export default function OrderForm<T extends Order>({
             )
           : order.priceCurrency;
 
-      mutation.mutate(order, {
-        onSettled: () => onOpenChange && onOpenChange(false),
+      mutation(order, {
+        onSuccess: () => onOpenChange && onOpenChange(false),
       });
     } catch (error) {
       showBoundary({
@@ -77,6 +78,8 @@ export default function OrderForm<T extends Order>({
     }
   };
 
+  const label = values ? 'Edytuj zlecenie' : 'Dodaj zlecenie';
+
   return (
     <Form {...form}>
       <form
@@ -85,16 +88,15 @@ export default function OrderForm<T extends Order>({
         })}
         className='space-y-8'
       >
-        <CustomerSection />
-        <DatesSection />
-        <PlacesSection />
-        <PriceSection />
-        <TruckSection />
-        <Button
-          type='submit'
-          aria-label={values ? 'Edytuj zlecenie' : 'Dodaj zlecenie'}
-        >
-          {values ? 'Edytuj' : 'Dodaj'}
+        <Suspense fallback={<p>Loading....</p>}>
+          <CustomerSection customerID={values?.customerID} />
+          <DatesSection />
+          <PlacesSection />
+          <PriceSection />
+          <TruckSection />
+        </Suspense>
+        <Button type='submit' aria-label={label} disabled={isPending}>
+          {label}
           {isPending && <LoaderCircle className='animate-spin' />}
         </Button>
         <DevTool control={form.control} />

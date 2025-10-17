@@ -1,50 +1,67 @@
-import { useMemo } from 'react';
-import { Link, useSearch } from '@tanstack/react-router';
-import { TruckWithId } from '@/types/types';
+import { useNavigate, useSearch } from '@tanstack/react-router';
+import { DriverWithId, TruckWithId } from '@/types/types';
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/primitives/select';
+import { RotateCcw, User } from 'lucide-react';
 import { Button } from '@/components/ui/primitives/button';
 
 type TimeTableHeaderProps = {
   trucks: TruckWithId[];
+  drivers: DriverWithId[];
 };
 
-export default function TimeTableHeader({ trucks }: TimeTableHeaderProps) {
-  return (
-    <ul className='flex gap-2 p-2'>
-      {trucks.map((truck) => (
-        <TimeTableHeaderButton truck={truck} key={truck.id} />
-      ))}
-    </ul>
-  );
-}
-
-type TimeTableHeaderButtonProps = {
-  truck: TruckWithId;
-};
-
-function TimeTableHeaderButton({ truck }: TimeTableHeaderButtonProps) {
-  const { truckId: selectedTruckId, startDate } = useSearch({
+export default function TimeTableHeader({
+  trucks,
+  drivers,
+}: TimeTableHeaderProps) {
+  const { truckID: selectedTruckID, startDate } = useSearch({
     from: '/_layout/time-table',
   });
+  const navigate = useNavigate({ from: '/time-table' });
 
-  const isSelected = truck.id === selectedTruckId;
-
-  const search = useMemo(
-    () => ({ truckId: truck.id, startDate }),
-    [truck.id, startDate]
-  );
+  const assignedDriver = drivers
+    .filter((driver) => driver.truckID === selectedTruckID)
+    .map((driver) => `${driver.firstName} ${driver.lastName}`);
 
   return (
-    <li>
-      <Button
-        variant={'outline'}
-        className={isSelected ? 'border-gray-950' : ''}
-        asChild
-      >
-        <Link from='/time-table' search={search}>
-          <span className='sr-only'>{truck.plate}</span>
-          {truck.plate}
-        </Link>
-      </Button>
-    </li>
+    <div className='mb-3 flex flex-col gap-2'>
+      <div className='text-sm flex gap-2 items-end'>
+        <User />{' '}
+        {assignedDriver.length ? assignedDriver : 'Kierowca nieprzypisany'}
+      </div>
+      <div className='flex gap-2'>
+        <Select
+          defaultValue={selectedTruckID.toString()}
+          value={selectedTruckID === 0 ? '' : selectedTruckID.toString()}
+          onValueChange={(value) =>
+            navigate({ search: { truckID: +value, startDate } })
+          }
+        >
+          <SelectTrigger className='w-[280px]'>
+            <SelectValue placeholder='Pojazd' />
+          </SelectTrigger>
+          <SelectContent className='max-h-[300px]'>
+            {trucks.map((truck) => (
+              <SelectItem value={truck.id.toString()} key={truck.id}>
+                {truck.plate}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button
+          onClick={() => navigate({ search: { truckID: 0, startDate } })}
+          variant={'ghost'}
+          className='flex items-center'
+        >
+          <RotateCcw /> Pokaż wszystkich
+        </Button>
+      </div>
+    </div>
   );
 }

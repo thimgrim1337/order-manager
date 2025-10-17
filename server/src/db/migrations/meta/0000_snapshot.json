@@ -1,76 +1,11 @@
 {
-  "id": "84a69c60-1ed2-482a-9ce5-fac765953c6a",
+  "id": "5dc6b95a-2e65-4597-8f7c-c8b400c487c1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.address": {
-      "name": "address",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "street": {
-          "name": "street",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "street_nr": {
-          "name": "street_nr",
-          "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "postal": {
-          "name": "postal",
-          "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "city": {
-          "name": "city",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "country_id": {
-          "name": "country_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "address_country_id_country_id_fk": {
-          "name": "address_country_id_country_id_fk",
-          "tableFrom": "address",
-          "tableTo": "country",
-          "columnsFrom": ["country_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "address_street_street_nr_city_country_id_unique": {
-          "name": "address_street_street_nr_city_country_id_unique",
-          "nullsNotDistinct": false,
-          "columns": ["street", "street_nr", "city", "country_id"]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.city": {
-      "name": "city",
+    "public.cities": {
+      "name": "cities",
       "schema": "",
       "columns": {
         "id": {
@@ -81,13 +16,13 @@
         },
         "name": {
           "name": "name",
-          "type": "varchar(255)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
         "postal": {
           "name": "postal",
-          "type": "varchar(10)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -98,12 +33,28 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_cities_name_lower": {
+          "name": "idx_cities_name_lower",
+          "columns": [
+            {
+              "expression": "LOWER(\"name\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "city_country_id_country_id_fk": {
-          "name": "city_country_id_country_id_fk",
-          "tableFrom": "city",
-          "tableTo": "country",
+        "cities_country_id_countries_id_fk": {
+          "name": "cities_country_id_countries_id_fk",
+          "tableFrom": "cities",
+          "tableTo": "countries",
           "columnsFrom": ["country_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
@@ -112,8 +63,8 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "city_pk": {
-          "name": "city_pk",
+        "cities_name_postal_country_id_unique": {
+          "name": "cities_name_postal_country_id_unique",
           "nullsNotDistinct": false,
           "columns": ["name", "postal", "country_id"]
         }
@@ -122,8 +73,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.country": {
-      "name": "country",
+    "public.countries": {
+      "name": "countries",
       "schema": "",
       "columns": {
         "id": {
@@ -134,13 +85,13 @@
         },
         "name": {
           "name": "name",
-          "type": "varchar(45)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
         "code": {
           "name": "code",
-          "type": "varchar(2)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         }
@@ -149,13 +100,13 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "country_name_unique": {
-          "name": "country_name_unique",
+        "countries_name_unique": {
+          "name": "countries_name_unique",
           "nullsNotDistinct": false,
           "columns": ["name"]
         },
-        "country_code_unique": {
-          "name": "country_code_unique",
+        "countries_code_unique": {
+          "name": "countries_code_unique",
           "nullsNotDistinct": false,
           "columns": ["code"]
         }
@@ -164,8 +115,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.customer": {
-      "name": "customer",
+    "public.customers": {
+      "name": "customers",
       "schema": "",
       "columns": {
         "id": {
@@ -176,28 +127,44 @@
         },
         "tax_nr": {
           "name": "tax_nr",
-          "type": "varchar(15)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
         "name": {
           "name": "name",
-          "type": "varchar(50)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_customers_name_lower": {
+          "name": "idx_customers_name_lower",
+          "columns": [
+            {
+              "expression": "LOWER(\"name\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "customer_tax_nr_unique": {
-          "name": "customer_tax_nr_unique",
+        "customers_tax_nr_unique": {
+          "name": "customers_tax_nr_unique",
           "nullsNotDistinct": false,
           "columns": ["tax_nr"]
         },
-        "customer_name_unique": {
-          "name": "customer_name_unique",
+        "customers_name_unique": {
+          "name": "customers_name_unique",
           "nullsNotDistinct": false,
           "columns": ["name"]
         }
@@ -206,8 +173,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.driver": {
-      "name": "driver",
+    "public.drivers": {
+      "name": "drivers",
       "schema": "",
       "columns": {
         "id": {
@@ -218,27 +185,37 @@
         },
         "first_name": {
           "name": "first_name",
-          "type": "varchar(20)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
         "last_name": {
           "name": "last_name",
-          "type": "varchar(20)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "truck_id": {
+          "name": "truck_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "full_name": {
-          "name": "full_name",
-          "nullsNotDistinct": false,
-          "columns": ["first_name", "last_name"]
+      "foreignKeys": {
+        "drivers_truck_id_drivers_id_fk": {
+          "name": "drivers_truck_id_drivers_id_fk",
+          "tableFrom": "drivers",
+          "tableTo": "drivers",
+          "columnsFrom": ["truck_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -247,12 +224,6 @@
       "name": "order_loading_places",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": false,
-          "notNull": true
-        },
         "order_id": {
           "name": "order_id",
           "type": "integer",
@@ -266,21 +237,37 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_loading_places_order_id": {
+          "name": "idx_loading_places_order_id",
+          "columns": [
+            {
+              "expression": "order_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "order_loading_places_order_id_order_id_fk": {
-          "name": "order_loading_places_order_id_order_id_fk",
+        "order_loading_places_order_id_orders_id_fk": {
+          "name": "order_loading_places_order_id_orders_id_fk",
           "tableFrom": "order_loading_places",
-          "tableTo": "order",
+          "tableTo": "orders",
           "columnsFrom": ["order_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "order_loading_places_place_id_city_id_fk": {
-          "name": "order_loading_places_place_id_city_id_fk",
+        "order_loading_places_place_id_cities_id_fk": {
+          "name": "order_loading_places_place_id_cities_id_fk",
           "tableFrom": "order_loading_places",
-          "tableTo": "city",
+          "tableTo": "cities",
           "columnsFrom": ["place_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
@@ -298,8 +285,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.order": {
-      "name": "order",
+    "public.orders": {
+      "name": "orders",
       "schema": "",
       "columns": {
         "id": {
@@ -308,9 +295,16 @@
           "primaryKey": true,
           "notNull": true
         },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
         "order_nr": {
           "name": "order_nr",
-          "type": "varchar(30)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -348,17 +342,16 @@
         },
         "currency": {
           "name": "currency",
-          "type": "varchar(3)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'PLN'"
         },
         "currency_rate": {
           "name": "currency_rate",
-          "type": "numeric(10, 4)",
+          "type": "numeric(5, 4)",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'1'"
+          "notNull": true
         },
         "truck_id": {
           "name": "truck_id",
@@ -379,39 +372,85 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_orders_order_nr_lower": {
+          "name": "idx_orders_order_nr_lower",
+          "columns": [
+            {
+              "expression": "LOWER(\"order_nr\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idex_orders_start_date_date": {
+          "name": "idex_orders_start_date_date",
+          "columns": [
+            {
+              "expression": "DATE(\"start_date\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idex_orders_end_date_date": {
+          "name": "idex_orders_end_date_date",
+          "columns": [
+            {
+              "expression": "DATE(\"end_date\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "order_status_id_status_id_fk": {
-          "name": "order_status_id_status_id_fk",
-          "tableFrom": "order",
-          "tableTo": "status",
+        "orders_status_id_statuses_id_fk": {
+          "name": "orders_status_id_statuses_id_fk",
+          "tableFrom": "orders",
+          "tableTo": "statuses",
           "columnsFrom": ["status_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "order_truck_id_truck_id_fk": {
-          "name": "order_truck_id_truck_id_fk",
-          "tableFrom": "order",
-          "tableTo": "truck",
+        "orders_truck_id_trucks_id_fk": {
+          "name": "orders_truck_id_trucks_id_fk",
+          "tableFrom": "orders",
+          "tableTo": "trucks",
           "columnsFrom": ["truck_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "order_driver_id_driver_id_fk": {
-          "name": "order_driver_id_driver_id_fk",
-          "tableFrom": "order",
-          "tableTo": "driver",
+        "orders_driver_id_drivers_id_fk": {
+          "name": "orders_driver_id_drivers_id_fk",
+          "tableFrom": "orders",
+          "tableTo": "drivers",
           "columnsFrom": ["driver_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "order_customer_id_customer_id_fk": {
-          "name": "order_customer_id_customer_id_fk",
-          "tableFrom": "order",
-          "tableTo": "customer",
+        "orders_customer_id_customers_id_fk": {
+          "name": "orders_customer_id_customers_id_fk",
+          "tableFrom": "orders",
+          "tableTo": "customers",
           "columnsFrom": ["customer_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
@@ -424,8 +463,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.status": {
-      "name": "status",
+    "public.statuses": {
+      "name": "statuses",
       "schema": "",
       "columns": {
         "id": {
@@ -436,17 +475,33 @@
         },
         "name": {
           "name": "name",
-          "type": "varchar(20)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_statuses_name_lower": {
+          "name": "idx_statuses_name_lower",
+          "columns": [
+            {
+              "expression": "LOWER(\"name\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "status_name_unique": {
-          "name": "status_name_unique",
+        "statuses_name_unique": {
+          "name": "statuses_name_unique",
           "nullsNotDistinct": false,
           "columns": ["name"]
         }
@@ -455,8 +510,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.truck": {
-      "name": "truck",
+    "public.trucks": {
+      "name": "trucks",
       "schema": "",
       "columns": {
         "id": {
@@ -467,7 +522,7 @@
         },
         "plate": {
           "name": "plate",
-          "type": "varchar(10)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -486,12 +541,28 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_trucks_plate_lower": {
+          "name": "idx_trucks_plate_lower",
+          "columns": [
+            {
+              "expression": "LOWER(\"plate\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "truck_plate_unique": {
-          "name": "truck_plate_unique",
+        "trucks_plate_unique": {
+          "name": "trucks_plate_unique",
           "nullsNotDistinct": false,
           "columns": ["plate"]
         }
@@ -504,12 +575,6 @@
       "name": "order_unloading_places",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": false,
-          "notNull": true
-        },
         "order_id": {
           "name": "order_id",
           "type": "integer",
@@ -523,21 +588,37 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_unloading_places_order_id": {
+          "name": "idx_unloading_places_order_id",
+          "columns": [
+            {
+              "expression": "order_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "order_unloading_places_order_id_order_id_fk": {
-          "name": "order_unloading_places_order_id_order_id_fk",
+        "order_unloading_places_order_id_orders_id_fk": {
+          "name": "order_unloading_places_order_id_orders_id_fk",
           "tableFrom": "order_unloading_places",
-          "tableTo": "order",
+          "tableTo": "orders",
           "columnsFrom": ["order_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "order_unloading_places_place_id_city_id_fk": {
-          "name": "order_unloading_places_place_id_city_id_fk",
+        "order_unloading_places_place_id_cities_id_fk": {
+          "name": "order_unloading_places_place_id_cities_id_fk",
           "tableFrom": "order_unloading_places",
-          "tableTo": "city",
+          "tableTo": "cities",
           "columnsFrom": ["place_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
@@ -551,6 +632,54 @@
         }
       },
       "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "username": {
+          "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_username_unique": {
+          "name": "users_username_unique",
+          "nullsNotDistinct": false,
+          "columns": ["username"]
+        },
+        "users_token_unique": {
+          "name": "users_token_unique",
+          "nullsNotDistinct": false,
+          "columns": ["token"]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

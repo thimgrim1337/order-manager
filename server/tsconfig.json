@@ -13,16 +13,16 @@
     "skipLibCheck": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitAny": true,
-
-    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
+
   "tsc-alias": {
     "resolveFullPaths": true,
     "verbose": false
   },
-  "include": ["src", "src/drizzle.config.ts"],
+  "include": ["src", "drizzle.config.ts"],
   "exclude": ["node_modules"]
 }

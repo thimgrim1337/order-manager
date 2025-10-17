@@ -7,4 +7,3 @@ export { default as truck } from './truck';
 export { default as loadingPlaces } from './loadingPlace';
 export { default as unloadingPlaces } from './unloadingPlace';
 export { default as country } from './country';
-export { default as address } from './address';

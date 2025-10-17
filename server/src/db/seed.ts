@@ -25,25 +25,23 @@ for (const table of [
   schema.truck,
   schema.status,
   schema.country,
-  schema.address,
   schema.city,
   schema.customer,
-  // schema.order,
+  schema.order,
   schema.loadingPlaces,
   schema.unloadingPlaces,
 ]) {
   await resetTable(db, table);
 }
 
+await seeds.customer(db);
 await seeds.driver(db);
 await seeds.truck(db);
 await seeds.status(db);
 await seeds.country(db);
-await seeds.address(db);
-await seeds.city(db);
-await seeds.customer(db);
-await seeds.order(db);
-await seeds.loadingPlaces(db);
-await seeds.unloadingPlaces(db);
+// await seeds.city(db);
+// await seeds.order(db);
+// await seeds.loadingPlaces(db);
+// await seeds.unloadingPlaces(db);
 
 await connection.end();

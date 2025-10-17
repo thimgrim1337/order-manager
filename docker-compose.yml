@@ -1,4 +1,10 @@
 services:
+  # fronted:
+  #  build: ./client
+  #  ports:
+  #   - '5173:5173'
+  #  volumes:
+  #   - ./client:/app
   db:
     image: postgres
     environment:

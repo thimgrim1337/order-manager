@@ -1,8 +1,8 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown } from 'lucide-react';
-import { Button } from '@/components/ui/primitives/button';
 import { OrderWithDetails } from '@/types/types';
 import OrderOptions from '../order-options';
+import { formatDate } from '@/helpers/dates';
+import StatusBadge from '@/components/status-badge';
 
 export const columns: ColumnDef<OrderWithDetails>[] = [
   {
@@ -11,54 +11,51 @@ export const columns: ColumnDef<OrderWithDetails>[] = [
   },
   {
     accessorKey: 'startDate',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant={'ghost'}
-          className={'bg-transparent'}
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Data załadunku
-          <ArrowUpDown className='ml-2 h-4 w-4' />
-        </Button>
-      );
-    },
+    accessorFn: (order) => formatDate(order.startDate, 'dd-MM-yyyy'),
+    header: 'Data załadunku',
   },
   {
     accessorKey: 'endDate',
+    accessorFn: (order) => formatDate(order.endDate, 'dd-MM-yyyy'),
     header: 'Data rozładunku',
   },
   {
-    accessorKey: 'loadingPlaces',
-    accessorFn: (order) => order.loadingPlaces[0]?.name,
-    header: 'Miejsca załadunku',
+    accessorKey: 'loadingCity',
+    header: ' Miejsce załadunku',
   },
   {
-    accessorKey: 'unloadingPlaces',
-    accessorFn: (order) => order.unloadingPlaces[0]?.name,
-    header: 'Miejsca rozładunku',
+    accessorKey: 'unloadingCity',
+    header: 'Miejsce rozładunku',
   },
   {
-    accessorKey: 'status.name',
+    accessorKey: 'statusID',
+    cell: ({ row }) => {
+      const statusID = row.getValue('statusID') as number;
+
+      return (
+        <StatusBadge statusID={statusID}> {row.original.status}</StatusBadge>
+      );
+    },
     header: 'Status',
   },
   {
-    accessorKey: 'truck.plate',
+    accessorKey: 'truckID',
+    accessorFn: (order) => order.truck,
     header: 'Pojazd',
   },
   {
-    accessorKey: 'driver',
-    accessorFn: (order) => `${order.driver.firstName} ${order.driver.lastName}`,
+    accessorKey: 'driverID',
+    accessorFn: (order) => order.driver,
     header: 'Kierowca',
   },
   {
-    id: 'customer',
-    accessorKey: 'customer.name',
+    accessorKey: 'customerID',
+    accessorFn: (order) => order.customer,
     header: 'Klient',
   },
   {
     accessorKey: 'priceCurrency',
-    header: () => <div className='text-right'>Cena w walucie</div>,
+    header: 'Cena',
     cell: ({ row }) => {
       const price = parseFloat(row.getValue('priceCurrency'));
       const formatted = new Intl.NumberFormat('pl-PL').format(price);
@@ -68,25 +65,14 @@ export const columns: ColumnDef<OrderWithDetails>[] = [
 
   {
     accessorKey: 'currency',
-    header: () => <div className='text-right'>Waluta</div>,
+    header: 'Waluta',
     cell: ({ row }) => (
       <div className='text-right font-medium'>{row.getValue('currency')}</div>
     ),
   },
   {
     accessorKey: 'pricePLN',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant={'ghost'}
-          className={'bg-transparent'}
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Cena w PLN
-          <ArrowUpDown className='ml-2 h-4 w-4' />
-        </Button>
-      );
-    },
+    header: 'Cena (PLN)',
     cell: ({ row }) => {
       const price = parseFloat(row.getValue('pricePLN'));
 
