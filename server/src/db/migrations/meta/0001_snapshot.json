@@ -1,6 +1,6 @@
 {
-  "id": "ea62dd90-2c35-4963-a463-95fdb9056769",
-  "prevId": "45af602d-e44b-4116-a30d-48fd59c41d40",
+  "id": "8393f37c-2b05-4d9c-b5d1-5d4d8faf02dd",
+  "prevId": "5dc6b95a-2e65-4597-8f7c-c8b400c487c1",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -719,6 +719,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
@@ -729,6 +735,13 @@
           "name": "users_username_unique",
           "columns": [
             "username"
+          ],
+          "nullsNotDistinct": false
+        },
+        "users_token_unique": {
+          "name": "users_token_unique",
+          "columns": [
+            "token"
           ],
           "nullsNotDistinct": false
         }

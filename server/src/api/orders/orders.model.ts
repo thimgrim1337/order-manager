@@ -29,14 +29,16 @@ export const Order = createInsertSchema(order, {
 });
 export type Order = z.infer<typeof Order>;
 
-export const OrderWithId = createSelectSchema(order);
-export type OrderWithId = z.infer<typeof OrderWithId>;
-
 export const OrderWithPlaces = Order.extend({
   loadingPlaces: Places,
   unloadingPlaces: Places,
 });
 export type OrderWithPlaces = z.infer<typeof OrderWithPlaces>;
+
+export const OrderWithId = createSelectSchema(order, {
+  truckID: z.coerce.number(),
+});
+export type OrderWithId = z.infer<typeof OrderWithId>;
 
 export const OrderWithIdAndPlaces = Order.extend({
   loadingPlaces: Places,
@@ -44,7 +46,7 @@ export const OrderWithIdAndPlaces = Order.extend({
 }).required({ id: true });
 export type OrderWithIdAndPlaces = z.infer<typeof OrderWithIdAndPlaces>;
 
-export const OrderWithIdAndDetails = Order.extend({
+export const OrderWithIdAndDetails = OrderWithId.extend({
   status: z.string().min(1),
   truck: z.string().min(1),
   driver: z.string().min(1),
@@ -58,7 +60,7 @@ export type OrderWithIdAndDetails = z.infer<typeof OrderWithIdAndDetails>;
 
 export const OrderFilters = z
   .object({
-    ...Order.shape,
+    ...OrderWithId.shape,
     ...PaginationParams.shape,
     ...SortParams.shape,
     globalFilters: z.string(),

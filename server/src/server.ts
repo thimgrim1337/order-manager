@@ -4,6 +4,7 @@ import { error } from './middleware/error';
 import api from './api/index';
 import env from './env';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -15,6 +16,7 @@ const app = express();
 app.use(urlencoded({ extended: true }));
 app.use(json());
 app.use(cors());
+app.use(cookieParser());
 
 app.use('/api/v1', api);
 

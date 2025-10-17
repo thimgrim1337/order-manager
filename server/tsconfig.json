@@ -13,12 +13,12 @@
     "skipLibCheck": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitAny": true,
-
-    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
+
   "tsc-alias": {
     "resolveFullPaths": true,
     "verbose": false

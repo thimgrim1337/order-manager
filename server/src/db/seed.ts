@@ -39,9 +39,9 @@ await seeds.driver(db);
 await seeds.truck(db);
 await seeds.status(db);
 await seeds.country(db);
-await seeds.city(db);
-await seeds.order(db);
-await seeds.loadingPlaces(db);
-await seeds.unloadingPlaces(db);
+// await seeds.city(db);
+// await seeds.order(db);
+// await seeds.loadingPlaces(db);
+// await seeds.unloadingPlaces(db);
 
 await connection.end();

@@ -75,7 +75,9 @@ CREATE TABLE "users" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"username" text NOT NULL,
 	"password" text NOT NULL,
-	CONSTRAINT "users_username_unique" UNIQUE("username")
+	"token" text,
+	CONSTRAINT "users_username_unique" UNIQUE("username"),
+	CONSTRAINT "users_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
 ALTER TABLE "cities" ADD CONSTRAINT "cities_country_id_countries_id_fk" FOREIGN KEY ("country_id") REFERENCES "public"."countries"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
